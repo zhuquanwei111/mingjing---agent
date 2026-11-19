@@ -1,0 +1,35 @@
+{
+  "trace_id": "693056c4e934c14039d43774d5724507",
+  "span_chain": [
+    "StartWorkflow:Gateway",
+    "mingjing.api.submit",
+    "RunWorkflow:Gateway",
+    "StartActivity:p1-agent.approval",
+    "RunActivity:p1-agent.approval",
+    "HandleSignal:approve",
+    "StartActivity:p1-agent.approval",
+    "RunActivity:p1-agent.approval",
+    "StartActivity:p1-agent.tool",
+    "mingjing.tool",
+    "mingjing.agent_tool",
+    "RunActivity:p1-agent.tool",
+    "CompleteWorkflow:Gateway"
+  ],
+  "ids": {
+    "task_id": "6b9c6cd4-6216-4ef6-869e-a4bd547877d7",
+    "operation_id": "f11b186e-f5e2-4935-9d09-1373456c0f63",
+    "attempt_id": "01a1f2c4-31fa-7047-8122-ef95ab57f7c4:3:1",
+    "run_id": "a24fc071-8683-4778-a715-0ebc035566a8",
+    "workflow_id": "p1-6b9c6cd4-6216-4ef6-869e-a4bd547877d7",
+    "artifact_id": "6b9c6cd4-6216-4ef6-869e-a4bd547877d7:1",
+    "outcome": "succeeded"
+  },
+  "audit_codes": [
+    "approval_accepted",
+    "execution_allowed",
+    "committed"
+  ],
+  "export_failure": "injected",
+  "receipt_persisted": true,
+  "audit_persisted": true
+}

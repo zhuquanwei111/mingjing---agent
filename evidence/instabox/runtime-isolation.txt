@@ -1,0 +1,9 @@
+internal_network=true
+/mingjing-p1-local-3bcf6cb7-db-1 published_ports=0
+/mingjing-p1-local-3bcf6cb7-temporal-1 published_ports=0
+/mingjing-p1-local-3bcf6cb7-early published_ports=0
+/mingjing-p1-local-3bcf6cb7-middle published_ports=0
+/mingjing-p1-local-3bcf6cb7-at08 published_ports=0
+/mingjing-p1-local-3bcf6cb7-at09-11-12 published_ports=0
+/mingjing-p1-local-3bcf6cb7-at10 published_ports=0
+MINGJING_ENV=p1 MINGJING_MODEL=fake LANGSMITH_TRACING=false LANGCHAIN_TRACING_V2=false OTEL_TRACES_EXPORTER=none

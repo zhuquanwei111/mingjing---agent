@@ -1,0 +1,34 @@
+--- .p1/revision/at09-11-12/src/mingjing_p1/temporal/probes.py	2026-11-19 07:40:33.000000000 +0000
++++ .p1/revision/at10/src/mingjing_p1/temporal/probes.py	2026-11-19 07:44:35.000000000 +0000
+@@ -4,10 +4,9 @@
+ import json
+ import os
+ import sys
+-from datetime import datetime, timedelta
++from datetime import timedelta
+ from importlib.metadata import version
+ from pathlib import Path
+-from uuid import UUID
+ 
+ from temporalio import activity, workflow
+ from temporalio.client import Client, WorkflowHistory
+@@ -23,9 +22,10 @@
+     from temporalio.contrib.workflow_streams import WorkflowStream
+     from temporalio.langgraph import LangGraphPlugin, cache, graph
+     from temporalio.langgraph import entrypoint as workflow_entrypoint
++    import temporalio.langgraph as integration
+ 
+     from mingjing_p1.temporal.activities import barrier
+-    from mingjing_p1.temporal.probe_models import Cursor, Detail, StreamInput, TypedInput
++    from mingjing_p1.temporal.probe_models import Cursor, StreamInput, TypedInput
+     from mingjing_p1.temporal.workflows import RETRY
+ 
+ 
+@@ -192,6 +192,7 @@
+ async def run() -> None:
+     mode = os.environ["P1_PROBE_MODE"]
+     print(f"PLUGIN_VERSION {version('temporalio-langgraph')}", flush=True)
++    print(f"PLUGIN_MODULE {integration.__file__}", flush=True)
+     if len(sys.argv) > 1 and sys.argv[1] == "replay":
+         result = await replay(mode, sys.argv[2], Path(sys.argv[3]))
+         failure = result.replay_failure

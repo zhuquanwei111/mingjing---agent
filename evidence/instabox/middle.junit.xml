@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="1" skipped="0" tests="6" time="43.793" timestamp="2026-11-19T07:38:09.657450+00:00" hostname="d812dbaa5763"><testcase classname="tests.test_at03_at05" name="test_at03_commit_before_ack_and_unknown_external" time="17.305" /><testcase classname="tests.test_at03_at05" name="test_at04_approval_revocation_publication_and_store_failure" time="6.009" /><testcase classname="tests.test_at03_at05" name="test_at05_cancellation_before_during_and_after_commit" time="4.006" /><testcase classname="tests.test_at06_at08" name="test_at06_agent_bounds" time="5.509" /><testcase classname="tests.test_at06_at08" name="test_at07_parallel_budget_and_unknown_settlement" time="9.391" /><testcase classname="tests.test_at06_at08" name="test_at08_artifact_versions_and_current_permissions" time="1.406"><failure message="KeyError: 'MINGJING_ARTIFACT_DIR'">rig = &lt;conftest.Harness object at 0x7fe883abf770&gt;
+
+    def test_at08_artifact_versions_and_current_permissions(rig):
+        async def run():
+            api = await rig.api()
+            result = api.submit("direct", "first-version", key="artifact")
+            with storage.connect() as connection:
+                task = storage.for_update(connection, result["task_id"])
+                version2 = storage.add_artifact(connection, task, 2, "second-version")
+            first = api.request("GET", f"/artifacts/{result['artifact_id']}")
+            second = api.request("GET", f"/artifacts/{version2}")
+            assert first[0] == second[0] == 200
+            assert [first[1]["version"], second[1]["version"]] == [1, 2]
+            assert first[1]["sha256"] != second[1]["sha256"]
+            assert api.submit("direct", "first-version", key="artifact") == result
+            with pytest.raises(Rejected, match="artifact_version_conflict"):
+                with storage.connect() as connection:
+                    task = storage.for_update(connection, result["task_id"])
+                    storage.add_artifact(connection, task, 1, "different-value")
+            assert api.request("GET", f"/artifacts/{result['artifact_id']}") == first
+            foreign = api.request("GET", f"/artifacts/{result['artifact_id']}", who="other")
+            assert foreign[0] == 404
+            rig.grant("read", False)
+            revoked = api.request("GET", f"/artifacts/{result['artifact_id']}")
+            assert revoked[0] == 403
+            evidence("AT08", {"versions": [first[1], second[1]], "tenant_denial": foreign[0],
+                              "revocation_denial": revoked[0], "same_version_overwrite": "rejected"})
+    
+&gt;       asyncio.run(run())
+
+tests/test_at06_at08.py:114: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/usr/local/lib/python3.12/asyncio/runners.py:195: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+/usr/local/lib/python3.12/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/local/lib/python3.12/asyncio/base_events.py:691: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_at06_at08.py:94: in run
+    version2 = storage.add_artifact(connection, task, 2, "second-version")
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/mingjing_p1/storage.py:177: in add_artifact
+    folder = Path(os.environ["MINGJING_ARTIFACT_DIR"])
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = environ({'PATH': '/usr/local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin', 'HOSTNAME': 'd812dbaa5...'9.2.0', 'PYTEST_CURRENT_TEST': 'tests/test_at06_at08.py::test_at08_artifact_versions_and_current_permissions (call)'})
+key = 'MINGJING_ARTIFACT_DIR'
+
+&gt;   ???
+E   KeyError: 'MINGJING_ARTIFACT_DIR'
+
+&lt;frozen os&gt;:715: KeyError</failure></testcase></testsuite></testsuites>

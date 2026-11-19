@@ -1,0 +1,24 @@
+{
+  "waiting": "cancelled",
+  "child": "cancelled",
+  "heartbeat_cancel_observed": true,
+  "after_commit_product_state": {
+    "task_id": "368eeccc-005b-4f06-8ea8-6eefbe7e6ff5",
+    "run_id": "5767638c-4a66-4e1b-9b74-dca6d12417aa",
+    "workflow_id": "p1-368eeccc-005b-4f06-8ea8-6eefbe7e6ff5",
+    "operation_id": "959ca8ae-866f-477a-a78d-61fa5433fed8",
+    "status": "succeeded",
+    "cancel_requested": true,
+    "result": {
+      "state": "succeeded",
+      "value": "marker",
+      "run_id": "5767638c-4a66-4e1b-9b74-dca6d12417aa",
+      "task_id": "368eeccc-005b-4f06-8ea8-6eefbe7e6ff5",
+      "attempt_id": "01a1f2be-3c94-7c6b-96e9-3ed514f54cd2:1:1",
+      "artifact_id": "368eeccc-005b-4f06-8ea8-6eefbe7e6ff5:1",
+      "workflow_id": "p1-368eeccc-005b-4f06-8ea8-6eefbe7e6ff5",
+      "operation_id": "959ca8ae-866f-477a-a78d-61fa5433fed8",
+      "schema_version": 1
+    }
+  }
+}

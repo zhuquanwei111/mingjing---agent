@@ -1,0 +1,18 @@
+Source and rebuilt projects: mingjing-p1-local-3bcf6cb7 mingjing-p1-local-8dbf9696
+Restored PostgreSQL version: postgres (PostgreSQL) 17.12
+ Container mingjing-p1-local-8dbf9696-namespace-run-46776c01db7d Creating 
+ Container mingjing-p1-local-8dbf9696-namespace-run-46776c01db7d Created 
+SERVING
+Rebuilt network internal: true
+Backup SHA-256: 8e436986b55f18bf1871dd783f93bc129f95be200e7ea6994224e3e00ac1099f
+identical source/restore table, count, content checksum
+accounts|16|05f8a7e2718a0ce9bcca501edb9a7b82
+grants|56|639aa3dff6c1383f8746e6c93e7591d7
+published|64|b17f149f97254944499439f3517f2fb1
+tasks|23|955e2605b226d2974e19321a47f46bff
+approvals|17|73bd8e3fb8fbebc6a423e23ec7a36cc3
+receipts|11|378f1d90f7fe2a06349a4c54b5f88b39
+markers|8|6a7dec9464054d0c712d9552df884f91
+artifacts|8|d211b36afc4ad71359f5fb342ca8aea3
+attempts|17|687f807e74df02310d5da65944129f04
+audit|65|9e326ff8a1fc37084c8481a170a90b70

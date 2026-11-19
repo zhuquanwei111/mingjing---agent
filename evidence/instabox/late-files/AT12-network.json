@@ -1,0 +1,11 @@
+{
+  "database": {
+    "role": "p1_app",
+    "database": "mingjing",
+    "version": "17.12"
+  },
+  "temporal_db_connect": false,
+  "temporal_visibility_connect": false,
+  "runner_uid": 10101,
+  "external_route": "blocked"
+}

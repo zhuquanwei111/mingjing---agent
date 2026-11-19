@@ -1,0 +1,9 @@
+{
+  "worker_exit": -9,
+  "activity_types": [
+    "p1-agent.approval",
+    "p1-agent.approval",
+    "p1-agent.tool"
+  ],
+  "state": "succeeded"
+}
