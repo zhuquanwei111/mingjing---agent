@@ -1,0 +1,16 @@
+{
+  "old_worker_exit": -9,
+  "signals": 3,
+  "accepted_decisions": 1,
+  "result": {
+    "artifact_id": "f6c4de41-688f-459d-ad97-411ef9bce8c3:1",
+    "attempt_id": "01a1f2c9-b112-78fa-8fcd-c9e0c6296f53:1:1",
+    "operation_id": "44cbd35e-2aba-4762-b2bb-bf3ea1964c77",
+    "run_id": "7d98e88f-6de4-4cd3-b15a-581ace909b9b",
+    "schema_version": 1,
+    "state": "succeeded",
+    "task_id": "f6c4de41-688f-459d-ad97-411ef9bce8c3",
+    "value": "marker",
+    "workflow_id": "p1-f6c4de41-688f-459d-ad97-411ef9bce8c3"
+  }
+}

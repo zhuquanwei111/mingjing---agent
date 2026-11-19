@@ -1,0 +1,21 @@
+{
+  "worker_builds": [
+    [
+      "plugin-0-1-0"
+    ],
+    [
+      "plugin-1-0-0"
+    ],
+    [
+      "plugin-0-1-0"
+    ]
+  ],
+  "activity_counts": [
+    1,
+    2
+  ],
+  "same_version": "passed",
+  "forward_in_place": "NondeterminismError",
+  "rollback_in_place": "NondeterminismError",
+  "node_rename": "NondeterminismError"
+}

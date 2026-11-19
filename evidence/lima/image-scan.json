@@ -1,0 +1,1315 @@
+{
+  "scanner": "Trivy 0.76.2",
+  "scan_date": "2026-11-19",
+  "platform": "linux/arm64",
+  "scope": "Selected OCI images and local test runner, OS and library HIGH/CRITICAL findings",
+  "images": {
+    "server": {
+      "image": "docker.io/temporalio/server@sha256:7bf69188a6232fea14869b9cef3d94aa82a1601d99517f7e86c71f22da4e0670",
+      "image_id": "sha256:7bf69188a6232fea14869b9cef3d94aa82a1601d99517f7e86c71f22da4e0670",
+      "sbom_components": 189,
+      "finding_rows": {
+        "HIGH": 2
+      },
+      "unique_ids": {
+        "HIGH": 2
+      },
+      "findings": [
+        {
+          "id": "CVE-2026-78661",
+          "severity": "HIGH",
+          "target": "usr/local/bin/temporal-server",
+          "package": "golang.org/x/net",
+          "installed": "v0.60.0",
+          "fixed": "0.62.0",
+          "advisory": "https://avd.aquasec.com/nvd/cve-2026-78661"
+        },
+        {
+          "id": "CVE-2026-97054",
+          "severity": "HIGH",
+          "target": "usr/local/bin/temporal-server",
+          "package": "stdlib",
+          "installed": "v1.26.10",
+          "fixed": "1.26.11, 1.27.4",
+          "advisory": "https://avd.aquasec.com/nvd/cve-2026-97054"
+        }
+      ]
+    },
+    "admin": {
+      "image": "docker.io/temporalio/admin-tools@sha256:4a95866efba29d7e17ab012df5232795e8b0ad0f7d5f9d1ec4df321f7792a754",
+      "image_id": "sha256:4a95866efba29d7e17ab012df5232795e8b0ad0f7d5f9d1ec4df321f7792a754",
+      "sbom_components": 669,
+      "finding_rows": {
+        "HIGH": 9
+      },
+      "unique_ids": {
+        "HIGH": 2
+      },
+      "findings": [
+        {
+          "id": "CVE-2026-78661",
+          "severity": "HIGH",
+          "target": "usr/local/bin/tdbg",
+          "package": "golang.org/x/net",
+          "installed": "v0.60.0",
+          "fixed": "0.62.0",
+          "advisory": "https://avd.aquasec.com/nvd/cve-2026-78661"
+        },
+        {
+          "id": "CVE-2026-97054",
+          "severity": "HIGH",
+          "target": "usr/local/bin/tdbg",
+          "package": "stdlib",
+          "installed": "v1.26.10",
+          "fixed": "1.26.11, 1.27.4",
+          "advisory": "https://avd.aquasec.com/nvd/cve-2026-97054"
+        },
+        {
+          "id": "CVE-2026-97054",
+          "severity": "HIGH",
+          "target": "usr/local/bin/temporal",
+          "package": "stdlib",
+          "installed": "v1.26.10",
+          "fixed": "1.26.11, 1.27.4",
+          "advisory": "https://avd.aquasec.com/nvd/cve-2026-97054"
+        },
+        {
+          "id": "CVE-2026-78661",
+          "severity": "HIGH",
+          "target": "usr/local/bin/temporal-cassandra-tool",
+          "package": "golang.org/x/net",
+          "installed": "v0.60.0",
+          "fixed": "0.62.0",
+          "advisory": "https://avd.aquasec.com/nvd/cve-2026-78661"
+        },
+        {
+          "id": "CVE-2026-97054",
+          "severity": "HIGH",
+          "target": "usr/local/bin/temporal-cassandra-tool",
+          "package": "stdlib",
+          "installed": "v1.26.10",
+          "fixed": "1.26.11, 1.27.4",
+          "advisory": "https://avd.aquasec.com/nvd/cve-2026-97054"
+        },
+        {
+          "id": "CVE-2026-78661",
+          "severity": "HIGH",
+          "target": "usr/local/bin/temporal-elasticsearch-tool",
+          "package": "golang.org/x/net",
+          "installed": "v0.60.0",
+          "fixed": "0.62.0",
+          "advisory": "https://avd.aquasec.com/nvd/cve-2026-78661"
+        },
+        {
+          "id": "CVE-2026-97054",
+          "severity": "HIGH",
+          "target": "usr/local/bin/temporal-elasticsearch-tool",
+          "package": "stdlib",
+          "installed": "v1.26.10",
+          "fixed": "1.26.11, 1.27.4",
+          "advisory": "https://avd.aquasec.com/nvd/cve-2026-97054"
+        },
+        {
+          "id": "CVE-2026-78661",
+          "severity": "HIGH",
+          "target": "usr/local/bin/temporal-sql-tool",
+          "package": "golang.org/x/net",
+          "installed": "v0.60.0",
+          "fixed": "0.62.0",
+          "advisory": "https://avd.aquasec.com/nvd/cve-2026-78661"
+        },
+        {
+          "id": "CVE-2026-97054",
+          "severity": "HIGH",
+          "target": "usr/local/bin/temporal-sql-tool",
+          "package": "stdlib",
+          "installed": "v1.26.10",
+          "fixed": "1.26.11, 1.27.4",
+          "advisory": "https://avd.aquasec.com/nvd/cve-2026-97054"
+        }
+      ]
+    },
+    "postgres": {
+      "image": "docker.io/library/postgres@sha256:526f86d93c6ea08fd3f1fe5605650cacc781b2c6013169a0ad8f42c7d3d84f32",
+      "image_id": "sha256:526f86d93c6ea08fd3f1fe5605650cacc781b2c6013169a0ad8f42c7d3d84f32",
+      "sbom_components": 51,
+      "finding_rows": {
+        "CRITICAL": 1,
+        "HIGH": 26
+      },
+      "unique_ids": {
+        "HIGH": 26,
+        "CRITICAL": 1
+      },
+      "findings": [
+        {
+          "id": "CVE-2025-68121",
+          "severity": "CRITICAL",
+          "target": "usr/local/bin/gosu",
+          "package": "stdlib",
+          "installed": "v1.24.6",
+          "fixed": "1.24.13, 1.25.7, 1.26.0-rc.3",
+          "advisory": "https://avd.aquasec.com/nvd/cve-2025-68121"
+        },
+        {
+          "id": "CVE-2025-61726",
+          "severity": "HIGH",
+          "target": "usr/local/bin/gosu",
+          "package": "stdlib",
+          "installed": "v1.24.6",
+          "fixed": "1.24.12, 1.25.6",
+          "advisory": "https://avd.aquasec.com/nvd/cve-2025-61726"
+        },
+        {
+          "id": "CVE-2025-61729",
+          "severity": "HIGH",
+          "target": "usr/local/bin/gosu",
+          "package": "stdlib",
+          "installed": "v1.24.6",
+          "fixed": "1.24.11, 1.25.5",
+          "advisory": "https://avd.aquasec.com/nvd/cve-2025-61729"
+        },
+        {
+          "id": "CVE-2026-111943",
+          "severity": "HIGH",
+          "target": "usr/local/bin/gosu",
+          "package": "stdlib",
+          "installed": "v1.24.6",
+          "fixed": "1.26.10, 1.27.3",
+          "advisory": "https://avd.aquasec.com/nvd/cve-2026-111943"
+        },
+        {
+          "id": "CVE-2026-25679",
+          "severity": "HIGH",
+          "target": "usr/local/bin/gosu",
+          "package": "stdlib",
+          "installed": "v1.24.6",
+          "fixed": "1.25.8, 1.26.1",
+          "advisory": "https://avd.aquasec.com/nvd/cve-2026-25679"
+        },
+        {
+          "id": "CVE-2026-27145",
+          "severity": "HIGH",
+          "target": "usr/local/bin/gosu",
+          "package": "stdlib",
+          "installed": "v1.24.6",
+          "fixed": "1.25.11, 1.26.4",
+          "advisory": "https://avd.aquasec.com/nvd/cve-2026-27145"
+        },
+        {
+          "id": "CVE-2026-32280",
+          "severity": "HIGH",
+          "target": "usr/local/bin/gosu",
+          "package": "stdlib",
+          "installed": "v1.24.6",
+          "fixed": "1.25.9, 1.26.2",
+          "advisory": "https://avd.aquasec.com/nvd/cve-2026-32280"
+        },
+        {
+          "id": "CVE-2026-32281",
+          "severity": "HIGH",
+          "target": "usr/local/bin/gosu",
+          "package": "stdlib",
+          "installed": "v1.24.6",
+          "fixed": "1.25.9, 1.26.2",
+          "advisory": "https://avd.aquasec.com/nvd/cve-2026-32281"
+        },
+        {
+          "id": "CVE-2026-32283",
+          "severity": "HIGH",
+          "target": "usr/local/bin/gosu",
+          "package": "stdlib",
+          "installed": "v1.24.6",
+          "fixed": "1.25.9, 1.26.2",
+          "advisory": "https://avd.aquasec.com/nvd/cve-2026-32283"
+        },
+        {
+          "id": "CVE-2026-33811",
+          "severity": "HIGH",
+          "target": "usr/local/bin/gosu",
+          "package": "stdlib",
+          "installed": "v1.24.6",
+          "fixed": "1.25.10, 1.26.3",
+          "advisory": "https://avd.aquasec.com/nvd/cve-2026-33811"
+        },
+        {
+          "id": "CVE-2026-33814",
+          "severity": "HIGH",
+          "target": "usr/local/bin/gosu",
+          "package": "stdlib",
+          "installed": "v1.24.6",
+          "fixed": "1.25.10, 1.26.3",
+          "advisory": "https://avd.aquasec.com/nvd/cve-2026-33814"
+        },
+        {
+          "id": "CVE-2026-33818",
+          "severity": "HIGH",
+          "target": "usr/local/bin/gosu",
+          "package": "stdlib",
+          "installed": "v1.24.6",
+          "fixed": "1.25.13, 1.26.6, 1.27.0-rc.3",
+          "advisory": "https://avd.aquasec.com/nvd/cve-2026-33818"
+        },
+        {
+          "id": "CVE-2026-39820",
+          "severity": "HIGH",
+          "target": "usr/local/bin/gosu",
+          "package": "stdlib",
+          "installed": "v1.24.6",
+          "fixed": "1.25.10, 1.26.3",
+          "advisory": "https://avd.aquasec.com/nvd/cve-2026-39820"
+        },
+        {
+          "id": "CVE-2026-39821",
+          "severity": "HIGH",
+          "target": "usr/local/bin/gosu",
+          "package": "stdlib",
+          "installed": "v1.24.6",
+          "fixed": "1.25.13, 1.26.6, 1.27.0-rc.3",
+          "advisory": "https://avd.aquasec.com/nvd/cve-2026-39821"
+        },
+        {
+          "id": "CVE-2026-39822",
+          "severity": "HIGH",
+          "target": "usr/local/bin/gosu",
+          "package": "stdlib",
+          "installed": "v1.24.6",
+          "fixed": "1.25.12, 1.26.5, 1.27.0-rc.2",
+          "advisory": "https://avd.aquasec.com/nvd/cve-2026-39822"
+        },
+        {
+          "id": "CVE-2026-39836",
+          "severity": "HIGH",
+          "target": "usr/local/bin/gosu",
+          "package": "stdlib",
+          "installed": "v1.24.6",
+          "fixed": "1.25.10, 1.26.3",
+          "advisory": "https://avd.aquasec.com/nvd/cve-2026-39836"
+        },
+        {
+          "id": "CVE-2026-42499",
+          "severity": "HIGH",
+          "target": "usr/local/bin/gosu",
+          "package": "stdlib",
+          "installed": "v1.24.6",
+          "fixed": "1.25.10, 1.26.3",
+          "advisory": "https://avd.aquasec.com/nvd/cve-2026-42499"
+        },
+        {
+          "id": "CVE-2026-42504",
+          "severity": "HIGH",
+          "target": "usr/local/bin/gosu",
+          "package": "stdlib",
+          "installed": "v1.24.6",
+          "fixed": "1.25.11, 1.26.4",
+          "advisory": "https://avd.aquasec.com/nvd/cve-2026-42504"
+        },
+        {
+          "id": "CVE-2026-56853",
+          "severity": "HIGH",
+          "target": "usr/local/bin/gosu",
+          "package": "stdlib",
+          "installed": "v1.24.6",
+          "fixed": "1.25.13, 1.26.6, 1.27.0-rc.3",
+          "advisory": "https://avd.aquasec.com/nvd/cve-2026-56853"
+        },
+        {
+          "id": "CVE-2026-56858",
+          "severity": "HIGH",
+          "target": "usr/local/bin/gosu",
+          "package": "stdlib",
+          "installed": "v1.24.6",
+          "fixed": "1.25.13, 1.26.6, 1.27.0-rc.3",
+          "advisory": "https://avd.aquasec.com/nvd/cve-2026-56858"
+        },
+        {
+          "id": "CVE-2026-56859",
+          "severity": "HIGH",
+          "target": "usr/local/bin/gosu",
+          "package": "stdlib",
+          "installed": "v1.24.6",
+          "fixed": "1.25.13, 1.26.6, 1.27.0-rc.3",
+          "advisory": "https://avd.aquasec.com/nvd/cve-2026-56859"
+        },
+        {
+          "id": "CVE-2026-56860",
+          "severity": "HIGH",
+          "target": "usr/local/bin/gosu",
+          "package": "stdlib",
+          "installed": "v1.24.6",
+          "fixed": "1.25.13, 1.26.6, 1.27.0-rc.3",
+          "advisory": "https://avd.aquasec.com/nvd/cve-2026-56860"
+        },
+        {
+          "id": "CVE-2026-56862",
+          "severity": "HIGH",
+          "target": "usr/local/bin/gosu",
+          "package": "stdlib",
+          "installed": "v1.24.6",
+          "fixed": "1.25.13, 1.26.6, 1.27.0-rc.3",
+          "advisory": "https://avd.aquasec.com/nvd/cve-2026-56862"
+        },
+        {
+          "id": "CVE-2026-78667",
+          "severity": "HIGH",
+          "target": "usr/local/bin/gosu",
+          "package": "stdlib",
+          "installed": "v1.24.6",
+          "fixed": "1.26.9, 1.27.2",
+          "advisory": "https://avd.aquasec.com/nvd/cve-2026-78667"
+        },
+        {
+          "id": "CVE-2026-78669",
+          "severity": "HIGH",
+          "target": "usr/local/bin/gosu",
+          "package": "stdlib",
+          "installed": "v1.24.6",
+          "fixed": "1.26.9, 1.27.2",
+          "advisory": "https://avd.aquasec.com/nvd/cve-2026-78669"
+        },
+        {
+          "id": "CVE-2026-97031",
+          "severity": "HIGH",
+          "target": "usr/local/bin/gosu",
+          "package": "stdlib",
+          "installed": "v1.24.6",
+          "fixed": "1.26.9, 1.27.2",
+          "advisory": "https://avd.aquasec.com/nvd/cve-2026-97031"
+        },
+        {
+          "id": "CVE-2026-97054",
+          "severity": "HIGH",
+          "target": "usr/local/bin/gosu",
+          "package": "stdlib",
+          "installed": "v1.24.6",
+          "fixed": "1.26.11, 1.27.4",
+          "advisory": "https://avd.aquasec.com/nvd/cve-2026-97054"
+        }
+      ]
+    },
+    "runner": {
+      "image": "mingjing-p1-local-69432e75-test:latest",
+      "image_id": "sha256:222a0a2d4d8b613ee8c34b58dc517b144c89d59224f27035211b64569f7741f6",
+      "sbom_components": 956,
+      "finding_rows": {
+        "HIGH": 99,
+        "CRITICAL": 2
+      },
+      "unique_ids": {
+        "HIGH": 29,
+        "CRITICAL": 2
+      },
+      "findings": [
+        {
+          "id": "CVE-2026-53613",
+          "severity": "HIGH",
+          "target": "mingjing-p1-local-69432e75-test:latest (debian 12.15)",
+          "package": "bsdutils",
+          "installed": "1:2.38.1-5+deb12u3",
+          "fixed": null,
+          "advisory": "https://avd.aquasec.com/nvd/cve-2026-53613"
+        },
+        {
+          "id": "CVE-2026-53615",
+          "severity": "HIGH",
+          "target": "mingjing-p1-local-69432e75-test:latest (debian 12.15)",
+          "package": "bsdutils",
+          "installed": "1:2.38.1-5+deb12u3",
+          "fixed": null,
+          "advisory": "https://avd.aquasec.com/nvd/cve-2026-53615"
+        },
+        {
+          "id": "CVE-2026-78410",
+          "severity": "HIGH",
+          "target": "mingjing-p1-local-69432e75-test:latest (debian 12.15)",
+          "package": "bsdutils",
+          "installed": "1:2.38.1-5+deb12u3",
+          "fixed": null,
+          "advisory": "https://avd.aquasec.com/nvd/cve-2026-78410"
+        },
+        {
+          "id": "CVE-2026-41992",
+          "severity": "HIGH",
+          "target": "mingjing-p1-local-69432e75-test:latest (debian 12.15)",
+          "package": "gzip",
+          "installed": "1.12-1",
+          "fixed": null,
+          "advisory": "https://avd.aquasec.com/nvd/cve-2026-41992"
+        },
+        {
+          "id": "CVE-2026-54369",
+          "severity": "HIGH",
+          "target": "mingjing-p1-local-69432e75-test:latest (debian 12.15)",
+          "package": "libacl1",
+          "installed": "2.3.1-3",
+          "fixed": null,
+          "advisory": "https://avd.aquasec.com/nvd/cve-2026-54369"
+        },
+        {
+          "id": "CVE-2026-53613",
+          "severity": "HIGH",
+          "target": "mingjing-p1-local-69432e75-test:latest (debian 12.15)",
+          "package": "libblkid1",
+          "installed": "2.38.1-5+deb12u3",
+          "fixed": null,
+          "advisory": "https://avd.aquasec.com/nvd/cve-2026-53613"
+        },
+        {
+          "id": "CVE-2026-53615",
+          "severity": "HIGH",
+          "target": "mingjing-p1-local-69432e75-test:latest (debian 12.15)",
+          "package": "libblkid1",
+          "installed": "2.38.1-5+deb12u3",
+          "fixed": null,
+          "advisory": "https://avd.aquasec.com/nvd/cve-2026-53615"
+        },
+        {
+          "id": "CVE-2026-78410",
+          "severity": "HIGH",
+          "target": "mingjing-p1-local-69432e75-test:latest (debian 12.15)",
+          "package": "libblkid1",
+          "installed": "2.38.1-5+deb12u3",
+          "fixed": null,
+          "advisory": "https://avd.aquasec.com/nvd/cve-2026-78410"
+        },
+        {
+          "id": "CVE-2026-107364",
+          "severity": "HIGH",
+          "target": "mingjing-p1-local-69432e75-test:latest (debian 12.15)",
+          "package": "libgssapi-krb5-2",
+          "installed": "1.20.1-2+deb12u5",
+          "fixed": null,
+          "advisory": "https://avd.aquasec.com/nvd/cve-2026-107364"
+        },
+        {
+          "id": "CVE-2026-112315",
+          "severity": "HIGH",
+          "target": "mingjing-p1-local-69432e75-test:latest (debian 12.15)",
+          "package": "libgssapi-krb5-2",
+          "installed": "1.20.1-2+deb12u5",
+          "fixed": null,
+          "advisory": "https://avd.aquasec.com/nvd/cve-2026-112315"
+        },
+        {
+          "id": "CVE-2026-112316",
+          "severity": "HIGH",
+          "target": "mingjing-p1-local-69432e75-test:latest (debian 12.15)",
+          "package": "libgssapi-krb5-2",
+          "installed": "1.20.1-2+deb12u5",
+          "fixed": null,
+          "advisory": "https://avd.aquasec.com/nvd/cve-2026-112316"
+        },
+        {
+          "id": "CVE-2026-112317",
+          "severity": "HIGH",
+          "target": "mingjing-p1-local-69432e75-test:latest (debian 12.15)",
+          "package": "libgssapi-krb5-2",
+          "installed": "1.20.1-2+deb12u5",
+          "fixed": null,
+          "advisory": "https://avd.aquasec.com/nvd/cve-2026-112317"
+        },
+        {
+          "id": "CVE-2026-112318",
+          "severity": "HIGH",
+          "target": "mingjing-p1-local-69432e75-test:latest (debian 12.15)",
+          "package": "libgssapi-krb5-2",
+          "installed": "1.20.1-2+deb12u5",
+          "fixed": null,
+          "advisory": "https://avd.aquasec.com/nvd/cve-2026-112318"
+        },
+        {
+          "id": "CVE-2026-112319",
+          "severity": "HIGH",
+          "target": "mingjing-p1-local-69432e75-test:latest (debian 12.15)",
+          "package": "libgssapi-krb5-2",
+          "installed": "1.20.1-2+deb12u5",
+          "fixed": null,
+          "advisory": "https://avd.aquasec.com/nvd/cve-2026-112319"
+        },
+        {
+          "id": "CVE-2026-112320",
+          "severity": "HIGH",
+          "target": "mingjing-p1-local-69432e75-test:latest (debian 12.15)",
+          "package": "libgssapi-krb5-2",
+          "installed": "1.20.1-2+deb12u5",
+          "fixed": null,
+          "advisory": "https://avd.aquasec.com/nvd/cve-2026-112320"
+        },
+        {
+          "id": "CVE-2026-112321",
+          "severity": "HIGH",
+          "target": "mingjing-p1-local-69432e75-test:latest (debian 12.15)",
+          "package": "libgssapi-krb5-2",
+          "installed": "1.20.1-2+deb12u5",
+          "fixed": null,
+          "advisory": "https://avd.aquasec.com/nvd/cve-2026-112321"
+        },
+        {
+          "id": "CVE-2026-112322",
+          "severity": "HIGH",
+          "target": "mingjing-p1-local-69432e75-test:latest (debian 12.15)",
+          "package": "libgssapi-krb5-2",
+          "installed": "1.20.1-2+deb12u5",
+          "fixed": null,
+          "advisory": "https://avd.aquasec.com/nvd/cve-2026-112322"
+        },
+        {
+          "id": "CVE-2026-112323",
+          "severity": "HIGH",
+          "target": "mingjing-p1-local-69432e75-test:latest (debian 12.15)",
+          "package": "libgssapi-krb5-2",
+          "installed": "1.20.1-2+deb12u5",
+          "fixed": null,
+          "advisory": "https://avd.aquasec.com/nvd/cve-2026-112323"
+        },
+        {
+          "id": "CVE-2026-118380",
+          "severity": "HIGH",
+          "target": "mingjing-p1-local-69432e75-test:latest (debian 12.15)",
+          "package": "libgssapi-krb5-2",
+          "installed": "1.20.1-2+deb12u5",
+          "fixed": null,
+          "advisory": "https://avd.aquasec.com/nvd/cve-2026-118380"
+        },
+        {
+          "id": "CVE-2026-119079",
+          "severity": "HIGH",
+          "target": "mingjing-p1-local-69432e75-test:latest (debian 12.15)",
+          "package": "libgssapi-krb5-2",
+          "installed": "1.20.1-2+deb12u5",
+          "fixed": null,
+          "advisory": "https://avd.aquasec.com/nvd/cve-2026-119079"
+        },
+        {
+          "id": "CVE-2026-71199",
+          "severity": "HIGH",
+          "target": "mingjing-p1-local-69432e75-test:latest (debian 12.15)",
+          "package": "libgssapi-krb5-2",
+          "installed": "1.20.1-2+deb12u5",
+          "fixed": null,
+          "advisory": "https://avd.aquasec.com/nvd/cve-2026-71199"
+        },
+        {
+          "id": "CVE-2026-71200",
+          "severity": "HIGH",
+          "target": "mingjing-p1-local-69432e75-test:latest (debian 12.15)",
+          "package": "libgssapi-krb5-2",
+          "installed": "1.20.1-2+deb12u5",
+          "fixed": null,
+          "advisory": "https://avd.aquasec.com/nvd/cve-2026-71200"
+        },
+        {
+          "id": "CVE-2026-107364",
+          "severity": "HIGH",
+          "target": "mingjing-p1-local-69432e75-test:latest (debian 12.15)",
+          "package": "libk5crypto3",
+          "installed": "1.20.1-2+deb12u5",
+          "fixed": null,
+          "advisory": "https://avd.aquasec.com/nvd/cve-2026-107364"
+        },
+        {
+          "id": "CVE-2026-112315",
+          "severity": "HIGH",
+          "target": "mingjing-p1-local-69432e75-test:latest (debian 12.15)",
+          "package": "libk5crypto3",
+          "installed": "1.20.1-2+deb12u5",
+          "fixed": null,
+          "advisory": "https://avd.aquasec.com/nvd/cve-2026-112315"
+        },
+        {
+          "id": "CVE-2026-112316",
+          "severity": "HIGH",
+          "target": "mingjing-p1-local-69432e75-test:latest (debian 12.15)",
+          "package": "libk5crypto3",
+          "installed": "1.20.1-2+deb12u5",
+          "fixed": null,
+          "advisory": "https://avd.aquasec.com/nvd/cve-2026-112316"
+        },
+        {
+          "id": "CVE-2026-112317",
+          "severity": "HIGH",
+          "target": "mingjing-p1-local-69432e75-test:latest (debian 12.15)",
+          "package": "libk5crypto3",
+          "installed": "1.20.1-2+deb12u5",
+          "fixed": null,
+          "advisory": "https://avd.aquasec.com/nvd/cve-2026-112317"
+        },
+        {
+          "id": "CVE-2026-112318",
+          "severity": "HIGH",
+          "target": "mingjing-p1-local-69432e75-test:latest (debian 12.15)",
+          "package": "libk5crypto3",
+          "installed": "1.20.1-2+deb12u5",
+          "fixed": null,
+          "advisory": "https://avd.aquasec.com/nvd/cve-2026-112318"
+        },
+        {
+          "id": "CVE-2026-112319",
+          "severity": "HIGH",
+          "target": "mingjing-p1-local-69432e75-test:latest (debian 12.15)",
+          "package": "libk5crypto3",
+          "installed": "1.20.1-2+deb12u5",
+          "fixed": null,
+          "advisory": "https://avd.aquasec.com/nvd/cve-2026-112319"
+        },
+        {
+          "id": "CVE-2026-112320",
+          "severity": "HIGH",
+          "target": "mingjing-p1-local-69432e75-test:latest (debian 12.15)",
+          "package": "libk5crypto3",
+          "installed": "1.20.1-2+deb12u5",
+          "fixed": null,
+          "advisory": "https://avd.aquasec.com/nvd/cve-2026-112320"
+        },
+        {
+          "id": "CVE-2026-112321",
+          "severity": "HIGH",
+          "target": "mingjing-p1-local-69432e75-test:latest (debian 12.15)",
+          "package": "libk5crypto3",
+          "installed": "1.20.1-2+deb12u5",
+          "fixed": null,
+          "advisory": "https://avd.aquasec.com/nvd/cve-2026-112321"
+        },
+        {
+          "id": "CVE-2026-112322",
+          "severity": "HIGH",
+          "target": "mingjing-p1-local-69432e75-test:latest (debian 12.15)",
+          "package": "libk5crypto3",
+          "installed": "1.20.1-2+deb12u5",
+          "fixed": null,
+          "advisory": "https://avd.aquasec.com/nvd/cve-2026-112322"
+        },
+        {
+          "id": "CVE-2026-112323",
+          "severity": "HIGH",
+          "target": "mingjing-p1-local-69432e75-test:latest (debian 12.15)",
+          "package": "libk5crypto3",
+          "installed": "1.20.1-2+deb12u5",
+          "fixed": null,
+          "advisory": "https://avd.aquasec.com/nvd/cve-2026-112323"
+        },
+        {
+          "id": "CVE-2026-118380",
+          "severity": "HIGH",
+          "target": "mingjing-p1-local-69432e75-test:latest (debian 12.15)",
+          "package": "libk5crypto3",
+          "installed": "1.20.1-2+deb12u5",
+          "fixed": null,
+          "advisory": "https://avd.aquasec.com/nvd/cve-2026-118380"
+        },
+        {
+          "id": "CVE-2026-119079",
+          "severity": "HIGH",
+          "target": "mingjing-p1-local-69432e75-test:latest (debian 12.15)",
+          "package": "libk5crypto3",
+          "installed": "1.20.1-2+deb12u5",
+          "fixed": null,
+          "advisory": "https://avd.aquasec.com/nvd/cve-2026-119079"
+        },
+        {
+          "id": "CVE-2026-71199",
+          "severity": "HIGH",
+          "target": "mingjing-p1-local-69432e75-test:latest (debian 12.15)",
+          "package": "libk5crypto3",
+          "installed": "1.20.1-2+deb12u5",
+          "fixed": null,
+          "advisory": "https://avd.aquasec.com/nvd/cve-2026-71199"
+        },
+        {
+          "id": "CVE-2026-71200",
+          "severity": "HIGH",
+          "target": "mingjing-p1-local-69432e75-test:latest (debian 12.15)",
+          "package": "libk5crypto3",
+          "installed": "1.20.1-2+deb12u5",
+          "fixed": null,
+          "advisory": "https://avd.aquasec.com/nvd/cve-2026-71200"
+        },
+        {
+          "id": "CVE-2026-107364",
+          "severity": "HIGH",
+          "target": "mingjing-p1-local-69432e75-test:latest (debian 12.15)",
+          "package": "libkrb5-3",
+          "installed": "1.20.1-2+deb12u5",
+          "fixed": null,
+          "advisory": "https://avd.aquasec.com/nvd/cve-2026-107364"
+        },
+        {
+          "id": "CVE-2026-112315",
+          "severity": "HIGH",
+          "target": "mingjing-p1-local-69432e75-test:latest (debian 12.15)",
+          "package": "libkrb5-3",
+          "installed": "1.20.1-2+deb12u5",
+          "fixed": null,
+          "advisory": "https://avd.aquasec.com/nvd/cve-2026-112315"
+        },
+        {
+          "id": "CVE-2026-112316",
+          "severity": "HIGH",
+          "target": "mingjing-p1-local-69432e75-test:latest (debian 12.15)",
+          "package": "libkrb5-3",
+          "installed": "1.20.1-2+deb12u5",
+          "fixed": null,
+          "advisory": "https://avd.aquasec.com/nvd/cve-2026-112316"
+        },
+        {
+          "id": "CVE-2026-112317",
+          "severity": "HIGH",
+          "target": "mingjing-p1-local-69432e75-test:latest (debian 12.15)",
+          "package": "libkrb5-3",
+          "installed": "1.20.1-2+deb12u5",
+          "fixed": null,
+          "advisory": "https://avd.aquasec.com/nvd/cve-2026-112317"
+        },
+        {
+          "id": "CVE-2026-112318",
+          "severity": "HIGH",
+          "target": "mingjing-p1-local-69432e75-test:latest (debian 12.15)",
+          "package": "libkrb5-3",
+          "installed": "1.20.1-2+deb12u5",
+          "fixed": null,
+          "advisory": "https://avd.aquasec.com/nvd/cve-2026-112318"
+        },
+        {
+          "id": "CVE-2026-112319",
+          "severity": "HIGH",
+          "target": "mingjing-p1-local-69432e75-test:latest (debian 12.15)",
+          "package": "libkrb5-3",
+          "installed": "1.20.1-2+deb12u5",
+          "fixed": null,
+          "advisory": "https://avd.aquasec.com/nvd/cve-2026-112319"
+        },
+        {
+          "id": "CVE-2026-112320",
+          "severity": "HIGH",
+          "target": "mingjing-p1-local-69432e75-test:latest (debian 12.15)",
+          "package": "libkrb5-3",
+          "installed": "1.20.1-2+deb12u5",
+          "fixed": null,
+          "advisory": "https://avd.aquasec.com/nvd/cve-2026-112320"
+        },
+        {
+          "id": "CVE-2026-112321",
+          "severity": "HIGH",
+          "target": "mingjing-p1-local-69432e75-test:latest (debian 12.15)",
+          "package": "libkrb5-3",
+          "installed": "1.20.1-2+deb12u5",
+          "fixed": null,
+          "advisory": "https://avd.aquasec.com/nvd/cve-2026-112321"
+        },
+        {
+          "id": "CVE-2026-112322",
+          "severity": "HIGH",
+          "target": "mingjing-p1-local-69432e75-test:latest (debian 12.15)",
+          "package": "libkrb5-3",
+          "installed": "1.20.1-2+deb12u5",
+          "fixed": null,
+          "advisory": "https://avd.aquasec.com/nvd/cve-2026-112322"
+        },
+        {
+          "id": "CVE-2026-112323",
+          "severity": "HIGH",
+          "target": "mingjing-p1-local-69432e75-test:latest (debian 12.15)",
+          "package": "libkrb5-3",
+          "installed": "1.20.1-2+deb12u5",
+          "fixed": null,
+          "advisory": "https://avd.aquasec.com/nvd/cve-2026-112323"
+        },
+        {
+          "id": "CVE-2026-118380",
+          "severity": "HIGH",
+          "target": "mingjing-p1-local-69432e75-test:latest (debian 12.15)",
+          "package": "libkrb5-3",
+          "installed": "1.20.1-2+deb12u5",
+          "fixed": null,
+          "advisory": "https://avd.aquasec.com/nvd/cve-2026-118380"
+        },
+        {
+          "id": "CVE-2026-119079",
+          "severity": "HIGH",
+          "target": "mingjing-p1-local-69432e75-test:latest (debian 12.15)",
+          "package": "libkrb5-3",
+          "installed": "1.20.1-2+deb12u5",
+          "fixed": null,
+          "advisory": "https://avd.aquasec.com/nvd/cve-2026-119079"
+        },
+        {
+          "id": "CVE-2026-71199",
+          "severity": "HIGH",
+          "target": "mingjing-p1-local-69432e75-test:latest (debian 12.15)",
+          "package": "libkrb5-3",
+          "installed": "1.20.1-2+deb12u5",
+          "fixed": null,
+          "advisory": "https://avd.aquasec.com/nvd/cve-2026-71199"
+        },
+        {
+          "id": "CVE-2026-71200",
+          "severity": "HIGH",
+          "target": "mingjing-p1-local-69432e75-test:latest (debian 12.15)",
+          "package": "libkrb5-3",
+          "installed": "1.20.1-2+deb12u5",
+          "fixed": null,
+          "advisory": "https://avd.aquasec.com/nvd/cve-2026-71200"
+        },
+        {
+          "id": "CVE-2026-107364",
+          "severity": "HIGH",
+          "target": "mingjing-p1-local-69432e75-test:latest (debian 12.15)",
+          "package": "libkrb5support0",
+          "installed": "1.20.1-2+deb12u5",
+          "fixed": null,
+          "advisory": "https://avd.aquasec.com/nvd/cve-2026-107364"
+        },
+        {
+          "id": "CVE-2026-112315",
+          "severity": "HIGH",
+          "target": "mingjing-p1-local-69432e75-test:latest (debian 12.15)",
+          "package": "libkrb5support0",
+          "installed": "1.20.1-2+deb12u5",
+          "fixed": null,
+          "advisory": "https://avd.aquasec.com/nvd/cve-2026-112315"
+        },
+        {
+          "id": "CVE-2026-112316",
+          "severity": "HIGH",
+          "target": "mingjing-p1-local-69432e75-test:latest (debian 12.15)",
+          "package": "libkrb5support0",
+          "installed": "1.20.1-2+deb12u5",
+          "fixed": null,
+          "advisory": "https://avd.aquasec.com/nvd/cve-2026-112316"
+        },
+        {
+          "id": "CVE-2026-112317",
+          "severity": "HIGH",
+          "target": "mingjing-p1-local-69432e75-test:latest (debian 12.15)",
+          "package": "libkrb5support0",
+          "installed": "1.20.1-2+deb12u5",
+          "fixed": null,
+          "advisory": "https://avd.aquasec.com/nvd/cve-2026-112317"
+        },
+        {
+          "id": "CVE-2026-112318",
+          "severity": "HIGH",
+          "target": "mingjing-p1-local-69432e75-test:latest (debian 12.15)",
+          "package": "libkrb5support0",
+          "installed": "1.20.1-2+deb12u5",
+          "fixed": null,
+          "advisory": "https://avd.aquasec.com/nvd/cve-2026-112318"
+        },
+        {
+          "id": "CVE-2026-112319",
+          "severity": "HIGH",
+          "target": "mingjing-p1-local-69432e75-test:latest (debian 12.15)",
+          "package": "libkrb5support0",
+          "installed": "1.20.1-2+deb12u5",
+          "fixed": null,
+          "advisory": "https://avd.aquasec.com/nvd/cve-2026-112319"
+        },
+        {
+          "id": "CVE-2026-112320",
+          "severity": "HIGH",
+          "target": "mingjing-p1-local-69432e75-test:latest (debian 12.15)",
+          "package": "libkrb5support0",
+          "installed": "1.20.1-2+deb12u5",
+          "fixed": null,
+          "advisory": "https://avd.aquasec.com/nvd/cve-2026-112320"
+        },
+        {
+          "id": "CVE-2026-112321",
+          "severity": "HIGH",
+          "target": "mingjing-p1-local-69432e75-test:latest (debian 12.15)",
+          "package": "libkrb5support0",
+          "installed": "1.20.1-2+deb12u5",
+          "fixed": null,
+          "advisory": "https://avd.aquasec.com/nvd/cve-2026-112321"
+        },
+        {
+          "id": "CVE-2026-112322",
+          "severity": "HIGH",
+          "target": "mingjing-p1-local-69432e75-test:latest (debian 12.15)",
+          "package": "libkrb5support0",
+          "installed": "1.20.1-2+deb12u5",
+          "fixed": null,
+          "advisory": "https://avd.aquasec.com/nvd/cve-2026-112322"
+        },
+        {
+          "id": "CVE-2026-112323",
+          "severity": "HIGH",
+          "target": "mingjing-p1-local-69432e75-test:latest (debian 12.15)",
+          "package": "libkrb5support0",
+          "installed": "1.20.1-2+deb12u5",
+          "fixed": null,
+          "advisory": "https://avd.aquasec.com/nvd/cve-2026-112323"
+        },
+        {
+          "id": "CVE-2026-118380",
+          "severity": "HIGH",
+          "target": "mingjing-p1-local-69432e75-test:latest (debian 12.15)",
+          "package": "libkrb5support0",
+          "installed": "1.20.1-2+deb12u5",
+          "fixed": null,
+          "advisory": "https://avd.aquasec.com/nvd/cve-2026-118380"
+        },
+        {
+          "id": "CVE-2026-119079",
+          "severity": "HIGH",
+          "target": "mingjing-p1-local-69432e75-test:latest (debian 12.15)",
+          "package": "libkrb5support0",
+          "installed": "1.20.1-2+deb12u5",
+          "fixed": null,
+          "advisory": "https://avd.aquasec.com/nvd/cve-2026-119079"
+        },
+        {
+          "id": "CVE-2026-71199",
+          "severity": "HIGH",
+          "target": "mingjing-p1-local-69432e75-test:latest (debian 12.15)",
+          "package": "libkrb5support0",
+          "installed": "1.20.1-2+deb12u5",
+          "fixed": null,
+          "advisory": "https://avd.aquasec.com/nvd/cve-2026-71199"
+        },
+        {
+          "id": "CVE-2026-71200",
+          "severity": "HIGH",
+          "target": "mingjing-p1-local-69432e75-test:latest (debian 12.15)",
+          "package": "libkrb5support0",
+          "installed": "1.20.1-2+deb12u5",
+          "fixed": null,
+          "advisory": "https://avd.aquasec.com/nvd/cve-2026-71200"
+        },
+        {
+          "id": "CVE-2026-53613",
+          "severity": "HIGH",
+          "target": "mingjing-p1-local-69432e75-test:latest (debian 12.15)",
+          "package": "libmount1",
+          "installed": "2.38.1-5+deb12u3",
+          "fixed": null,
+          "advisory": "https://avd.aquasec.com/nvd/cve-2026-53613"
+        },
+        {
+          "id": "CVE-2026-53615",
+          "severity": "HIGH",
+          "target": "mingjing-p1-local-69432e75-test:latest (debian 12.15)",
+          "package": "libmount1",
+          "installed": "2.38.1-5+deb12u3",
+          "fixed": null,
+          "advisory": "https://avd.aquasec.com/nvd/cve-2026-53615"
+        },
+        {
+          "id": "CVE-2026-78410",
+          "severity": "HIGH",
+          "target": "mingjing-p1-local-69432e75-test:latest (debian 12.15)",
+          "package": "libmount1",
+          "installed": "2.38.1-5+deb12u3",
+          "fixed": null,
+          "advisory": "https://avd.aquasec.com/nvd/cve-2026-78410"
+        },
+        {
+          "id": "CVE-2025-69720",
+          "severity": "HIGH",
+          "target": "mingjing-p1-local-69432e75-test:latest (debian 12.15)",
+          "package": "libncursesw6",
+          "installed": "6.4-4",
+          "fixed": null,
+          "advisory": "https://avd.aquasec.com/nvd/cve-2025-69720"
+        },
+        {
+          "id": "CVE-2025-6020",
+          "severity": "HIGH",
+          "target": "mingjing-p1-local-69432e75-test:latest (debian 12.15)",
+          "package": "libpam-modules",
+          "installed": "1.5.2-6+deb12u2",
+          "fixed": null,
+          "advisory": "https://avd.aquasec.com/nvd/cve-2025-6020"
+        },
+        {
+          "id": "CVE-2025-6020",
+          "severity": "HIGH",
+          "target": "mingjing-p1-local-69432e75-test:latest (debian 12.15)",
+          "package": "libpam-modules-bin",
+          "installed": "1.5.2-6+deb12u2",
+          "fixed": null,
+          "advisory": "https://avd.aquasec.com/nvd/cve-2025-6020"
+        },
+        {
+          "id": "CVE-2025-6020",
+          "severity": "HIGH",
+          "target": "mingjing-p1-local-69432e75-test:latest (debian 12.15)",
+          "package": "libpam-runtime",
+          "installed": "1.5.2-6+deb12u2",
+          "fixed": null,
+          "advisory": "https://avd.aquasec.com/nvd/cve-2025-6020"
+        },
+        {
+          "id": "CVE-2025-6020",
+          "severity": "HIGH",
+          "target": "mingjing-p1-local-69432e75-test:latest (debian 12.15)",
+          "package": "libpam0g",
+          "installed": "1.5.2-6+deb12u2",
+          "fixed": null,
+          "advisory": "https://avd.aquasec.com/nvd/cve-2025-6020"
+        },
+        {
+          "id": "CVE-2026-53613",
+          "severity": "HIGH",
+          "target": "mingjing-p1-local-69432e75-test:latest (debian 12.15)",
+          "package": "libsmartcols1",
+          "installed": "2.38.1-5+deb12u3",
+          "fixed": null,
+          "advisory": "https://avd.aquasec.com/nvd/cve-2026-53613"
+        },
+        {
+          "id": "CVE-2026-53615",
+          "severity": "HIGH",
+          "target": "mingjing-p1-local-69432e75-test:latest (debian 12.15)",
+          "package": "libsmartcols1",
+          "installed": "2.38.1-5+deb12u3",
+          "fixed": null,
+          "advisory": "https://avd.aquasec.com/nvd/cve-2026-53615"
+        },
+        {
+          "id": "CVE-2026-78410",
+          "severity": "HIGH",
+          "target": "mingjing-p1-local-69432e75-test:latest (debian 12.15)",
+          "package": "libsmartcols1",
+          "installed": "2.38.1-5+deb12u3",
+          "fixed": null,
+          "advisory": "https://avd.aquasec.com/nvd/cve-2026-78410"
+        },
+        {
+          "id": "CVE-2025-7458",
+          "severity": "CRITICAL",
+          "target": "mingjing-p1-local-69432e75-test:latest (debian 12.15)",
+          "package": "libsqlite3-0",
+          "installed": "3.40.1-2+deb12u2",
+          "fixed": null,
+          "advisory": "https://avd.aquasec.com/nvd/cve-2025-7458"
+        },
+        {
+          "id": "CVE-2026-11822",
+          "severity": "HIGH",
+          "target": "mingjing-p1-local-69432e75-test:latest (debian 12.15)",
+          "package": "libsqlite3-0",
+          "installed": "3.40.1-2+deb12u2",
+          "fixed": null,
+          "advisory": "https://avd.aquasec.com/nvd/cve-2026-11822"
+        },
+        {
+          "id": "CVE-2026-11824",
+          "severity": "HIGH",
+          "target": "mingjing-p1-local-69432e75-test:latest (debian 12.15)",
+          "package": "libsqlite3-0",
+          "installed": "3.40.1-2+deb12u2",
+          "fixed": null,
+          "advisory": "https://avd.aquasec.com/nvd/cve-2026-11824"
+        },
+        {
+          "id": "CVE-2026-119373",
+          "severity": "HIGH",
+          "target": "mingjing-p1-local-69432e75-test:latest (debian 12.15)",
+          "package": "libsqlite3-0",
+          "installed": "3.40.1-2+deb12u2",
+          "fixed": null,
+          "advisory": "https://avd.aquasec.com/nvd/cve-2026-119373"
+        },
+        {
+          "id": "CVE-2026-119374",
+          "severity": "HIGH",
+          "target": "mingjing-p1-local-69432e75-test:latest (debian 12.15)",
+          "package": "libsqlite3-0",
+          "installed": "3.40.1-2+deb12u2",
+          "fixed": null,
+          "advisory": "https://avd.aquasec.com/nvd/cve-2026-119374"
+        },
+        {
+          "id": "CVE-2026-119379",
+          "severity": "HIGH",
+          "target": "mingjing-p1-local-69432e75-test:latest (debian 12.15)",
+          "package": "libsqlite3-0",
+          "installed": "3.40.1-2+deb12u2",
+          "fixed": null,
+          "advisory": "https://avd.aquasec.com/nvd/cve-2026-119379"
+        },
+        {
+          "id": "CVE-2026-16742",
+          "severity": "HIGH",
+          "target": "mingjing-p1-local-69432e75-test:latest (debian 12.15)",
+          "package": "libsystemd0",
+          "installed": "252.39-1~deb12u2",
+          "fixed": null,
+          "advisory": "https://avd.aquasec.com/nvd/cve-2026-16742"
+        },
+        {
+          "id": "CVE-2025-69720",
+          "severity": "HIGH",
+          "target": "mingjing-p1-local-69432e75-test:latest (debian 12.15)",
+          "package": "libtinfo6",
+          "installed": "6.4-4",
+          "fixed": null,
+          "advisory": "https://avd.aquasec.com/nvd/cve-2025-69720"
+        },
+        {
+          "id": "CVE-2026-16742",
+          "severity": "HIGH",
+          "target": "mingjing-p1-local-69432e75-test:latest (debian 12.15)",
+          "package": "libudev1",
+          "installed": "252.39-1~deb12u2",
+          "fixed": null,
+          "advisory": "https://avd.aquasec.com/nvd/cve-2026-16742"
+        },
+        {
+          "id": "CVE-2026-53613",
+          "severity": "HIGH",
+          "target": "mingjing-p1-local-69432e75-test:latest (debian 12.15)",
+          "package": "libuuid1",
+          "installed": "2.38.1-5+deb12u3",
+          "fixed": null,
+          "advisory": "https://avd.aquasec.com/nvd/cve-2026-53613"
+        },
+        {
+          "id": "CVE-2026-53615",
+          "severity": "HIGH",
+          "target": "mingjing-p1-local-69432e75-test:latest (debian 12.15)",
+          "package": "libuuid1",
+          "installed": "2.38.1-5+deb12u3",
+          "fixed": null,
+          "advisory": "https://avd.aquasec.com/nvd/cve-2026-53615"
+        },
+        {
+          "id": "CVE-2026-78410",
+          "severity": "HIGH",
+          "target": "mingjing-p1-local-69432e75-test:latest (debian 12.15)",
+          "package": "libuuid1",
+          "installed": "2.38.1-5+deb12u3",
+          "fixed": null,
+          "advisory": "https://avd.aquasec.com/nvd/cve-2026-78410"
+        },
+        {
+          "id": "CVE-2026-53613",
+          "severity": "HIGH",
+          "target": "mingjing-p1-local-69432e75-test:latest (debian 12.15)",
+          "package": "mount",
+          "installed": "2.38.1-5+deb12u3",
+          "fixed": null,
+          "advisory": "https://avd.aquasec.com/nvd/cve-2026-53613"
+        },
+        {
+          "id": "CVE-2026-53615",
+          "severity": "HIGH",
+          "target": "mingjing-p1-local-69432e75-test:latest (debian 12.15)",
+          "package": "mount",
+          "installed": "2.38.1-5+deb12u3",
+          "fixed": null,
+          "advisory": "https://avd.aquasec.com/nvd/cve-2026-53615"
+        },
+        {
+          "id": "CVE-2026-78410",
+          "severity": "HIGH",
+          "target": "mingjing-p1-local-69432e75-test:latest (debian 12.15)",
+          "package": "mount",
+          "installed": "2.38.1-5+deb12u3",
+          "fixed": null,
+          "advisory": "https://avd.aquasec.com/nvd/cve-2026-78410"
+        },
+        {
+          "id": "CVE-2025-69720",
+          "severity": "HIGH",
+          "target": "mingjing-p1-local-69432e75-test:latest (debian 12.15)",
+          "package": "ncurses-base",
+          "installed": "6.4-4",
+          "fixed": null,
+          "advisory": "https://avd.aquasec.com/nvd/cve-2025-69720"
+        },
+        {
+          "id": "CVE-2025-69720",
+          "severity": "HIGH",
+          "target": "mingjing-p1-local-69432e75-test:latest (debian 12.15)",
+          "package": "ncurses-bin",
+          "installed": "6.4-4",
+          "fixed": null,
+          "advisory": "https://avd.aquasec.com/nvd/cve-2025-69720"
+        },
+        {
+          "id": "CVE-2026-9538",
+          "severity": "HIGH",
+          "target": "mingjing-p1-local-69432e75-test:latest (debian 12.15)",
+          "package": "perl-base",
+          "installed": "5.36.0-7+deb12u4",
+          "fixed": null,
+          "advisory": "https://avd.aquasec.com/nvd/cve-2026-9538"
+        },
+        {
+          "id": "CVE-2026-53613",
+          "severity": "HIGH",
+          "target": "mingjing-p1-local-69432e75-test:latest (debian 12.15)",
+          "package": "util-linux",
+          "installed": "2.38.1-5+deb12u3",
+          "fixed": null,
+          "advisory": "https://avd.aquasec.com/nvd/cve-2026-53613"
+        },
+        {
+          "id": "CVE-2026-53615",
+          "severity": "HIGH",
+          "target": "mingjing-p1-local-69432e75-test:latest (debian 12.15)",
+          "package": "util-linux",
+          "installed": "2.38.1-5+deb12u3",
+          "fixed": null,
+          "advisory": "https://avd.aquasec.com/nvd/cve-2026-53615"
+        },
+        {
+          "id": "CVE-2026-78410",
+          "severity": "HIGH",
+          "target": "mingjing-p1-local-69432e75-test:latest (debian 12.15)",
+          "package": "util-linux",
+          "installed": "2.38.1-5+deb12u3",
+          "fixed": null,
+          "advisory": "https://avd.aquasec.com/nvd/cve-2026-78410"
+        },
+        {
+          "id": "CVE-2026-53613",
+          "severity": "HIGH",
+          "target": "mingjing-p1-local-69432e75-test:latest (debian 12.15)",
+          "package": "util-linux-extra",
+          "installed": "2.38.1-5+deb12u3",
+          "fixed": null,
+          "advisory": "https://avd.aquasec.com/nvd/cve-2026-53613"
+        },
+        {
+          "id": "CVE-2026-53615",
+          "severity": "HIGH",
+          "target": "mingjing-p1-local-69432e75-test:latest (debian 12.15)",
+          "package": "util-linux-extra",
+          "installed": "2.38.1-5+deb12u3",
+          "fixed": null,
+          "advisory": "https://avd.aquasec.com/nvd/cve-2026-53615"
+        },
+        {
+          "id": "CVE-2026-78410",
+          "severity": "HIGH",
+          "target": "mingjing-p1-local-69432e75-test:latest (debian 12.15)",
+          "package": "util-linux-extra",
+          "installed": "2.38.1-5+deb12u3",
+          "fixed": null,
+          "advisory": "https://avd.aquasec.com/nvd/cve-2026-78410"
+        },
+        {
+          "id": "CVE-2023-45853",
+          "severity": "CRITICAL",
+          "target": "mingjing-p1-local-69432e75-test:latest (debian 12.15)",
+          "package": "zlib1g",
+          "installed": "1:1.2.13.dfsg-1",
+          "fixed": null,
+          "advisory": "https://avd.aquasec.com/nvd/cve-2023-45853"
+        },
+        {
+          "id": "CVE-2026-85091",
+          "severity": "HIGH",
+          "target": "mingjing-p1-local-69432e75-test:latest (debian 12.15)",
+          "package": "zlib1g",
+          "installed": "1:1.2.13.dfsg-1",
+          "fixed": null,
+          "advisory": "https://avd.aquasec.com/nvd/cve-2026-85091"
+        }
+      ]
+    }
+  }
+}

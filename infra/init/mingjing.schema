@@ -1,0 +1,81 @@
+CREATE TABLE accounts (
+    tenant text PRIMARY KEY,
+    remaining integer NOT NULL CHECK (remaining >= 0)
+);
+CREATE TABLE grants (
+    tenant text REFERENCES accounts,
+    subject text NOT NULL,
+    resource text NOT NULL,
+    action text NOT NULL,
+    allowed boolean NOT NULL,
+    PRIMARY KEY (tenant, subject, resource, action)
+);
+CREATE TABLE published (
+    tenant text REFERENCES accounts,
+    capability text NOT NULL,
+    enabled boolean NOT NULL,
+    PRIMARY KEY (tenant, capability)
+);
+CREATE TABLE tasks (
+    id text PRIMARY KEY,
+    tenant text NOT NULL REFERENCES accounts,
+    subject text NOT NULL,
+    resource text NOT NULL,
+    kind text NOT NULL,
+    capability text NOT NULL,
+    body_hash text NOT NULL,
+    request_key text NOT NULL,
+    value text NOT NULL,
+    run_id text NOT NULL,
+    workflow_id text NOT NULL UNIQUE,
+    operation_id text NOT NULL UNIQUE,
+    cancel_requested boolean NOT NULL DEFAULT false,
+    status text NOT NULL DEFAULT 'pending',
+    UNIQUE (tenant, subject, request_key)
+);
+CREATE TABLE approvals (
+    task_id text PRIMARY KEY REFERENCES tasks,
+    decision_id text NOT NULL UNIQUE,
+    body_hash text NOT NULL,
+    expires_at timestamptz NOT NULL,
+    approved_by text
+);
+CREATE TABLE receipts (
+    tenant text NOT NULL,
+    operation_id text NOT NULL REFERENCES tasks(operation_id),
+    body_hash text NOT NULL,
+    state text NOT NULL,
+    result jsonb,
+    PRIMARY KEY (tenant, operation_id)
+);
+CREATE TABLE markers (
+    operation_id text PRIMARY KEY REFERENCES tasks(operation_id),
+    value text NOT NULL
+);
+CREATE TABLE artifacts (
+    id text PRIMARY KEY,
+    tenant text NOT NULL,
+    task_id text NOT NULL REFERENCES tasks,
+    version integer NOT NULL,
+    digest text NOT NULL,
+    UNIQUE (task_id, version)
+);
+CREATE TABLE attempts (
+    id text PRIMARY KEY,
+    operation_id text NOT NULL REFERENCES tasks(operation_id),
+    engine_run_id text,
+    reserved integer NOT NULL DEFAULT 0,
+    state text NOT NULL,
+    reference text
+);
+CREATE TABLE audit (
+    id bigint GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    tenant text NOT NULL,
+    task_id text,
+    operation_id text,
+    attempt_id text,
+    code text NOT NULL
+);
+GRANT USAGE ON SCHEMA public TO p1_app;
+GRANT SELECT, INSERT, UPDATE ON ALL TABLES IN SCHEMA public TO p1_app;
+GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO p1_app;

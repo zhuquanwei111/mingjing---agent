@@ -1,0 +1,5 @@
+Temporal CLI 1.10.1 (Server 1.32.2, UI 2.56.4)
+
+Temporal Server:      localhost:58528
+Temporal Persistence: .p1/temporal.sqlite
+Temporal Metrics:     http://localhost:58531/metrics

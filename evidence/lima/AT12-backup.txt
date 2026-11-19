@@ -1,0 +1,5 @@
+PostgreSQL custom format backup and fresh database restore matched.
+receipts=15, sha256=9ef1507ae70144451b285d34ecf8ac5ce3a222bf58e39567168dd8777df0b289
+markers=11
+audit=82
+approvals=20

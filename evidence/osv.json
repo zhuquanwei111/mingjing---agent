@@ -1,0 +1,7 @@
+{
+  "source": "https://api.osv.dev/v1/querybatch",
+  "date": "2026-11-19",
+  "candidate": "Linux arm64 + legacy test plugin",
+  "queried": 53,
+  "findings": []
+}
