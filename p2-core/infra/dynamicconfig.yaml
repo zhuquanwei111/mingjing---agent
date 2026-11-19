@@ -1,0 +1,8 @@
+frontend.enableWorkerVersioningWorkflowAPIs:
+  - value: true
+frontend.enableWorkerVersioningDataAPIs:
+  - value: true
+frontend.enableDeployments:
+  - value: true
+system.enableDeploymentVersions:
+  - value: true

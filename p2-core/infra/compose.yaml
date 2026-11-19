@@ -1,0 +1,105 @@
+x-runtime: &runtime
+  image: ${P2_PROJECT:?}-runner
+  build:
+    context: ..
+    dockerfile: infra/Dockerfile
+  init: true
+  cap_drop: [ALL]
+  security_opt: [no-new-privileges:true]
+x-app-env: &app-env
+  MINGJING_ENVIRONMENT: dev
+  MINGJING_DB_DSN: postgresql://p2_app:${P2_APP_PASSWORD:?}@db:5432/mingjing
+  MINGJING_BLOBS: /artifacts
+  TEMPORAL_ADDRESS: temporal:7233
+  TEMPORAL_NAMESPACE: ${P2_PROJECT:?}
+  TEMPORAL_TASK_QUEUE: mingjing-core-v1
+  LANGSMITH_TRACING: "false"
+  LANGCHAIN_TRACING_V2: "false"
+  LANGGRAPH_STRICT_MSGPACK: "true"
+  OTEL_TRACES_EXPORTER: none
+services:
+  db:
+    image: docker.io/library/postgres@sha256:e80acae3f1109e8e4533618b594918936f2858c63afc7204c4773148a673add8
+    environment:
+      POSTGRES_PASSWORD: ${P2_BOOTSTRAP_PASSWORD:?}
+      P2_MIGRATION_PASSWORD: ${P2_MIGRATION_PASSWORD:?}
+      P2_APP_PASSWORD: ${P2_APP_PASSWORD:?}
+      P2_TEMPORAL_PASSWORD: ${P2_TEMPORAL_PASSWORD:?}
+    volumes:
+      - postgres:/var/lib/postgresql/data
+      - ./postgres.sh:/docker-entrypoint-initdb.d/01-mingjing.sh:ro
+    healthcheck:
+      test: [CMD, pg_isready, -h, 127.0.0.1, -U, postgres]
+      interval: 2s
+      timeout: 3s
+      retries: 45
+  schema:
+    image: docker.io/temporalio/admin-tools@sha256:d6655e288364110b61204fbae5f103232b2c5c78e647a27bc11603d274145809
+    environment:
+      SQL_PASSWORD: ${P2_TEMPORAL_PASSWORD:?}
+    depends_on:
+      db:
+        condition: service_healthy
+    entrypoint: [/bin/sh, /p2/schema.sh]
+    volumes:
+      - ./temporal-schema.sh:/p2/schema.sh:ro
+  temporal:
+    image: docker.io/temporalio/server@sha256:3e11544607762c3187c12a63e289e03beddf46c21ebb52b47ccb77db179d6313
+    depends_on:
+      schema:
+        condition: service_completed_successfully
+    environment:
+      DB: postgres12
+      DB_PORT: "5432"
+      DBNAME: temporal
+      VISIBILITY_DBNAME: temporal_visibility
+      POSTGRES_USER: p2_temporal
+      POSTGRES_PWD: ${P2_TEMPORAL_PASSWORD:?}
+      POSTGRES_SEEDS: db
+      BIND_ON_IP: 0.0.0.0
+      DYNAMIC_CONFIG_FILE_PATH: config/dynamicconfig/p2.yaml
+    volumes:
+      - ./dynamicconfig.yaml:/etc/temporal/config/dynamicconfig/p2.yaml:ro
+    healthcheck:
+      test: [CMD, nc, -z, 127.0.0.1, "7233"]
+      interval: 2s
+      timeout: 3s
+      retries: 45
+  namespace:
+    image: docker.io/temporalio/admin-tools@sha256:d6655e288364110b61204fbae5f103232b2c5c78e647a27bc11603d274145809
+    environment:
+      TEMPORAL_ADDRESS: temporal:7233
+      TEMPORAL_NAMESPACE: ${P2_PROJECT:?}
+    entrypoint:
+      - /bin/sh
+      - -ec
+      - |
+        temporal operator namespace describe -n "$$TEMPORAL_NAMESPACE" >/dev/null 2>&1 ||
+        temporal operator namespace create -n "$$TEMPORAL_NAMESPACE" --retention 1d
+  migrate:
+    <<: *runtime
+    environment:
+      MINGJING_MIGRATION_DSN: postgresql://p2_owner:${P2_MIGRATION_PASSWORD:?}@db:5432/mingjing
+    command: [python, -m, mingjing, migrate]
+  api:
+    <<: *runtime
+    environment: *app-env
+    volumes: [artifacts:/artifacts]
+    command: [python, -m, mingjing, api]
+  worker:
+    <<: *runtime
+    environment: *app-env
+    volumes: [artifacts:/artifacts]
+    command: [python, -m, mingjing, worker]
+  test:
+    <<: *runtime
+    environment:
+      <<: *app-env
+      MINGJING_MIGRATION_DSN: postgresql://p2_owner:${P2_MIGRATION_PASSWORD:?}@db:5432/mingjing
+    command: [python, -m, pytest, -q, "-ra", "--junitxml=/evidence/junit.xml", tests]
+volumes:
+  postgres:
+  artifacts:
+networks:
+  default:
+    internal: true
