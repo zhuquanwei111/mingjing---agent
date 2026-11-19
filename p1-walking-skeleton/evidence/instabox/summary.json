@@ -1,0 +1,83 @@
+{
+  "acceptance_passed": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12
+  ],
+  "test_cases": {
+    "test_pinned_temporal_cli_smoke": {
+      "status": "passed",
+      "junit": "early.junit.xml"
+    },
+    "test_at01_shared_capability_and_idempotency": {
+      "status": "passed",
+      "junit": "early.junit.xml"
+    },
+    "test_at02_worker_restart_duplicate_and_late_approval": {
+      "status": "passed",
+      "junit": "early.junit.xml"
+    },
+    "test_at03_commit_before_ack_and_unknown_external": {
+      "status": "passed",
+      "junit": "middle.junit.xml"
+    },
+    "test_at04_approval_revocation_publication_and_store_failure": {
+      "status": "passed",
+      "junit": "middle.junit.xml"
+    },
+    "test_at05_cancellation_before_during_and_after_commit": {
+      "status": "passed",
+      "junit": "middle.junit.xml"
+    },
+    "test_at06_agent_bounds": {
+      "status": "passed",
+      "junit": "middle.junit.xml"
+    },
+    "test_at07_parallel_budget_and_unknown_settlement": {
+      "status": "passed",
+      "junit": "middle.junit.xml"
+    },
+    "test_at08_artifact_versions_and_current_permissions": {
+      "status": "passed",
+      "junit": "at08.junit.xml"
+    },
+    "test_at09_graph_continue_as_new_cache": {
+      "status": "passed",
+      "junit": "late-files/late.junit.xml"
+    },
+    "test_at09_functional_retry_typed_cold_replay": {
+      "status": "passed",
+      "junit": "late-files/late.junit.xml"
+    },
+    "test_at09_graph_interrupt_cold_replay": {
+      "status": "passed",
+      "junit": "late-files/late.junit.xml"
+    },
+    "test_at09_stream_retry_resume_dedupe_across_run": {
+      "status": "passed",
+      "junit": "late-files/late.junit.xml"
+    },
+    "test_at11_trace_correlation_and_sink_failure": {
+      "status": "passed",
+      "junit": "late-files/late.junit.xml"
+    },
+    "test_at12_internal_network_and_database_permissions": {
+      "status": "passed",
+      "junit": "late-files/late.junit.xml"
+    },
+    "test_at10_version_routing_and_replay_boundaries": {
+      "status": "passed",
+      "junit": "at10-files/at10.junit.xml"
+    }
+  },
+  "postgres_restore": "at12-backup-rebuild.txt"
+}

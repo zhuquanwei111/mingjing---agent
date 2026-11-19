@@ -1,0 +1,18 @@
+{
+  "revoked": "authorization_denied",
+  "disabled": "release_disabled",
+  "db_unavailable": "gate_unavailable",
+  "unauthenticated_approval": 403,
+  "audit_codes": [
+    "approve_denied",
+    "approval_accepted",
+    "authorization_denied",
+    "approval_accepted",
+    "release_disabled"
+  ],
+  "markers": [
+    0,
+    0,
+    0
+  ]
+}

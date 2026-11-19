@@ -1,0 +1,10 @@
+{
+  "rejections": {
+    "test-denied-tool": "agent_tool_denied",
+    "test-steps": "agent_step_limit",
+    "test-depth": "agent_depth_limit",
+    "test-expired": "agent_deadline",
+    "budget-empty": "budget_exhausted"
+  },
+  "provider_calls": 0
+}

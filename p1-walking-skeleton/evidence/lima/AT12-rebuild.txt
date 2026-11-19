@@ -1,0 +1,89 @@
+ Network mingjing-p1-local-db58b1e1_default  Creating
+ Network mingjing-p1-local-db58b1e1_default  Created
+ Volume mingjing-p1-local-db58b1e1_db  Creating
+ Volume mingjing-p1-local-db58b1e1_db  Created
+ Container mingjing-p1-local-db58b1e1-db-1  Creating
+ Container mingjing-p1-local-db58b1e1-db-1  Created
+ Container mingjing-p1-local-db58b1e1-schema-1  Creating
+ Container mingjing-p1-local-db58b1e1-schema-1  Created
+ Container mingjing-p1-local-db58b1e1-temporal-1  Creating
+ Container mingjing-p1-local-db58b1e1-temporal-1  Created
+ Container mingjing-p1-local-db58b1e1-db-1  Starting
+ Container mingjing-p1-local-db58b1e1-db-1  Started
+ Container mingjing-p1-local-db58b1e1-db-1  Waiting
+ Container mingjing-p1-local-db58b1e1-db-1  Healthy
+ Container mingjing-p1-local-db58b1e1-schema-1  Starting
+ Container mingjing-p1-local-db58b1e1-schema-1  Started
+ Container mingjing-p1-local-db58b1e1-schema-1  Waiting
+ Container mingjing-p1-local-db58b1e1-schema-1  Exited
+ Container mingjing-p1-local-db58b1e1-temporal-1  Starting
+ Container mingjing-p1-local-db58b1e1-temporal-1  Started
+ Container mingjing-p1-local-db58b1e1-temporal-1  Waiting
+ Container mingjing-p1-local-db58b1e1-db-1  Waiting
+ Container mingjing-p1-local-db58b1e1-schema-1  Waiting
+ Container mingjing-p1-local-db58b1e1-schema-1  Exited
+ Container mingjing-p1-local-db58b1e1-db-1  Healthy
+ Container mingjing-p1-local-db58b1e1-temporal-1  Healthy
+Namespace p1-a0869a57 successfully registered.
+time="2026-11-19T15:52:33+08:00" level=warning msg="Docker Compose is configured to build using Bake, but buildx isn't installed"
+#0 building with "default" instance using docker driver
+
+#1 [test internal] load build definition from Dockerfile
+#1 transferring dockerfile: 1.00kB done
+#1 DONE 0.0s
+
+#2 [test internal] load metadata for docker.io/library/python@sha256:935c3c5b12357a7e10caa9c1e6ca5692344d97cf229832ef584be2cec9fc03df
+#2 DONE 0.0s
+
+#3 [test internal] load .dockerignore
+#3 transferring context: 96B done
+#3 DONE 0.0s
+
+#4 [test 1/9] FROM docker.io/library/python@sha256:935c3c5b12357a7e10caa9c1e6ca5692344d97cf229832ef584be2cec9fc03df
+#4 resolve docker.io/library/python@sha256:935c3c5b12357a7e10caa9c1e6ca5692344d97cf229832ef584be2cec9fc03df done
+#4 DONE 0.0s
+
+#5 [test internal] load build context
+#5 transferring context: 107.94kB done
+#5 DONE 0.0s
+
+#6 [test 3/9] COPY requirements/linux-aarch64.lock /p1/requirements/
+#6 CACHED
+
+#7 [test 4/9] RUN python -m pip --isolated install --no-cache-dir --require-hashes --only-binary=:all: -r requirements/linux-aarch64.lock && python -m pip check
+#7 CACHED
+
+#8 [test 2/9] WORKDIR /p1
+#8 CACHED
+
+#9 [test 5/9] COPY requirements/legacy-plugin.lock /p1/requirements/
+#9 CACHED
+
+#10 [test 6/9] RUN python -m venv /opt/legacy &&     grep -v '^temporalio-langgraph==' requirements/linux-aarch64.lock > /tmp/legacy.lock &&     cat requirements/legacy-plugin.lock >> /tmp/legacy.lock &&     /opt/legacy/bin/python -m pip --isolated install --no-cache-dir --require-hashes --only-binary=:all: -r /tmp/legacy.lock &&     /opt/legacy/bin/python -m pip check && rm /tmp/legacy.lock
+#10 CACHED
+
+#11 [test 8/9] COPY src src
+#11 CACHED
+
+#12 [test 7/9] RUN useradd -m -u 10101 probe && mkdir /evidence && chown probe:probe /evidence
+#12 CACHED
+
+#13 [test 9/9] COPY tests tests
+#13 CACHED
+
+#14 [test] exporting to image
+#14 exporting layers done
+#14 exporting manifest sha256:558b6967c3be2c63ec963c6eaaaac920ae29d204bddb3be51d43971cb685328c done
+#14 exporting config sha256:ac449bfc7e73ec41e760b06a84266097631923e66a7b89b3c0d54ee331f8e915 done
+#14 exporting attestation manifest sha256:e641438be7028b89a8c5f92db953699e39a03894d1205941803d852d99210a5b done
+#14 exporting manifest list sha256:98429262141eefc672f99924d6df0a6f7987dde100446a37e034ff1d1e7faf95 done
+#14 naming to docker.io/library/mingjing-p1-local-db58b1e1-test:latest done
+#14 unpacking to docker.io/library/mingjing-p1-local-db58b1e1-test:latest done
+#14 DONE 0.0s
+
+#15 [test] resolving provenance for metadata file
+#15 DONE 0.0s
+ test  Built
+Independent Compose project started with zero receipts and a new namespace.
+..                                                                       [100%]
+2 passed in 0.75s

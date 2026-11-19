@@ -1,0 +1,19 @@
+{
+  "versions": [
+    {
+      "artifact_id": "13c4c507-0971-4d11-9d5b-cafab6c713cf:1",
+      "version": 1,
+      "sha256": "84029356610e459263420df02206b06643128d0d45bb32879caecb0cbfb90d0a",
+      "text": "first-version"
+    },
+    {
+      "artifact_id": "13c4c507-0971-4d11-9d5b-cafab6c713cf:2",
+      "version": 2,
+      "sha256": "0bf4f0c2fe256440721e138b839d11642d6529b99be0b9d7c1752cc954cb0b40",
+      "text": "second-version"
+    }
+  ],
+  "tenant_denial": 404,
+  "revocation_denial": 403,
+  "same_version_overwrite": "rejected"
+}

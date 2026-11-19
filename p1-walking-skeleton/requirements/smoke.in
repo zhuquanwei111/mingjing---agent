@@ -1,0 +1,4 @@
+temporalio==1.36.1
+langgraph==1.2.22
+temporalio-langgraph==1.0.0
+pytest==9.2.0

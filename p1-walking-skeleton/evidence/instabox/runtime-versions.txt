@@ -1,0 +1,4 @@
+temporal version 1.32.2
+postgres (PostgreSQL) 17.12
+3.12.16
+{'temporalio': '1.36.1', 'langgraph': '1.2.22', 'temporalio-langgraph': '1.0.0', 'psycopg': '3.3.9', 'pytest': '9.2.0'}

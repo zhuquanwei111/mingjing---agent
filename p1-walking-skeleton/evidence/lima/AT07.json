@@ -1,0 +1,16 @@
+{
+  "race_outcomes": [
+    "succeeded",
+    "denied"
+  ],
+  "race_dispatches": 1,
+  "budget_lock": "gate_unavailable",
+  "unknown_reservation": {
+    "reserved": 1,
+    "state": "unknown"
+  },
+  "reconciled": "succeeded",
+  "remaining": 0,
+  "post_send_db_failure": "unknown",
+  "post_send_dispatches": 1
+}

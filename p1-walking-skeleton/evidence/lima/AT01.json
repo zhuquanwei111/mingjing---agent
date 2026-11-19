@@ -1,0 +1,57 @@
+{
+  "shared_contract": [
+    {
+      "kind": "direct",
+      "result": {
+        "schema_version": 1,
+        "state": "succeeded",
+        "task_id": "157967bd-3151-40c3-899a-e6fdc333576b",
+        "run_id": "e8fc0b87-d385-42e5-95d2-538a2e1fd22b",
+        "workflow_id": "p1-157967bd-3151-40c3-899a-e6fdc333576b",
+        "operation_id": "09888386-aedb-4bfa-8473-9c6d1c5ee199",
+        "attempt_id": "api:b1448708-8cfd-49ee-98be-6b2264ab513f",
+        "value": "synthetic-direct",
+        "artifact_id": "157967bd-3151-40c3-899a-e6fdc333576b:1"
+      }
+    },
+    {
+      "kind": "workflow",
+      "result": {
+        "artifact_id": "87b206a1-00c4-4fd5-b7d3-90f78ee8329d:1",
+        "attempt_id": "01a1f2c9-8069-7c73-a6c8-31dfebb39915:1:1",
+        "operation_id": "f036185f-ca2f-4e59-a234-605a8326872a",
+        "run_id": "9ec66518-7d04-4dfc-a53a-fb5faee1a5e8",
+        "schema_version": 1,
+        "state": "succeeded",
+        "task_id": "87b206a1-00c4-4fd5-b7d3-90f78ee8329d",
+        "value": "synthetic-workflow",
+        "workflow_id": "p1-87b206a1-00c4-4fd5-b7d3-90f78ee8329d"
+      }
+    },
+    {
+      "kind": "agent",
+      "result": {
+        "artifact_id": "647b3b69-21cc-490d-a2c4-b2a3986c4c18:1",
+        "attempt_id": "01a1f2c9-80b8-73c4-86a1-dc6e2b830a19:3:1",
+        "operation_id": "85e69db4-378e-43b2-ba37-590ca4de8373",
+        "run_id": "48cbb3ae-56f5-40e0-a7d9-158d61a1c6c2",
+        "schema_version": 1,
+        "state": "succeeded",
+        "task_id": "647b3b69-21cc-490d-a2c4-b2a3986c4c18",
+        "value": "synthetic-agent",
+        "workflow_id": "p1-647b3b69-21cc-490d-a2c4-b2a3986c4c18"
+      }
+    }
+  ],
+  "registered_capability": {
+    "schema_version": 1,
+    "state": "succeeded",
+    "task_id": "3e6cc3fe-3aa0-4d8f-a6dc-c0a4453a3ffa",
+    "run_id": "d094fd98-921d-473e-b2c8-0b97642a4e2a",
+    "workflow_id": "p1-3e6cc3fe-3aa0-4d8f-a6dc-c0a4453a3ffa",
+    "operation_id": "ef1fb50e-e86a-422d-80b6-1ec5221c0e8c",
+    "attempt_id": "api:96532e7d-e409-4821-8ec3-9b06d228f75d",
+    "value": "other-capability",
+    "artifact_id": "3e6cc3fe-3aa0-4d8f-a6dc-c0a4453a3ffa:1"
+  }
+}

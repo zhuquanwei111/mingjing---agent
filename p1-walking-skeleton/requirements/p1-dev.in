@@ -1,0 +1,3 @@
+-r smoke.in
+temporalio[opentelemetry]==1.36.1
+psycopg[binary]==3.3.9

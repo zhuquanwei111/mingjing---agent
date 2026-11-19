@@ -1,0 +1,20 @@
+{
+  "first_run": "01a1f2c3-7e9e-73c6-9318-f43098482e32",
+  "second_run": "abb5dfbc-58c5-4c9b-b817-90d94836590b",
+  "scheduled_per_run": [
+    2,
+    1
+  ],
+  "serials": {
+    "prior": [
+      "01a1f2c3-7e9e-73c6-9318-f43098482e32:1",
+      "01a1f2c3-7e9e-73c6-9318-f43098482e32:2"
+    ],
+    "current": [
+      "01a1f2c3-7e9e-73c6-9318-f43098482e32:2",
+      "abb5dfbc-58c5-4c9b-b817-90d94836590b:1"
+    ],
+    "cursor": 1
+  },
+  "same_version_replay": "passed"
+}

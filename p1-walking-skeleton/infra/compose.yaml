@@ -1,0 +1,87 @@
+services:
+  db:
+    image: docker.io/library/postgres@sha256:526f86d93c6ea08fd3f1fe5605650cacc781b2c6013169a0ad8f42c7d3d84f32
+    environment:
+      POSTGRES_PASSWORD: ${P1_BOOTSTRAP_PASSWORD:?}
+      P1_DB_PASSWORD: ${P1_DB_PASSWORD:?}
+      P1_TEMPORAL_PASSWORD: ${P1_TEMPORAL_PASSWORD:?}
+    volumes:
+      - db:/var/lib/postgresql/data
+      - ./init:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: [CMD, pg_isready, -h, 127.0.0.1, -U, postgres]
+      interval: 1s
+      timeout: 3s
+      retries: 90
+  schema:
+    image: docker.io/temporalio/admin-tools@sha256:4a95866efba29d7e17ab012df5232795e8b0ad0f7d5f9d1ec4df321f7792a754
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      SQL_PASSWORD: ${P1_TEMPORAL_PASSWORD:?}
+    entrypoint: [/bin/sh, /p1/temporal-schema.sh]
+    volumes:
+      - ./temporal-schema.sh:/p1/temporal-schema.sh:ro
+  temporal:
+    image: docker.io/temporalio/server@sha256:7bf69188a6232fea14869b9cef3d94aa82a1601d99517f7e86c71f22da4e0670
+    depends_on:
+      schema:
+        condition: service_completed_successfully
+    environment:
+      DB: postgres12
+      DB_PORT: "5432"
+      DBNAME: temporal
+      VISIBILITY_DBNAME: temporal_visibility
+      POSTGRES_USER: p1_temporal
+      POSTGRES_PWD: ${P1_TEMPORAL_PASSWORD:?}
+      POSTGRES_SEEDS: db
+      BIND_ON_IP: 0.0.0.0
+      DYNAMIC_CONFIG_FILE_PATH: config/dynamicconfig/p1.yaml
+    volumes:
+      - ./dynamicconfig.yaml:/etc/temporal/config/dynamicconfig/p1.yaml:ro
+    healthcheck:
+      test: [CMD, nc, -z, 127.0.0.1, "7233"]
+      interval: 2s
+      timeout: 3s
+      retries: 60
+  namespace:
+    image: docker.io/temporalio/admin-tools@sha256:4a95866efba29d7e17ab012df5232795e8b0ad0f7d5f9d1ec4df321f7792a754
+    depends_on:
+      temporal:
+        condition: service_healthy
+    environment:
+      TEMPORAL_ADDRESS: temporal:7233
+      TEMPORAL_NAMESPACE: ${TEMPORAL_NAMESPACE:?}
+    entrypoint:
+      - /bin/sh
+      - -ec
+      - |
+        temporal operator namespace describe -n "$$TEMPORAL_NAMESPACE" >/dev/null 2>&1 ||
+        temporal operator namespace create -n "$$TEMPORAL_NAMESPACE" --retention 1d
+  test:
+    build:
+      context: ..
+      dockerfile: infra/Dockerfile
+    depends_on:
+      namespace:
+        condition: service_completed_successfully
+    environment:
+      MINGJING_ENV: p1
+      MINGJING_MODEL: fake
+      MINGJING_DB_DSN: postgresql://p1_app:${P1_DB_PASSWORD:?}@db:5432/mingjing
+      TEMPORAL_ADDRESS: temporal:7233
+      TEMPORAL_NAMESPACE: ${TEMPORAL_NAMESPACE:?}
+      LANGSMITH_TRACING: "false"
+      LANGCHAIN_TRACING_V2: "false"
+      LANGGRAPH_STRICT_MSGPACK: "true"
+      OTEL_TRACES_EXPORTER: none
+    command: [python, -m, pytest, -q, -ra, -s, "--junitxml=/evidence/acceptance.junit.xml", tests]
+    init: true
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+volumes:
+  db:
+networks:
+  default:
+    internal: true

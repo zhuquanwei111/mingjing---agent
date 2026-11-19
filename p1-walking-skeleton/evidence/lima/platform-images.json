@@ -1,0 +1,48 @@
+[
+  {
+    "repository": "temporalio/server",
+    "index": "sha256:7bf69188a6232fea14869b9cef3d94aa82a1601d99517f7e86c71f22da4e0670",
+    "platform": {
+      "architecture": "arm64",
+      "os": "linux"
+    },
+    "manifest": "sha256:a2d55f913eb0f646dd6d8026d02a3f851b87051beaa6d0be57be44c51506ee7b",
+    "configuration": "sha256:65dadb0a396826e9eb0b4fcac962353ba354e8481ece0412afc34800e9eaafc4",
+    "layers": 5
+  },
+  {
+    "repository": "temporalio/admin-tools",
+    "index": "sha256:4a95866efba29d7e17ab012df5232795e8b0ad0f7d5f9d1ec4df321f7792a754",
+    "platform": {
+      "architecture": "arm64",
+      "os": "linux"
+    },
+    "manifest": "sha256:df920de90e0d8a02bd65480524de7e76addc0b6c889696d76229f8c507c90e84",
+    "configuration": "sha256:63a805d52e3808dc34e00eb6e37a14d8b158ed700347015ba377d31e01876320",
+    "layers": 4
+  },
+  {
+    "repository": "library/postgres",
+    "index": "sha256:526f86d93c6ea08fd3f1fe5605650cacc781b2c6013169a0ad8f42c7d3d84f32",
+    "platform": {
+      "architecture": "arm64",
+      "os": "linux",
+      "variant": "v8"
+    },
+    "manifest": "sha256:e5f8ac607c7d44a0da3a42712a3e978b75fb1757e9f3e1488cd0cca4dbec76e9",
+    "configuration": "sha256:952102c847d67f9a4237d6398f04f5bcfcdfb2c33cbdc3fbc3175fba22bd2bda",
+    "layers": 9
+  },
+  {
+    "repository": "library/python",
+    "index": "sha256:935c3c5b12357a7e10caa9c1e6ca5692344d97cf229832ef584be2cec9fc03df",
+    "platform": {
+      "architecture": "arm64",
+      "os": "linux",
+      "variant": "v8"
+    },
+    "manifest": "sha256:df540bfd30bd380e89a349611ce42aa67bcb542d58c047706616eb6ba2f86a1b",
+    "configuration": "sha256:4703adf8fdd93b1441114e4f87ce2c62f7373fc5f88bda6a546c551625bcc71c",
+    "layers": 4
+  }
+]

@@ -1,0 +1,8 @@
+SERVICE     STATE
+db          running
+namespace   exited
+schema      exited
+temporal    running
+internal=true
+namespace_init_exit=0
+postgres (PostgreSQL) 17.12

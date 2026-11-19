@@ -1,0 +1,22 @@
+{
+  "worker_exit": -9,
+  "attempt": 2,
+  "scheduled_activities": 1,
+  "typed_roundtrip": {
+    "detail": {
+      "at": "2026-11-19T00:00:00Z",
+      "identifier": "6b57d989-bcc0-4aac-96fd-6db655ea393d"
+    },
+    "messages": [
+      {
+        "content": "synthetic marker",
+        "additional_kwargs": {},
+        "response_metadata": {},
+        "type": "human",
+        "name": null,
+        "id": "message-1"
+      }
+    ]
+  },
+  "replay": "passed"
+}

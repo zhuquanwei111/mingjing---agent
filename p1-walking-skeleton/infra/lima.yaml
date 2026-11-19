@@ -1,0 +1,31 @@
+vmType: vz
+arch: aarch64
+cpus: 4
+memory: 5GiB
+disk: 25GiB
+images:
+  - location: https://cloud-images.ubuntu.com/minimal/releases/noble/release-20261105/ubuntu-24.04-minimal-cloudimg-arm64.img
+    arch: aarch64
+    digest: sha256:3dc8370d923978d4b610fa7964d1b36ba040eefb43198809ca5bc8ac51777b18
+mounts: []
+ssh:
+  loadDotSSHPubKeys: false
+  forwardAgent: false
+containerd:
+  system: false
+  user: false
+provision:
+  - mode: system
+    script: |
+      #!/bin/bash
+      set -euo pipefail
+      export DEBIAN_FRONTEND=noninteractive
+      apt-get update -q
+      apt-get install -y -q docker.io docker-compose-v2
+      systemctl enable --now docker
+probes:
+  - script: |
+      #!/bin/bash
+      set -eu
+      sudo docker info >/dev/null
+      sudo docker compose version

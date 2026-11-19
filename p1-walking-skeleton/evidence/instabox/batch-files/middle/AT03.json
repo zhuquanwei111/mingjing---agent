@@ -1,0 +1,10 @@
+{
+  "before_ack_marker": 1,
+  "after_recovery_marker": 1,
+  "receipt_count": 1,
+  "attempts": 2,
+  "history_attempt": 2,
+  "killed_worker_status": -9,
+  "external_state": "unknown",
+  "external_dispatch_count": 1
+}
