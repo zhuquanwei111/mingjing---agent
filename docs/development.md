@@ -20,16 +20,18 @@
 | `make smoke` | 现有 macOS Temporal CLI 冒烟脚本 | 按 [P1 README](../p1-walking-skeleton/README.md)准备 `p1-walking-skeleton/.venv` 和已校验的 `.p1/bin/temporal` |
 | `make acceptance` | 既有全验收、备份恢复、Temporal 重启、独立重建；失败即停 | 隔离的 Linux ARM64 或 x86_64 环境与 Docker Compose |
 
-GitHub CI 分别在 Linux ARM64 与 x86_64 runner 运行 `check` 和 `acceptance`，两项都成功才生成成功的 `P1 acceptance` 汇总检查。验收与重建包含其原有 smoke 测试，但这不等于验证了 Darwin CLI。只改文档时不为凑本地流程启动整套服务；必需 CI 仍运行，避免缺少检查结果而无法合并。修改运行时、基础设施、依赖或验收逻辑时，按影响运行相应验证。历史 `evidence/` 不能作为新提交已通过的证明；保留本次日志、测试结果及对应 commit。上传证据只选本次 `.p1/results/` 和验证摘要，不打包含运行凭据、数据库备份的整个 `.p1/`。
+GitHub CI 的 **`P1 acceptance` 在官方 Linux ARM64 runner 上执行，承担正式验收**；它是本仓库 ruleset JSON 中唯一的 required check，服务器保护仍需实际启用。x86_64 使用独立的 `P1 regression (amd64, advisory)` 检查，为已有 Instabox 提供辅助回归反馈；不设为合并必需项，失败仍如实显示。x86_64 通过不能代替 ARM64 通过，也不代表项目承诺了新的正式部署平台。两者复用 `check` 和 `acceptance`，不维护两套测试逻辑。
+
+验收与重建包含其原有 smoke 测试，但这不等于验证了 Darwin CLI。只改文档时不为凑本地流程启动整套服务；必需 CI 仍运行，避免缺少检查结果而无法合并。修改运行时、基础设施、依赖或验收逻辑时，按影响运行相应验证。历史 `evidence/` 不能作为新提交已通过的证明；保留本次日志、测试结果及对应 commit。PR 明确贴出本次 head 对应的 CI run 链接，并能打开 ARM64 job 的完整日志；独立代码审查和截图不能替代这份运行证据。上传证据只选本次 `.p1/results/` 和验证摘要，不打包含运行凭据、数据库备份的整个 `.p1/`。
 
 ## 现有环境怎么使用
 
 | 环境 | 本项目的用途 | 执行方式与已知边界 |
 | --- | --- | --- |
 | Mac mini | Codex 主会话、查看修改和本地冒烟 | 使用项目配置；`make check`，已准备环境时 `make smoke`。不要求把 PostgreSQL/Temporal 常驻在 Mac 上 |
-| 已有 Instabox | 服务联调、完整 P1 回归和失败复现 | 历史 `mj-agent` 为 Linux x86_64、4 vCPU/8 GiB、Docker/Compose，已有 16 项用例记录；在专用 checkout 运行 `make acceptance`，新提交须重新验证 |
+| 已有 Instabox | 服务联调、辅助 P1 回归和失败复现 | 历史 `mj-agent` 为 Linux x86_64、4 vCPU/8 GiB、Docker/Compose，已有 16 项用例记录；在专用 checkout 运行 `make acceptance`，新提交须重新验证；不代替 ARM64 合并门禁 |
 | 已有 Daytona 沙盒 | 隔离开发、试验性修改、独立复现 | 先核实当前沙盒；`make check` 不需要 Docker。完整验收还需可用的 Docker daemon、Compose、兼容架构及拉取固定镜像/锁定依赖的网络 |
-| GitHub Actions | 每个 PR 的统一合并前检查 | 原生 ARM64/x86_64 runner 运行同一命令，汇总为 `P1 acceptance`；保护规则实际启用后由 GitHub 阻止不满足条件的合并 |
+| GitHub Actions | 每个 PR 的统一合并前检查 | 正式 ARM64 检查为 `P1 acceptance`，x86_64 为独立辅助检查；保护规则实际启用后由 GitHub 依据必需的 ARM64 结果约束合并 |
 
 Instabox 的既有证据及平台限制见 [Instabox 验收记录](../p1-walking-skeleton/evidence/instabox/README.md)。`requirements/linux-x86_64.lock` 原样复用该次 amd64 锁；Docker 构建按目标架构选择它或原有的 `linux-aarch64.lock`，无需临时改 Dockerfile。两个锁保持原先各平台的精确版本和 wheel 哈希。
 

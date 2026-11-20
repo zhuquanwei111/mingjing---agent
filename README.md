@@ -17,7 +17,8 @@ make smoke       # 已准备好的 macOS ARM64 环境冒烟
 make acceptance  # 专用 Linux ARM64/x86_64 Docker 环境：全量 P1 + 恢复与重建
 ```
 
-`P1 acceptance` 是 GitHub Actions 的检查名。服务端合并保护需由仓库管理员
+`P1 acceptance` 是 GitHub Actions 上的正式 ARM64 检查；x86_64 单独提供辅助
+回归反馈，不是合并必需项。服务端合并保护需由仓库管理员
 导入并启用 [.github/rulesets/main.json](.github/rulesets/main.json)；提交此 JSON
 本身不会启用保护。规则要求 PR 和检查通过，保留人工合并，不要求单人项目
 再找另一位审批人。启用状态以 GitHub Settings → Rules → Rulesets 为准。

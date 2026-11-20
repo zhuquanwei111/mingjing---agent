@@ -37,6 +37,9 @@
   Daytona 先核实当前沙盒架构、Docker/Compose 和运行权限。依赖锁由目标架构
   选择，不照搬 ARM64 wheel 到 x86_64。各任务使用独立 checkout 和 Compose
   project，不清理其他任务的资源；环境分工见 `docs/development.md`。
+- 正式 P1 合并验收以 GitHub ARM64 的 `P1 acceptance` 为准；x86_64 为辅助
+  回归，不加入 required checks，不以其通过代替 ARM64 结果。交付提供本次
+  head 对应的 CI run 链接与完整日志入口，独立审查不替代实际运行。
 - 实现者发起一次独立代码审查，收取结果并核实成立的问题。可使用原生
   `codex review`；已安装且兼容时可使用文档中固定版本的 Peter autoreview。
   审查者只审查，原实现者负责修复和复验。不要把自己的自检冒充独立审查。

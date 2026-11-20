@@ -16,19 +16,11 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  p1-platforms:
-    name: P1 acceptance (${{ matrix.arch }})
-    # Both native platforms use the existing OCI indexes and verified wheel locks.
+  p1-acceptance:
+    name: P1 acceptance
+    # ARM64 is the required acceptance platform; AMD64 feedback is independent.
     # https://docs.github.com/en/actions/reference/runners/github-hosted-runners
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - arch: arm64
-            runner: ubuntu-24.04-arm
-          - arch: amd64
-            runner: ubuntu-24.04
-    runs-on: ${{ matrix.runner }}
+    runs-on: ubuntu-24.04-arm
     timeout-minutes: 45
     steps:
       - name: Check out source
@@ -53,18 +45,25 @@ jobs:
       # Do not upload .p1/ or test artifacts: runtime.env contains generated
       # credentials, and dumps/history belong only to this disposable runner.
 
-  p1-acceptance:
-    name: P1 acceptance
-    needs: p1-platforms
-    if: ${{ always() }}
+  p1-regression-amd64:
+    name: P1 regression (amd64, advisory)
+    # Keep failures visible without making AMD64 a required acceptance platform.
     runs-on: ubuntu-24.04
-    timeout-minutes: 5
+    timeout-minutes: 45
     steps:
-      - name: Require every platform to pass
-        env:
-          ACCEPTANCE_RESULT: ${{ needs.p1-platforms.result }}
-        run: |
-          if [[ "$ACCEPTANCE_RESULT" != success ]]; then
-            printf 'Platform acceptance result: %s\n' "$ACCEPTANCE_RESULT" >&2
-            exit 1
-          fi
+      - name: Check out source
+        id: checkout
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          persist-credentials: false
+
+      - name: Check source syntax and whitespace
+        run: make check
+
+      - name: Run isolated P1 regression and recovery
+        run: make acceptance
+
+      - name: Clean current isolated project
+        if: ${{ always() && steps.checkout.outcome == 'success' }}
+        timeout-minutes: 5
+        run: make cleanup
