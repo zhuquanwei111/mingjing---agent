@@ -1,0 +1,5 @@
+# Project-scoped Codex defaults; loaded only after the project is trusted.
+# Keep the user's selected model, provider, reasoning effort and credentials.
+# Source: https://learn.chatgpt.com/docs/config-file/config-basic
+approval_policy = "on-request"
+sandbox_mode = "workspace-write"

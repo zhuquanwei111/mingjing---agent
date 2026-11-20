@@ -1,0 +1,70 @@
+name: Verify
+
+# Keep this required check present for every PR, including documentation changes.
+on:
+  push:
+    branches: [main]
+  pull_request:
+  merge_group:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: verify-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  p1-platforms:
+    name: P1 acceptance (${{ matrix.arch }})
+    # Both native platforms use the existing OCI indexes and verified wheel locks.
+    # https://docs.github.com/en/actions/reference/runners/github-hosted-runners
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - arch: arm64
+            runner: ubuntu-24.04-arm
+          - arch: amd64
+            runner: ubuntu-24.04
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 45
+    steps:
+      - name: Check out source
+        id: checkout
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          persist-credentials: false
+
+      - name: Check source syntax and whitespace
+        run: make check
+
+      - name: Run isolated P1 acceptance and recovery
+        run: make acceptance
+
+      # The Make target also cleans up on failure. Retry here after cancellation
+      # or an interrupted step; a cleanup failure must still fail the job.
+      - name: Clean current isolated project
+        if: ${{ always() && steps.checkout.outcome == 'success' }}
+        timeout-minutes: 5
+        run: make cleanup
+
+      # Do not upload .p1/ or test artifacts: runtime.env contains generated
+      # credentials, and dumps/history belong only to this disposable runner.
+
+  p1-acceptance:
+    name: P1 acceptance
+    needs: p1-platforms
+    if: ${{ always() }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - name: Require every platform to pass
+        env:
+          ACCEPTANCE_RESULT: ${{ needs.p1-platforms.result }}
+        run: |
+          if [[ "$ACCEPTANCE_RESULT" != success ]]; then
+            printf 'Platform acceptance result: %s\n' "$ACCEPTANCE_RESULT" >&2
+            exit 1
+          fi
