@@ -18,11 +18,11 @@ export EXPECTED_RUN_ID
 
 help:
 	@printf '%s\n' \
-	  'make check       Check Python/shell syntax and source whitespace.' \
+	  'make check       Check syntax, whitespace, architecture imports, and development docs.' \
 	  'make smoke       Run the existing macOS smoke test (prepared local environment).' \
 	  'make acceptance  Run isolated Linux ARM64/AMD64 acceptance and recovery, then clean up.' \
 	  'make cleanup     Remove only the current isolated P1 project and its credentials.' \
-	  'make p2-acceptance  Run the P2 public layer tests on isolated Linux AMD64.'
+	  'make p2-acceptance  Run the P2 public layer tests on isolated Linux ARM64/AMD64.'
 
 # Compare tracked source against the empty tree so a clean CI checkout is checked
 # too. Check untracked source separately so new local files are not missed.
@@ -43,7 +43,10 @@ check:
 	    *) sh -n "$$script" ;; \
 	  esac; \
 	done < <(git ls-files -z --cached --others --exclude-standard -- '*.sh')
-	@printf '%s\n' 'Shell syntax and source whitespace passed. No lint or type-check gate is configured.'
+	$(PYTHON) scripts/check_architecture.py
+	$(PYTHON) -m unittest discover -s scripts/tests -p 'test_*.py'
+	$(PYTHON) scripts/check_development_docs.py
+	@printf '%s\n' 'Source, architecture import boundaries, and development links passed. No general lint or type-check gate is configured.'
 
 smoke:
 	@test -x "$(P1_DIR)/.venv/bin/python" -a -x "$(P1_DIR)/.p1/bin/temporal" || { \
@@ -95,9 +98,10 @@ cleanup:
 	rm .p1/runtime.env
 
 p2-acceptance:
-	@[[ "$$(uname -s)/$$(uname -m)" == Linux/x86_64 ]] || { \
-	  printf '%s\n' 'P2 acceptance currently requires isolated Linux AMD64 with Docker Compose.' >&2; exit 1; \
-	}
+	@case "$$(uname -s)/$$(uname -m)" in \
+	  Linux/aarch64|Linux/x86_64) ;; \
+	  *) printf '%s\n' 'P2 acceptance requires isolated Linux ARM64/AMD64 with Docker Compose.' >&2; exit 1 ;; \
+	esac
 	@set -euo pipefail; \
 	umask 077; mkdir -p "$(CURDIR)/core/.runtime"; \
 	run_dir="$$(mktemp -d "$(CURDIR)/core/.runtime/accept.XXXXXXXX")"; \
