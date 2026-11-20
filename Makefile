@@ -99,17 +99,17 @@ p2-acceptance:
 	  printf '%s\n' 'P2 acceptance currently requires isolated Linux AMD64 with Docker Compose.' >&2; exit 1; \
 	}
 	@set -euo pipefail; \
-	umask 077; mkdir -p "$(CURDIR)/p2-core/.runtime"; \
-	run_dir="$$(mktemp -d "$(CURDIR)/p2-core/.runtime/accept.XXXXXXXX")"; \
+	umask 077; mkdir -p "$(CURDIR)/core/.runtime"; \
+	run_dir="$$(mktemp -d "$(CURDIR)/core/.runtime/accept.XXXXXXXX")"; \
 	export P2_ENV_FILE="$$run_dir/dev.env"; \
 	printf 'P2 isolated results: %s\n' "$$run_dir"; \
 	finish() { \
 	  status=$$?; trap - EXIT; \
-	  if ! sh p2-core/infra/dev.sh clean; then [[ "$$status" -ne 0 ]] || status=1; fi; \
+	  if ! sh core/infra/dev.sh clean; then [[ "$$status" -ne 0 ]] || status=1; fi; \
 	  exit "$$status"; \
 	}; \
 	trap finish EXIT; \
 	trap 'exit 130' INT; \
 	trap 'exit 143' TERM; \
-	sh p2-core/infra/dev.sh init; \
-	sh p2-core/infra/dev.sh test
+	sh core/infra/dev.sh init; \
+	sh core/infra/dev.sh test

@@ -1,7 +1,7 @@
 # 明镜业务智能体工程
 
 本仓库保存工程方案、P1 隔离验证和 P2 最小公共层。阶段结论和待放行事项见
-[P1 验收报告](p1-walking-skeleton/P1_REPORT.md)与 [P2 验收记录](p2-core/P2_REPORT.md)。
+[P1 验收报告](p1-walking-skeleton/P1_REPORT.md)与 [P2 验收记录](core/P2_REPORT.md)。
 
 ## 用 Codex 开发
 
@@ -32,5 +32,5 @@ Daytona 跑完整验收前需确认其当前 Docker/Compose 能力。
 
 - [方案入口](mingjing-codex-engineering-v1/README.md)
 - [P1 运行与复现说明](p1-walking-skeleton/README.md)
-- [P2 接口与操作手册](p2-core/README.md)
+- [P2 接口与操作手册](core/README.md)
 - [开发流程的来源与适配说明](docs/development.md#采用依据与核验版本)

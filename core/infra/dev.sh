@@ -5,7 +5,7 @@ action=${1:-}
 env_file=${P2_ENV_FILE:-.runtime/dev.env}
 if [ ! -e "$env_file" ]; then
     [ "$action" != clean ] || exit 0
-    [ "$action" = init ] || { echo 'Run sh p2-core/infra/dev.sh init first.' >&2; exit 1; }
+    [ "$action" = init ] || { echo 'Run sh core/infra/dev.sh init first.' >&2; exit 1; }
     umask 077
     mkdir -p "$(dirname "$env_file")"
     printf 'P2_PROJECT=mingjing-p2-%s\n' "$(openssl rand -hex 5)" > "$env_file"

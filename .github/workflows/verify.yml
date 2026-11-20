@@ -68,7 +68,7 @@ jobs:
         timeout-minutes: 5
         run: make cleanup
 
-  p2-core-amd64:
+  p2-amd64:
     name: P2 public layer (amd64)
     runs-on: ubuntu-24.04
     timeout-minutes: 20
