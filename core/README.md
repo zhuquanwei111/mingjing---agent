@@ -20,7 +20,8 @@ init 创建专用项目名称和合成数据库密码，使用 PostgreSQL 17.12�
       test ! -e core/.runtime/dev.env &&
       mkdir -p core/.runtime &&
       P2_ENV_FILE=../p2-core/.runtime/dev.env sh core/infra/dev.sh stop &&
-      mv p2-core/.runtime/dev.env core/.runtime/dev.env &&
+      mv -nT p2-core/.runtime/dev.env core/.runtime/dev.env &&
+      test ! -e p2-core/.runtime/dev.env &&
       P2_ENV_FILE=.runtime/dev.env sh core/infra/dev.sh run
 
 ### API v1
