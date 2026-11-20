@@ -11,6 +11,7 @@
 - P2 公共层代码、迁移及操作手册：`core/`。
 - 当前验收结论与未放行项：`p1-walking-skeleton/P1_REPORT.md`。
 - 开发、独立审查、提交和接续的执行方式：`docs/development.md`。
+- Codex 开发方式配置的完整范围与验收进度：`docs/tasks/codex-development-configuration.md`。
 - 本地与 CI 的检查入口：根目录 `Makefile`。
 
 先依据相关文档和已有实现定位问题，再编辑。P1 功能验收通过不代表镜像安全
