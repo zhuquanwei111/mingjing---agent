@@ -14,7 +14,7 @@ PYTHON ?= python3
 EXPECTED_RUN_ID ?=
 export EXPECTED_RUN_ID
 
-.PHONY: help check smoke acceptance cleanup p2-acceptance p2-cleanup
+.PHONY: help check smoke acceptance cleanup p2-acceptance
 
 help:
 	@printf '%s\n' \
@@ -98,13 +98,14 @@ p2-acceptance:
 	@[[ "$$(uname -s)/$$(uname -m)" == Linux/x86_64 ]] || { \
 	  printf '%s\n' 'P2 acceptance currently requires isolated Linux AMD64 with Docker Compose.' >&2; exit 1; \
 	}
-	@[[ ! -e p2-core/.runtime/dev.env ]] || { \
-	  printf '%s\n' 'Use a fresh checkout for P2 acceptance. The existing development project is active or reusable.' >&2; exit 1; \
-	}
 	@set -euo pipefail; \
+	umask 077; mkdir -p "$(CURDIR)/p2-core/.runtime"; \
+	run_dir="$$(mktemp -d "$(CURDIR)/p2-core/.runtime/accept.XXXXXXXX")"; \
+	export P2_ENV_FILE="$$run_dir/dev.env"; \
+	printf 'P2 isolated results: %s\n' "$$run_dir"; \
 	finish() { \
 	  status=$$?; trap - EXIT; \
-	  if ! make --no-print-directory p2-cleanup; then [[ "$$status" -ne 0 ]] || status=1; fi; \
+	  if ! sh p2-core/infra/dev.sh clean; then [[ "$$status" -ne 0 ]] || status=1; fi; \
 	  exit "$$status"; \
 	}; \
 	trap finish EXIT; \
@@ -112,6 +113,3 @@ p2-acceptance:
 	trap 'exit 143' TERM; \
 	sh p2-core/infra/dev.sh init; \
 	sh p2-core/infra/dev.sh test
-
-p2-cleanup:
-	sh p2-core/infra/dev.sh clean

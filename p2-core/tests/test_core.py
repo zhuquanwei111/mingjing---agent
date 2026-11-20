@@ -1,18 +1,21 @@
 import asyncio
 from concurrent.futures import ThreadPoolExecutor
 from dataclasses import replace
-from datetime import UTC, datetime, timedelta
+from datetime import UTC, date, datetime, timedelta
 from pathlib import Path
 from shutil import copy2
 from threading import Barrier, Event
-from uuid import UUID
+from time import monotonic, sleep
+from uuid import UUID, uuid4
 
 import psycopg
 import pytest
+from temporalio.service import RPCError, RPCStatusCode
 
 from conftest import RESOURCE
+from mingjing import artifacts, temporal_adapter
 from mingjing.catalog import Catalog
-from mingjing.contracts import Action, Fault
+from mingjing.contracts import Action, Fault, Model, Result
 from mingjing.db import Database
 from mingjing.service import Service
 from mingjing.temporal_adapter import connect, make_worker
@@ -77,6 +80,49 @@ def test_submit_does_not_grant_task_or_receipt_read_access(rig):
         assert http.request("GET", task)[1]["receipt"]["value"] == {"text": "private result"}
         rig.grant(name, "author", Action.READ, False)
         assert http.submit(name, {"text": "private result"}, key="execute-only") == (200, ack)
+
+
+def test_strict_json_contract_matches_temporal_types_at_submission_and_execution(rig):
+    class TypedInput(Model):
+        day: date
+        marker: UUID
+
+    def handler(data, context, notes):
+        assert isinstance(data.day, date) and isinstance(data.marker, UUID)
+        return Result({"text": data.day.isoformat()})
+
+    name = "normalize_text"
+    cap = rig.catalog.implementation(name, 1)
+    rig.catalog.entries[name, 1] = replace(cap, input=TypedInput, handler=handler)
+    rig.publish(name)
+    with rig.http() as http:
+        payload = {"day": "2026-11-20", "marker": str(uuid4())}
+        status, view = http.submit(name, payload)
+        assert status == 200
+        assert view["receipt"]["value"] == {"text": "2026-11-20"}
+        assert http.submit(name, {**payload, "day": "invalid"})[0] == 422
+
+
+def test_artifact_sync_failure_leaves_operation_uncommitted(rig, monkeypatch):
+    name = "normalize_text"
+    rig.publish(name)
+
+    def unavailable(_):
+        raise OSError("synthetic disk failure")
+
+    with rig.http() as http:
+        with monkeypatch.context() as fault:
+            fault.setattr(artifacts.os, "fsync", unavailable)
+            assert http.submit(name, {"text": "durable"}, key="fsync-failure") == (
+                503, {"schema_version": 1, "code": "artifact_store_unavailable"},
+            )
+        with rig.db.open() as conn:
+            assert not conn.execute("SELECT 1 FROM artifacts WHERE tenant=%s", (rig.tenant,)).fetchone()
+            assert not conn.execute("SELECT 1 FROM receipts WHERE tenant=%s", (rig.tenant,)).fetchone()
+        status, view = http.submit(name, {"text": "durable"}, key="fsync-failure")
+        assert status == 200
+        assert view["receipt"]["state"] == "succeeded"
+        assert http.request("GET", "/v1/artifacts/" + view["receipt"]["artifact_id"]) == (200, b"durable")
 
 
 async def get_when(http, task, predicate):
@@ -152,6 +198,78 @@ def test_revocation_after_approval_denies_actual_workflow_io(rig):
             with rig.db.open() as conn:
                 assert not conn.execute("SELECT 1 FROM example_notes WHERE tenant=%s", (rig.tenant,)).fetchone()
     asyncio.run(check())
+
+
+@pytest.mark.parametrize("expiration", ["approval", "requester", "approver"])
+def test_expiration_is_rechecked_after_approval_grant_lock_wait(rig, expiration):
+    name = "write_note"
+    rig.publish(name)
+    task = rig.service.submit(rig.tokens["author"], name, 1, RESOURCE, {"content": "expires"}, "expires")
+    task_id = UUID(task["task_id"])
+    rig.service.approval(rig.tokens["approver"], task_id, "approved")
+    with rig.owner.open() as conn:
+        expires_at = conn.execute("SELECT clock_timestamp()+interval '1.5 seconds' AS until").fetchone()["until"]
+        if expiration == "approval":
+            conn.execute("UPDATE approvals SET expires_at=%s WHERE task_id=%s", (expires_at, task_id))
+        else:
+            identifier = rig.credentials["author" if expiration == "requester" else "approver"]
+            conn.execute("UPDATE credentials SET expires_at=%s WHERE id=%s", (expires_at, identifier))
+    with ThreadPoolExecutor(max_workers=1) as executor:
+        with rig.owner.open() as holder, rig.owner.open() as observer:
+            blocker = holder.execute("SELECT pg_backend_pid() AS pid").fetchone()["pid"]
+            holder.execute(
+                "SELECT 1 FROM grants WHERE tenant=%s AND subject='approver' AND action='approve' FOR UPDATE",
+                (rig.tenant,),
+            )
+            started = executor.submit(rig.service.execute, task_id)
+            deadline = monotonic() + 1
+            while not observer.execute(
+                "SELECT EXISTS(SELECT 1 FROM pg_stat_activity WHERE %s=ANY(pg_blocking_pids(pid))) AS waiting",
+                (blocker,),
+            ).fetchone()["waiting"]:
+                assert monotonic() < deadline, "executor did not reach the held approval grant"
+                sleep(0.025)
+            sleep(max(0, (expires_at - datetime.now(UTC)).total_seconds()) + 0.05)
+        assert started.result(timeout=4)
+    view = rig.service.system_view(task_id)
+    assert view["state"] == "denied"
+    expected = "approval_unavailable" if expiration == "approval" else "unauthenticated"
+    assert view["receipt"]["code"] == expected
+    with rig.db.open() as conn:
+        assert not conn.execute("SELECT 1 FROM example_notes WHERE tenant=%s", (rig.tenant,)).fetchone()
+
+
+def test_retained_run_mapping_prevents_restart_when_engine_history_is_gone(rig, monkeypatch):
+    name = "write_note"
+    rig.publish(name)
+    fields = {"content": "retained product task"}
+    task = rig.service.submit(rig.tokens["author"], name, 1, RESOURCE, fields, "old")
+    task_id = UUID(task["task_id"])
+    temporal_run = str(uuid4())
+    rig.service.engine(task_id, "running", temporal_run)
+
+    class AbsentHistory:
+        async def describe(self, *, rpc_timeout):
+            raise RPCError("synthetic pruned history", RPCStatusCode.NOT_FOUND, b"")
+
+    class ClientWithoutHistory:
+        async def start_workflow(self, *args, **kwargs):
+            pytest.fail("a known run must not be started again")
+
+        def get_workflow_handle(self, workflow_id, *, run_id):
+            assert workflow_id == task["run"]["workflow_id"] and run_id == temporal_run
+            return AbsentHistory()
+
+    async def connect():
+        return ClientWithoutHistory()
+
+    monkeypatch.setattr(temporal_adapter, "connect", connect)
+    with rig.http() as http:
+        status, observed = http.submit(name, fields, key="old")
+        assert status == 200
+        assert observed["state"] == "unknown" and observed["receipt"] is None
+        assert observed["run"]["engine_state"] == "history_unavailable"
+        assert http.submit(name, fields, key="old") == (200, observed)
 
 
 def test_credential_revocation_and_cancellation_preserve_committed_receipt(rig):
@@ -300,6 +418,24 @@ def test_audit_and_otel_ids(rig):
     assert [event["event"] for event in audit] == ["task_submitted", "execution_allowed", "receipt_succeeded"]
 
 
+def test_grant_audit_records_each_decision(rig):
+    name = "normalize_text"
+    rig.lifecycle(name)
+    for allowed in (True, False):
+        rig.grant(name, "author", Action.EXECUTE, allowed)
+    with rig.db.open() as conn:
+        rows = conn.execute(
+            "SELECT subject,details FROM audit WHERE tenant=%s AND event='grant_changed' ORDER BY id", (rig.tenant,),
+        ).fetchall()
+    assert rows == [
+        {"subject": "admin", "details": {
+            "subject": "author", "capability_id": name, "version": 1, "resource": RESOURCE,
+            "action": "execute", "allowed": enabled,
+        }}
+        for enabled in (True, False)
+    ]
+
+
 def test_migration_checksums_and_database_separation(rig, tmp_path):
     assert rig.owner.migrate(Path("migrations")) == []
     for migration in Path("migrations").glob("*.sql"):
@@ -312,9 +448,12 @@ def test_migration_checksums_and_database_separation(rig, tmp_path):
             """SELECT current_user AS role,has_database_privilege(current_user,'temporal','CONNECT') AS engine,
                       has_database_privilege(current_user,'temporal_visibility','CONNECT') AS visibility,
                       has_table_privilege(current_user,'audit','UPDATE') AS audit_update,
-                      has_table_privilege(current_user,'audit','DELETE') AS audit_delete""",
+                      has_table_privilege(current_user,'audit','DELETE') AS audit_delete,
+                      has_table_privilege(current_user,'subjects','INSERT, UPDATE') AS subject_write,
+                      has_table_privilege(current_user,'credentials','SELECT, INSERT, UPDATE') AS credential_access""",
         ).fetchone()
-    assert roles == {"role": "p2_app", "engine": False, "visibility": False, "audit_update": False, "audit_delete": False}
+    assert roles.pop("role") == "p2_app"
+    assert not any(roles.values())
 
 
 def test_contract_versions_and_disable_gate(rig):

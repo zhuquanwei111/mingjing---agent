@@ -85,6 +85,9 @@ class TemporalAdapter:
         self.queue = queue
 
     async def start(self, view: dict) -> None:
+        if view["run"]["temporal_run_id"]:
+            await self.refresh(view)
+            return
         client = await connect()
         task_id = view["task_id"]
         cap = self.service.catalog.implementation(view["capability_id"], view["version"])
@@ -102,12 +105,17 @@ class TemporalAdapter:
 
     async def refresh(self, view: dict) -> None:
         client = await connect()
-        handle = client.get_workflow_handle(view["run"]["workflow_id"])
+        recorded_run = view["run"]["temporal_run_id"]
+        handle = client.get_workflow_handle(view["run"]["workflow_id"], run_id=recorded_run)
         try:
             info = await handle.describe(rpc_timeout=timedelta(seconds=3))
         except RPCError as error:
             if error.status != RPCStatusCode.NOT_FOUND:
                 raise
+            if recorded_run:
+                await asyncio.to_thread(
+                    self.service.engine, UUID(view["task_id"]), "history_unavailable", recorded_run,
+                )
             return
         if info.status:
             await asyncio.to_thread(self.service.engine, UUID(view["task_id"]), info.status.name.lower(), info.run_id)

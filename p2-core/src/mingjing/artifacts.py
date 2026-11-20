@@ -1,3 +1,4 @@
+import os
 from hashlib import sha256
 from pathlib import Path
 from tempfile import NamedTemporaryFile
@@ -14,15 +15,25 @@ class BlobStore:
         if len(data) > 64 * 1024:
             raise Fault("artifact_too_large", 413)
         digest = sha256(data).hexdigest()
-        self.root.mkdir(parents=True, mode=0o700, exist_ok=True)
+        if not self.root.is_dir():
+            raise Fault("artifact_store_unavailable", 503)
         target = self.root / digest
-        with NamedTemporaryFile(dir=self.root) as stream:
-            stream.write(data)
-            stream.flush()
+        try:
+            with NamedTemporaryFile(dir=self.root) as stream:
+                stream.write(data)
+                stream.flush()
+                os.fsync(stream.fileno())
+                try:
+                    target.hardlink_to(stream.name)
+                except FileExistsError:
+                    self.read(digest)
+            directory = os.open(self.root, os.O_RDONLY | os.O_DIRECTORY)
             try:
-                target.hardlink_to(stream.name)
-            except FileExistsError:
-                self.read(digest)
+                os.fsync(directory)
+            finally:
+                os.close(directory)
+        except OSError as error:
+            raise Fault("artifact_store_unavailable", 503) from error
         return digest
 
     def read(self, digest: str) -> bytes:

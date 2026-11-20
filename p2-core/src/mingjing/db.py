@@ -7,6 +7,7 @@ from uuid import UUID, uuid4
 
 import psycopg
 from psycopg.rows import dict_row
+from psycopg.types.json import Jsonb
 
 from .contracts import Fault, Identity
 
@@ -78,25 +79,21 @@ def token_hash(token: str) -> str:
 
 
 def authenticate(connection, *, token: str | None = None, credential: UUID | None = None) -> Identity:
-    if token is not None and 32 <= len(token) <= 512:
-        clause, value = "c.fingerprint=%s", token_hash(token)
-    elif credential is not None:
-        clause, value = "c.id=%s", credential
-    else:
+    fingerprint = token_hash(token) if token is not None and 32 <= len(token) <= 512 else None
+    if credential is None and fingerprint is None:
         raise Fault("unauthenticated", 401)
     row = connection.execute(
-        f"""SELECT c.id,c.tenant,c.subject,s.administrator
-            FROM credentials c JOIN subjects s USING (tenant,subject)
-            WHERE {clause} AND NOT c.revoked AND c.expires_at>clock_timestamp() AND s.enabled
-            FOR SHARE OF c,s""", (value,),
+        "SELECT * FROM public.authenticate_identity(%s, %s)", (credential, fingerprint),
     ).fetchone()
     if not row:
         raise Fault("unauthenticated", 401)
     return Identity(row["id"], row["tenant"], row["subject"], row["administrator"])
 
 
-def audit(connection, tenant: str, subject: str, event: str, task=None, attempt=None) -> None:
+def audit(connection, tenant: str, subject: str, event: str, task=None, attempt=None,
+          *, details: dict | None = None) -> None:
     connection.execute(
-        "INSERT INTO audit(tenant,subject,task_id,operation_id,attempt_id,event) VALUES (%s,%s,%s,%s,%s,%s)",
-        (tenant, subject, task["id"] if task else None, task["operation_id"] if task else None, attempt, event),
+        "INSERT INTO audit(tenant,subject,task_id,operation_id,attempt_id,event,details) VALUES (%s,%s,%s,%s,%s,%s,%s)",
+        (tenant, subject, task["id"] if task else None, task["operation_id"] if task else None,
+         attempt, event, Jsonb(details or {})),
     )

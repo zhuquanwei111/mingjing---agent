@@ -93,7 +93,9 @@ class Catalog:
                     state = "validated"
                 else:
                     state = self.update_publication(connection, key, release["state"], target)
-            audit(connection, identity.tenant, identity.subject, f"capability_{state}")
+            audit(connection, identity.tenant, identity.subject, f"capability_{state}", details={
+                "capability_id": name, "version": version, "environment": self.environment,
+            })
             return {**capability.description(), "state": state, "environment": self.environment}
 
     def update_publication(self, connection, key: tuple, registration: str, target: str) -> str:
@@ -141,7 +143,10 @@ class Catalog:
                    DO UPDATE SET allowed=EXCLUDED.allowed""",
                 (identity.tenant, subject, name, version, resource, action.value, allowed),
             )
-            audit(connection, identity.tenant, identity.subject, "grant_changed")
+            audit(connection, identity.tenant, identity.subject, "grant_changed", details={
+                "subject": subject, "capability_id": name, "version": version,
+                "resource": resource, "action": action.value, "allowed": allowed,
+            })
 
     def discover(self, token: str, resource: str) -> list[dict]:
         with self.db.open() as connection:

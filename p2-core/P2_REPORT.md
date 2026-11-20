@@ -22,7 +22,7 @@
 | 产物、审计和追踪 | 跨租户及撤权后不能读取产物。产品、引擎和工具 span 可关联，同库审计、尝试与收据持久存在。应用角色不能更新或删除审计。 |
 | 启动与迁移 | 运行两份迁移并重跑验证，拒绝篡改的已应用迁移。独立 API 容器健康端点返回 200，Worker 在专用任务队列有轮询者。 |
 
-最终 sh infra/dev.sh test 为 **11 通过，0 失败**。真实服务与本轮断言见 [运行结果](evidence/runtime.txt)、[测试索引](evidence/test-summary.txt) 和 [JUnit](evidence/junit.xml)。
+历史提交 `7d4df4f` 的 `sh infra/dev.sh test` 为 **11 通过，0 失败**。该提交的真实服务与断言见 [运行结果](evidence/runtime.txt)、[测试索引](evidence/test-summary.txt) 和 [JUnit](evidence/junit.xml)。当前 PR 以其 `P2 public layer (amd64)` 运行结果验证实际变更。
 
 ## 放行条件与回退
 

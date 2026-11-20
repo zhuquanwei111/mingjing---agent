@@ -123,8 +123,8 @@ class Capability:
 
     def validate_input(self, payload: dict) -> BaseModel:
         try:
-            return self.input.model_validate(payload)
-        except ValidationError as error:
+            return self.input.model_validate_json(json.dumps(payload, allow_nan=False))
+        except (ValueError, TypeError) as error:
             raise Fault("invalid_input", 422) from error
 
     def validate_output(self, payload: dict) -> dict:

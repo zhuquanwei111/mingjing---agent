@@ -10,9 +10,9 @@ P2 提供能力目录、版本发布、资源授权、任务与 Run API、审批
     sh p2-core/infra/dev.sh test
     sh p2-core/infra/dev.sh status
 
-init 创建专用项目名称和合成数据库密码，使用 PostgreSQL 17.12、Temporal Server 1.32.2 和 CPython 3.12.16 的固定镜像，执行三库初始化和产品迁移。test 在内部网络运行 API、Temporal Worker 和合成调用场景，将 JUnit 输出到 .runtime/junit.xml。依赖来自 [P1 已验证的 x86_64 锁](requirements/linux-x86_64.lock)，安装校验每个 wheel 的哈希。服务使用内部网络，API 在容器内绑定回环，Worker 为 UID 10101。生产制品放行仍需处理 [P1 镜像安全发现](../p1-walking-skeleton/evidence/lima/image-scan.json)。
+init 创建专用项目名称和合成数据库密码，使用 PostgreSQL 17.12、Temporal Server 1.32.2 和 CPython 3.12.16 的固定镜像，执行三库初始化和产品迁移。test 在内部网络运行 API、Temporal Worker 和合成调用场景。手动测试的 JUnit 位于 `p2-core/.runtime/junit.xml`，自动验收写入命令输出指定的独立目录。依赖来自 [P1 已验证的 x86_64 锁](requirements/linux-x86_64.lock)，安装校验每个 wheel 的哈希。服务使用内部网络，API 在容器内绑定回环，Worker 为 UID 10101。生产制品放行仍需处理 [P1 镜像安全发现](../p1-walking-skeleton/evidence/lima/image-scan.json)。
 
-手动调试执行 sh infra/dev.sh run，在 API 容器内使用 127.0.0.1:8080。执行 sh infra/dev.sh stop 可停止本项目容器，开发卷供下一次启动复用。应用和 Worker 共用产品角色及受限的产物卷。迁移和凭据开通使用专用的 MINGJING_MIGRATION_DSN，应用角色连接不到 Temporal 主库和可见性库。私有的 .runtime 文件应仅由本项目运维者读取。
+从根目录执行 `sh p2-core/infra/dev.sh run`，它在数据库和 Temporal 就绪并执行迁移后启动 API 与 Worker。API 容器内地址为 `127.0.0.1:8080`。`sh p2-core/infra/dev.sh stop` 停止此项目容器，开发卷供下次启动复用。迁移和凭据开通使用专用的 `MINGJING_MIGRATION_DSN`。应用角色通过受限认证函数读取身份，凭据开通和撤销由迁移角色管理。
 
 ### API v1
 
@@ -32,6 +32,8 @@ init 创建专用项目名称和合成数据库密码，使用 PostgreSQL 17.12�
 
 结构化错误含 schema_version 和 code。API 中出现引擎不可用时，原调用方可用相同请求键重试提交，数据库与引擎 ID 保持稳定。审批决策在发送信号前提交，Workflow 定期查看数据库审批状态。取消采用同样的先持久化原则。
 
+已记录 Temporal Run ID 的任务始终按该 Run 查询。引擎确认历史不可取得且业务收据缺失时，产品状态显示为 `unknown`，供人工核实。
+
 ### 开发能力与扩展
 
 定义 Model 的输入输出类型和 CapabilityContext 上下文，再在应用加载配置中注册 Capability。业务函数通过 NotesPort 使用同库事务。普通程序 normalize_text 返回产物，固定 Workflow 的 write_note 审批后记一条合成笔记，Agent 的 draft_note 使用固定决策和受控工具复用同一笔记实现。业务函数的签名与 Temporal 和 LangGraph 无关。应用根据可信契约决定执行入口。
@@ -43,7 +45,7 @@ init 创建专用项目名称和合成数据库密码，使用 PostgreSQL 17.12�
 - 业务写入、产品收据和审计同事务提交。已有收据阻止重复 I/O。对外发送前先提交预留和发送记录，发送前再次检查实时门禁。
 - 跨事务发送期间持有 PostgreSQL 会话锁。发送进程退出后，同键重试会将未完成的发送标为未知，保留预留并等待可信对账。
 - 产品 Run 与 Temporal Run ID 分别记录。只有可信产品 API 持久化审批，Temporal Signal 仅提示重新检查。
-- 摘要寻址的本地文件存储用于开发演练。业务库保存不可覆盖的产物元数据，版本 1 的写入采用原子链接，读取前校验授权。孤立字节可由后续存储清理流程回收。
+- 摘要寻址的本地文件存储用于开发演练。预先创建产物目录，文件及目录同步成功后才提交产物元数据和业务收据。读取前校验授权。孤立字节可由后续存储清理流程回收。
 - OTel SDK 可按 MINGJING_LOCAL_TRACE=1 输出开发追踪。审计表禁止应用角色更新或删除，授权、尝试及结果证据独立保存。
 
 生产接入还需要企业身份、生产对象存储、对外 TLS、供应商回执和成本上界、负载及 HA 验证。当前 API 的同步重试和异步状态查询用于开发闭环。后台无人值守投递和自动对账需专项验证。

@@ -74,7 +74,6 @@ jobs:
     timeout-minutes: 20
     steps:
       - name: Check out source
-        id: checkout
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
         with:
           persist-credentials: false
@@ -84,8 +83,3 @@ jobs:
 
       - name: Run isolated P2 tests
         run: make p2-acceptance
-
-      - name: Clean current isolated P2 project
-        if: ${{ always() && steps.checkout.outcome == 'success' }}
-        timeout-minutes: 5
-        run: make p2-cleanup

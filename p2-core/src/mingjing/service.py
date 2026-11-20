@@ -13,6 +13,7 @@ from .contracts import Action, Capability, CapabilityContext, Fault, Identity, K
 from .db import Database, audit, authenticate
 
 TERMINAL = {"succeeded", "denied", "unknown", "cancelled", "failed"}
+ENGINE_TERMINAL = {"completed", "failed", "cancelled", "terminated", "timed_out"}
 TRACER = trace.get_tracer("mingjing.core")
 EXECUTION_LOCK_SEED = 687202
 
@@ -255,8 +256,10 @@ class Service:
             task = load_task(connection, task_id)
             if not task["workflow_id"]:
                 return
-            closed = status in {"completed", "failed", "cancelled", "terminated", "timed_out"}
-            if task["engine_state"] in {"completed", "failed", "cancelled", "terminated", "timed_out"} and not closed:
+            closed = status in ENGINE_TERMINAL or status == "history_unavailable"
+            if task["engine_state"] in ENGINE_TERMINAL and status not in ENGINE_TERMINAL:
+                return
+            if task["engine_state"] == "history_unavailable" and status not in ENGINE_TERMINAL:
                 return
             connection.execute(
                 """UPDATE runs SET temporal_run_id=COALESCE(%s,temporal_run_id),engine_state=%s,
@@ -266,7 +269,7 @@ class Service:
                 (temporal_run_id, status, closed, task_id),
             )
             if closed and task["state"] not in TERMINAL and not load_receipt(connection, task):
-                state = "cancelled" if status == "cancelled" else "failed"
+                state = {"cancelled": "cancelled", "history_unavailable": "unknown"}.get(status, "failed")
                 set_state(connection, task, state)
                 audit(connection, task["tenant"], task["subject"], f"orchestration_{state}", task)
 
@@ -283,6 +286,7 @@ class Service:
             raise Fault("identity_mismatch", 403)
         self.catalog.release(connection, identity.tenant, cap, inflight=True)
         require_grant(connection, identity, cap.name, cap.version, task["resource"], Action.EXECUTE)
+        approval = None
         if cap.approval:
             approval = connection.execute(
                 "SELECT *,expires_at>clock_timestamp() AS fresh FROM approvals WHERE task_id=%s FOR SHARE",
@@ -298,6 +302,16 @@ class Service:
             if approver.tenant != identity.tenant or approver.subject != approval["approver"]:
                 raise Fault("approval_unavailable")
             require_grant(connection, approver, cap.name, cap.version, task["resource"], Action.APPROVE)
+        # The share locks remain held. Recheck time-based conditions after
+        # waiting for the grant and release locks, before the adapter can write.
+        authenticate(connection, credential=task["credential_id"])
+        if approval is not None:
+            authenticate(connection, credential=approval["credential_id"])
+            if not connection.execute(
+                "SELECT expires_at>clock_timestamp() AS fresh FROM approvals WHERE task_id=%s",
+                (task["id"],),
+            ).fetchone()["fresh"]:
+                raise Fault("approval_unavailable")
 
     def readiness(self, task_id: UUID) -> str:
         with self.db.open() as connection:
