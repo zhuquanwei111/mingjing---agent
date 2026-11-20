@@ -6,7 +6,7 @@
 
 ## macOS arm64 本地冒烟
 
-需要 CPython 3.12.16、curl 及 shasum。以下命令从仓库根目录执行。脚本使用空闲回环端口和项目临时目录，并在退出时关闭 CLI Server。
+需要 CPython 3.12.16、curl 及 shasum。以下命令从本仓库的 `p1-walking-skeleton/` 目录执行。脚本使用空闲回环端口和项目临时目录，并在退出时关闭 CLI Server。
 
 ```bash
 python3.12 -m venv .venv
@@ -20,11 +20,13 @@ tar -xzf .p1/temporal_cli_1.10.1_darwin_arm64.tar.gz -C .p1/bin temporal
 bash infra/smoke.sh
 ```
 
-## Linux arm64 隔离验收
+## Linux ARM64/x86_64 隔离验收
+
+从 Git 仓库根目录执行 `make acceptance`，可按同一顺序运行以下验收和恢复检查，并在成功或失败后清理本次 Compose project。支持原有 ARM64 环境与已有 Instabox 的 x86_64 环境；Docker 构建按目标架构选择对应带哈希的依赖锁，无需手工修改 Dockerfile。各环境分工见[开发流程](../docs/development.md#现有环境怎么使用)。
 
 在专用 Linux VM 中复制本仓库的文件，排除 `.git/`、`.p1/`、`.venv/`。本次使用 Lima 2.3.0 和 [VM 配置](infra/lima.yaml)。配置未挂载宿主机目录或转发 SSH agent，容器运行时仅安装在该 VM 中。
 
-在 VM 内执行。以项目私有的 `.p1/runtime.env` 保存新生成的合成凭据。Compose 仅使用内部网络，并且没有对宿主机发布任何服务端口。测试 runner 以 UID 10101 执行。旧版插件的测试程序使用独立 Python 环境，避免同名 namespace 包从新版环境加载。
+需要逐步运行时，以下命令从 VM 内的 `p1-walking-skeleton/` 目录执行。以项目私有的 `.p1/runtime.env` 保存新生成的合成凭据。Compose 仅使用内部网络，并且没有对宿主机发布任何服务端口。测试 runner 以 UID 10101 执行。旧版插件的测试程序使用独立 Python 环境，避免同名 namespace 包从新版环境加载。
 
 ```bash
 sh infra/new-run.sh
