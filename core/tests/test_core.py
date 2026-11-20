@@ -381,6 +381,41 @@ def test_unavailable_history_cannot_close_an_inflight_start_or_unseen_run(rig):
     assert refreshed["run"]["temporal_run_id"] == run_id and refreshed["run"]["engine_state"] == "running"
 
 
+def test_concurrent_resubmission_can_retry_a_failed_start(rig, monkeypatch):
+    rig.publish("write_note")
+    fields = {"content": "start retry"}
+    start_entered = Event()
+    release_start = Event()
+
+    class FailingClient:
+        async def start_workflow(self, *args, **kwargs):
+            start_entered.set()
+            assert release_start.wait(10), "test did not release the first start"
+            raise RPCError("synthetic pre-start failure", RPCStatusCode.UNAVAILABLE, b"")
+
+    async def connect_for_test():
+        if start_entered.is_set():
+            return await connect()
+        return FailingClient()
+
+    monkeypatch.setattr(temporal_adapter, "connect", connect_for_test)
+    with rig.http() as http, ThreadPoolExecutor(1) as pool:
+        first = pool.submit(http.submit, "write_note", fields, "concurrent-start")
+        try:
+            assert start_entered.wait(5), "first request did not reach Temporal start"
+            status, body = http.submit("write_note", fields, "concurrent-start")
+            assert status == 503 and body["code"] == "engine_start_in_progress"
+        finally:
+            release_start.set()
+        assert first.result(timeout=5)[0] == 503
+
+        status, started = http.submit("write_note", fields, "concurrent-start")
+        assert status == 202
+        run = started["run"]
+        assert run["temporal_run_id"] and run["engine_state"] == "running"
+        assert http.submit("write_note", fields, "concurrent-start") == (202, started)
+
+
 @pytest.mark.parametrize("submission", [True, False])
 def test_task_reads_retry_serialization_failure_with_fresh_authorization(rig, monkeypatch, submission):
     rig.publish("write_note")

@@ -14,7 +14,7 @@ from temporalio.langgraph import LangGraphPlugin
 from temporalio.service import RPCError, RPCStatusCode
 from temporalio.worker import Worker, WorkerDeploymentConfig
 
-from .contracts import Kind
+from .contracts import Fault, Kind
 from .service import Service, TERMINAL
 from .workflows import OPTIONS, TaskJob, TaskWorkflow
 
@@ -114,7 +114,7 @@ class TemporalAdapter:
             return
         lock = await asyncio.to_thread(self.service.lock_engine_start, task_id)
         if lock is None:
-            return
+            raise Fault("engine_start_in_progress", 503)
         try:
             view = await asyncio.to_thread(self.service.bind_engine_start, task_id, os.environ["TEMPORAL_NAMESPACE"])
             if not self.owns(view) or view["state"] in TERMINAL:
