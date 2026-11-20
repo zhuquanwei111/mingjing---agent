@@ -208,7 +208,7 @@ def test_expiration_is_rechecked_after_approval_grant_lock_wait(rig, expiration)
     task_id = UUID(task["task_id"])
     rig.service.approval(rig.tokens["approver"], task_id, "approved")
     with rig.owner.open() as conn:
-        expires_at = conn.execute("SELECT clock_timestamp()+interval '1.5 seconds' AS until").fetchone()["until"]
+        expires_at = conn.execute("SELECT clock_timestamp()+interval '2 seconds' AS until").fetchone()["until"]
         if expiration == "approval":
             conn.execute("UPDATE approvals SET expires_at=%s WHERE task_id=%s", (expires_at, task_id))
         else:
@@ -216,17 +216,20 @@ def test_expiration_is_rechecked_after_approval_grant_lock_wait(rig, expiration)
             conn.execute("UPDATE credentials SET expires_at=%s WHERE id=%s", (expires_at, identifier))
     with ThreadPoolExecutor(max_workers=1) as executor:
         with rig.owner.open() as holder, rig.owner.open() as observer:
+            observer.autocommit = True
             blocker = holder.execute("SELECT pg_backend_pid() AS pid").fetchone()["pid"]
             holder.execute(
                 "SELECT 1 FROM grants WHERE tenant=%s AND subject='approver' AND action='approve' FOR UPDATE",
                 (rig.tenant,),
             )
             started = executor.submit(rig.service.execute, task_id)
-            deadline = monotonic() + 1
+            deadline = monotonic() + 1.5
             while not observer.execute(
                 "SELECT EXISTS(SELECT 1 FROM pg_stat_activity WHERE %s=ANY(pg_blocking_pids(pid))) AS waiting",
                 (blocker,),
             ).fetchone()["waiting"]:
+                if started.done():
+                    pytest.fail(f"executor completed before grant release: {started.result()!r}")
                 assert monotonic() < deadline, "executor did not reach the held approval grant"
                 sleep(0.025)
             sleep(max(0, (expires_at - datetime.now(UTC)).total_seconds()) + 0.05)
