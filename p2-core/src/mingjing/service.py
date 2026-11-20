@@ -14,6 +14,7 @@ from .db import Database, audit, authenticate
 
 TERMINAL = {"succeeded", "denied", "unknown", "cancelled", "failed"}
 TRACER = trace.get_tracer("mingjing.core")
+EXECUTION_LOCK_SEED = 687202
 
 
 @dataclass(frozen=True)
@@ -181,6 +182,21 @@ class Service:
             _, row = require_task(connection, token, task, Action.READ)
             return task_view(connection, row)
 
+    def submission_response(self, token: str, task_id: UUID) -> tuple[int, dict]:
+        with self.db.open() as connection:
+            identity, task = require_task(connection, token, task_id, Action.EXECUTE)
+            status = 200 if task["state"] in TERMINAL else 202
+            try:
+                require_grant(
+                    connection, identity, task["capability"], task["version"], task["resource"], Action.READ,
+                )
+            except Fault:
+                return status, {
+                    "schema_version": 1, "task_id": str(task_id),
+                    "run": {"run_id": str(task["run_id"])},
+                }
+            return status, task_view(connection, task)
+
     def system_view(self, task: UUID) -> dict:
         with self.db.open() as connection:
             return task_view(connection, load_task(connection, task))
@@ -254,11 +270,14 @@ class Service:
                 set_state(connection, task, state)
                 audit(connection, task["tenant"], task["subject"], f"orchestration_{state}", task)
 
+    def require_pinned_contract(self, task, cap: Capability) -> None:
+        if (task["environment"] != self.catalog.environment or task["contract_hash"] != cap.fingerprint):
+            raise Fault("contract_drift", 503)
+
     def gate(self, connection, task, cap: Capability) -> None:
         if task["cancel_requested"]:
             raise Fault("cancelled")
-        if (task["environment"] != self.catalog.environment or task["contract_hash"] != cap.fingerprint):
-            raise Fault("contract_drift", 503)
+        self.require_pinned_contract(task, cap)
         identity = authenticate(connection, credential=task["credential_id"])
         if (identity.tenant, identity.subject) != (task["tenant"], task["subject"]):
             raise Fault("identity_mismatch", 403)
@@ -307,11 +326,22 @@ class Service:
                 {"code": fault.code}, attempt,
             )
 
-    def execute(self, task_id: UUID, *, agent_tool: str | None = None) -> None:
+    def execute(self, task_id: UUID, *, agent_tool: str | None = None) -> bool:
         with TRACER.start_as_current_span("mingjing.execute") as span:
-            external = self.start_execution(task_id, span, agent_tool)
-            if external:
-                self.send(task_id, *external)
+            # Keep a session lock over the reservation and the separate send
+            # transaction. A closed session releases it even if the process died.
+            with self.db.open() as lock:
+                acquired = lock.execute(
+                    "SELECT pg_try_advisory_lock(hashtextextended(%s,%s)) AS acquired",
+                    (str(task_id), EXECUTION_LOCK_SEED),
+                ).fetchone()
+                if not acquired["acquired"]:
+                    return False
+                lock.commit()
+                external = self.start_execution(task_id, span, agent_tool)
+                if external:
+                    self.send(task_id, *external)
+                return True
 
     def start_execution(self, task_id: UUID, span, agent_tool: str | None):
         with self.db.open() as connection:
@@ -321,7 +351,12 @@ class Service:
             )})
             if task["workflow_id"]:
                 span.set_attribute("workflow_id", task["workflow_id"])
-            if task["state"] in TERMINAL or load_receipt(connection, task):
+            if task["state"] in TERMINAL:
+                return None
+            previous = load_receipt(connection, task)
+            if previous:
+                if previous["state"] == "dispatching":
+                    self.mark_unknown(connection, task, previous["attempt_id"])
                 return None
             try:
                 cap = self.catalog.implementation(task["capability"], task["version"])
@@ -436,12 +471,19 @@ class Service:
 
     def reconcile(self, token: str, task_id: UUID) -> dict:
         with self.db.open() as connection:
+            available = connection.execute(
+                "SELECT pg_try_advisory_xact_lock(hashtextextended(%s,%s)) AS acquired",
+                (str(task_id), EXECUTION_LOCK_SEED),
+            ).fetchone()
             identity, task = require_task(connection, token, task_id, Action.RECONCILE)
+            if not available["acquired"]:
+                raise Fault("dispatch_inflight")
             cap = self.catalog.implementation(task["capability"], task["version"])
             receipt = load_receipt(connection, task)
             if not cap.provider or not receipt or not receipt["attempt_id"]:
                 raise Fault("reconciliation_unavailable")
             if receipt["state"] in ("dispatching", "unknown"):
+                self.require_pinned_contract(task, cap)
                 answer = cap.provider.lookup(task["operation_id"])
                 self.confirm_external(connection, task, cap, receipt["attempt_id"], answer)
                 audit(connection, identity.tenant, identity.subject, "reconciliation_checked", task, receipt["attempt_id"])

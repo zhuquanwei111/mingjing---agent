@@ -1,6 +1,6 @@
 # 明镜 P2 开发验收
 
-2026-11-19。最小公共层已在 InstaBox mj-agent 的 /data/workspace/mj-agent 下验收，开发分支为 codex/p2-core，基线为 40e02a8。执行真实 PostgreSQL、Temporal 和 LangGraph，业务数据、身份及供应商回执均来自合成夹具。
+本页归档 2026-11-19 的历史验收，对应 P2 实现提交 `7d4df4f`，基线为 `40e02a8`。该次测试在 InstaBox mj-agent 上执行真实 PostgreSQL、Temporal 和 LangGraph，业务数据、身份及供应商回执均来自合成夹具。后续候选在独立 checkout 使用 `make p2-acceptance` 复验，以对应提交的 CI 和运行日志为准。
 
 ## 环境和文件
 

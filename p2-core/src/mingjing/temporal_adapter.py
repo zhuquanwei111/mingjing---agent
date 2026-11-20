@@ -9,7 +9,7 @@ from temporalio import activity
 from temporalio.client import Client
 from temporalio.common import VersioningBehavior, WorkerDeploymentVersion, WorkflowIDReusePolicy
 from temporalio.contrib.opentelemetry import TracingInterceptor
-from temporalio.exceptions import WorkflowAlreadyStartedError
+from temporalio.exceptions import ApplicationError, WorkflowAlreadyStartedError
 from temporalio.langgraph import LangGraphPlugin
 from temporalio.service import RPCError, RPCStatusCode
 from temporalio.worker import Worker, WorkerDeploymentConfig
@@ -38,10 +38,12 @@ def make_worker(client: Client, queue: str, service: Service, deployment=None) -
 
     @activity.defn(name="mingjing.execute.v1")
     async def execute(task: str) -> None:
-        await asyncio.to_thread(service.execute, UUID(task))
+        if not await asyncio.to_thread(service.execute, UUID(task)):
+            raise ApplicationError("execution in progress", type="ExecutionInProgress")
 
     async def use_note_tool(state: AgentState) -> dict:
-        await asyncio.to_thread(service.execute, UUID(state["task_id"]), agent_tool=state["tool"])
+        if not await asyncio.to_thread(service.execute, UUID(state["task_id"]), agent_tool=state["tool"]):
+            raise ApplicationError("execution in progress", type="ExecutionInProgress")
         return {"done": True}
 
     agent = StateGraph(AgentState)

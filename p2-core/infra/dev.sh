@@ -3,6 +3,7 @@ set -eu
 cd "$(dirname "$0")/.."
 env_file=.runtime/dev.env
 if [ ! -e "$env_file" ]; then
+    [ "${1:-}" != clean ] || exit 0
     [ "$1" = init ] || { echo 'Run sh infra/dev.sh init first.' >&2; exit 1; }
     umask 077
     mkdir -p .runtime
@@ -26,10 +27,10 @@ case "$1" in
     test)
         compose build test
         runner="$project-test-$(openssl rand -hex 4)"
+        trap 'docker rm "$runner" >/dev/null 2>&1 || :' EXIT
         status=0
         compose run --no-deps -T --name "$runner" test || status=$?
         docker cp "$runner:/evidence/junit.xml" .runtime/junit.xml
-        docker rm "$runner" >/dev/null
         exit "$status"
         ;;
     run)
@@ -41,8 +42,12 @@ case "$1" in
     stop)
         compose down
         ;;
+    clean)
+        compose down --volumes --remove-orphans
+        rm "$env_file"
+        ;;
     *)
-        echo 'usage: sh infra/dev.sh init|test|run|status|stop' >&2
+        echo 'usage: sh infra/dev.sh init|test|run|status|stop|clean' >&2
         exit 2
         ;;
 esac

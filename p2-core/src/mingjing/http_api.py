@@ -62,16 +62,16 @@ class API:
             view = self.service.submit(
                 token, request.capability_id, request.version, request.resource, request.input, key,
             )
+            task_id = UUID(view["task_id"])
             span.set_attributes({key: view[key] for key in ("task_id", "operation_id")})
             span.set_attribute("run_id", view["run"]["run_id"])
             if view["state"] not in TERMINAL:
                 if view["run"]["workflow_id"]:
                     span.set_attribute("workflow_id", view["run"]["workflow_id"])
                     asyncio.run(self.engine.start(view))
-                    return 202, self.service.system_view(UUID(view["task_id"]))
-                self.service.execute(UUID(view["task_id"]))
-                view = self.service.system_view(UUID(view["task_id"]))
-            return (202 if view["state"] not in TERMINAL else 200), view
+                else:
+                    self.service.execute(task_id)
+            return self.service.submission_response(token, task_id)
 
     def get(self, token: str, task: UUID) -> dict:
         view = self.service.get(token, task)

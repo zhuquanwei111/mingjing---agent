@@ -4,7 +4,7 @@ from dataclasses import replace
 from datetime import UTC, datetime, timedelta
 from pathlib import Path
 from shutil import copy2
-from threading import Barrier
+from threading import Barrier, Event
 from uuid import UUID
 
 import psycopg
@@ -60,6 +60,23 @@ def test_api_lifecycle_grants_schema_idempotency_and_artifacts(rig):
         cancelled = http.request("POST", "/v1/tasks/" + first["task_id"] + "/cancel", who="approver")[1]
         assert cancelled == {"schema_version": 1, "task_id": first["task_id"], "cancel_requested": True}
         assert http.request("GET", "/v1/tasks/" + first["task_id"])[1]["state"] == "succeeded"
+
+
+def test_submit_does_not_grant_task_or_receipt_read_access(rig):
+    name = "normalize_text"
+    rig.lifecycle(name)
+    rig.grant(name, "author", Action.EXECUTE)
+    with rig.http() as http:
+        status, ack = http.submit(name, {"text": "private result"}, key="execute-only")
+        assert status == 200
+        assert set(ack) == {"schema_version", "task_id", "run"}
+        assert set(ack["run"]) == {"run_id"}
+        task = f"/v1/tasks/{ack['task_id']}"
+        assert http.request("GET", task)[0] == 403
+        rig.grant(name, "author", Action.READ)
+        assert http.request("GET", task)[1]["receipt"]["value"] == {"text": "private result"}
+        rig.grant(name, "author", Action.READ, False)
+        assert http.submit(name, {"text": "private result"}, key="execute-only") == (200, ack)
 
 
 async def get_when(http, task, predicate):
@@ -213,6 +230,58 @@ def test_unverifiable_external_keeps_hold_without_resend(rig):
         assert http.submit(name, {"mode": "unverifiable"}, key="no-evidence")[1] == first
         assert http.request("POST", f"/v1/tasks/{first['task_id']}/reconcile", who="admin")[1]["state"] == "unknown"
         assert len(rig.provider.calls) == 1 and rig.budget() == 0
+
+
+def test_abandoned_reservation_is_unknown_and_live_send_is_not_reconciled(rig, monkeypatch):
+    name = "fake_delivery"
+    rig.publish(name)
+    rig.budget(2)
+    pending = rig.service.submit(rig.tokens["author"], name, 1, RESOURCE, {"mode": "accept"}, "abandoned")
+    task_id = UUID(pending["task_id"])
+    reserved, release = Event(), Event()
+
+    def interrupted_send(*args):
+        reserved.set()
+        assert release.wait(10)
+        raise RuntimeError("synthetic interruption before the dispatch transaction")
+
+    with monkeypatch.context() as fault, ThreadPoolExecutor(max_workers=1) as pool:
+        fault.setattr(rig.service, "send", interrupted_send)
+        first = pool.submit(rig.service.execute, task_id)
+        try:
+            assert reserved.wait(10)
+            with pytest.raises(Fault, match="dispatch_inflight"):
+                rig.service.reconcile(rig.tokens["admin"], task_id)
+            assert rig.service.execute(task_id) is False
+            assert rig.service.system_view(task_id)["receipt"]["state"] == "dispatching"
+        finally:
+            release.set()
+        with pytest.raises(RuntimeError, match="synthetic interruption"):
+            first.result(timeout=10)
+    rig.service.execute(task_id)
+    assert rig.service.system_view(task_id)["receipt"]["state"] == "unknown"
+    assert rig.service.reconcile(rig.tokens["admin"], task_id)["state"] == "unknown"
+    assert rig.provider.calls == [] and rig.budget() == 0
+
+
+def test_reconciliation_requires_pinned_contract_and_environment(rig):
+    name = "fake_delivery"
+    rig.publish(name)
+    rig.budget(2)
+    pending = rig.service.submit(rig.tokens["author"], name, 1, RESOURCE, {"mode": "lose_receipt"}, "drift")
+    task_id = UUID(pending["task_id"])
+    rig.service.execute(task_id)
+    replacements = [
+        Catalog(rig.db, "preview", rig.catalog.entries.values()),
+        Catalog(rig.db, "dev", [replace(rig.catalog.implementation(name, 1), budget=3)]),
+    ]
+    for catalog in replacements:
+        stale = Service(rig.db, catalog, rig.service.blobs)
+        with pytest.raises(Fault, match="contract_drift"):
+            stale.reconcile(rig.tokens["admin"], task_id)
+    assert rig.budget() == 0
+    assert rig.service.reconcile(rig.tokens["admin"], task_id)["state"] == "succeeded"
+    assert len(rig.provider.calls) == 1 and rig.budget() == 1
 
 
 def test_audit_and_otel_ids(rig):

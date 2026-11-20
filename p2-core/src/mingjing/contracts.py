@@ -128,7 +128,10 @@ class Capability:
             raise Fault("invalid_input", 422) from error
 
     def validate_output(self, payload: dict) -> dict:
-        return self.output.model_validate(payload).model_dump(mode="json")
+        try:
+            return self.output.model_validate(payload).model_dump(mode="json")
+        except ValidationError as error:
+            raise Fault("invalid_adapter_output", 503) from error
 
 
 def digest(value: object) -> str:

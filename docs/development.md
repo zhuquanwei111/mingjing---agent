@@ -19,8 +19,11 @@
 | `make check` | Python AST 语法、按 shebang 选择的 shell 语法检查、代码与工作流等文件的空白检查；不冒充类型检查或完整 lint | Python 3、Git、sh/bash |
 | `make smoke` | 现有 macOS Temporal CLI 冒烟脚本 | 按 [P1 README](../p1-walking-skeleton/README.md)准备 `p1-walking-skeleton/.venv` 和已校验的 `.p1/bin/temporal` |
 | `make acceptance` | 既有全验收、备份恢复、Temporal 重启、独立重建；失败即停 | 隔离的 Linux ARM64 或 x86_64 环境与 Docker Compose |
+| `make p2-acceptance` | P2 迁移和公共层测试，包含真实 PostgreSQL、Temporal 及 LangGraph | 独立 Linux x86_64 checkout 与 Docker Compose |
 
 GitHub CI 的 **`P1 acceptance` 在官方 Linux ARM64 runner 上执行，承担正式验收**；它是本仓库 ruleset JSON 中唯一的 required check，服务器保护仍需实际启用。x86_64 使用独立的 `P1 regression (amd64, advisory)` 检查，为已有 Instabox 提供辅助回归反馈；不设为合并必需项，失败仍如实显示。x86_64 通过不能代替 ARM64 通过，也不代表项目承诺了新的正式部署平台。两者复用 `check` 和 `acceptance`，不维护两套测试逻辑。
+
+P2 使用 `P2 public layer (amd64)` 跑独立 Compose project。P2 runner 使用自身锁定的 x86_64 wheel，测试结束清理该项目的合成卷及凭据。
 
 验收与重建包含其原有 smoke 测试，但这不等于验证了 Darwin CLI。只改文档时不为凑本地流程启动整套服务；必需 CI 仍运行，避免缺少检查结果而无法合并。修改运行时、基础设施、依赖或验收逻辑时，按影响运行相应验证。历史 `evidence/` 不能作为新提交已通过的证明；保留本次日志、测试结果及对应 commit。PR 明确贴出本次 head 对应的 CI run 链接，并能打开 ARM64 job 的完整日志；独立代码审查和截图不能替代这份运行证据。上传证据只选本次 `.p1/results/` 和验证摘要，不打包含运行凭据、数据库备份的整个 `.p1/`。
 
