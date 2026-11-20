@@ -8,6 +8,7 @@
 
 - 产品、架构、能力契约与阶段计划：`mingjing-codex-engineering-v1/`。
 - P1 代码、测试及隔离基础设施：`p1-walking-skeleton/`。
+- P2 公共层代码、迁移及操作手册：`core/`。
 - 当前验收结论与未放行项：`p1-walking-skeleton/P1_REPORT.md`。
 - 开发、独立审查、提交和接续的执行方式：`docs/development.md`。
 - 本地与 CI 的检查入口：根目录 `Makefile`。

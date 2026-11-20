@@ -14,14 +14,15 @@ PYTHON ?= python3
 EXPECTED_RUN_ID ?=
 export EXPECTED_RUN_ID
 
-.PHONY: help check smoke acceptance cleanup
+.PHONY: help check smoke acceptance cleanup p2-acceptance
 
 help:
 	@printf '%s\n' \
 	  'make check       Check Python/shell syntax and source whitespace.' \
 	  'make smoke       Run the existing macOS smoke test (prepared local environment).' \
 	  'make acceptance  Run isolated Linux ARM64/AMD64 acceptance and recovery, then clean up.' \
-	  'make cleanup     Remove only the current isolated P1 project and its credentials.'
+	  'make cleanup     Remove only the current isolated P1 project and its credentials.' \
+	  'make p2-acceptance  Run the P2 public layer tests on isolated Linux AMD64.'
 
 # Compare tracked source against the empty tree so a clean CI checkout is checked
 # too. Check untracked source separately so new local files are not missed.
@@ -92,3 +93,23 @@ cleanup:
 	fi; \
 	sh infra/compose.sh down --volumes --remove-orphans; \
 	rm .p1/runtime.env
+
+p2-acceptance:
+	@[[ "$$(uname -s)/$$(uname -m)" == Linux/x86_64 ]] || { \
+	  printf '%s\n' 'P2 acceptance currently requires isolated Linux AMD64 with Docker Compose.' >&2; exit 1; \
+	}
+	@set -euo pipefail; \
+	umask 077; mkdir -p "$(CURDIR)/core/.runtime"; \
+	run_dir="$$(mktemp -d "$(CURDIR)/core/.runtime/accept.XXXXXXXX")"; \
+	export P2_ENV_FILE="$$run_dir/dev.env"; \
+	printf 'P2 isolated results: %s\n' "$$run_dir"; \
+	finish() { \
+	  status=$$?; trap - EXIT; \
+	  if ! sh core/infra/dev.sh clean; then [[ "$$status" -ne 0 ]] || status=1; fi; \
+	  exit "$$status"; \
+	}; \
+	trap finish EXIT; \
+	trap 'exit 130' INT; \
+	trap 'exit 143' TERM; \
+	sh core/infra/dev.sh init; \
+	sh core/infra/dev.sh test

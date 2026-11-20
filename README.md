@@ -1,7 +1,7 @@
 # 明镜业务智能体工程
 
-本仓库保存工程方案与 P1 隔离验证代码。当前阶段及尚未放行的事项见
-[P1 验收报告](p1-walking-skeleton/P1_REPORT.md)；CI 通过不改变阶段批准。
+本仓库保存工程方案、P1 隔离验证和 P2 最小公共层。阶段结论和待放行事项见
+[P1 验收报告](p1-walking-skeleton/P1_REPORT.md)与 [P2 验收记录](core/P2_REPORT.md)。
 
 ## 用 Codex 开发
 
@@ -15,6 +15,7 @@
 make check       # Python / Shell 语法及代码空白检查
 make smoke       # 已准备好的 macOS ARM64 环境冒烟
 make acceptance  # 专用 Linux ARM64/x86_64 Docker 环境：全量 P1 + 恢复与重建
+make p2-acceptance  # 专用 Linux x86_64 Docker 环境：P2 公共层
 ```
 
 `P1 acceptance` 是 GitHub Actions 上的正式 ARM64 检查；x86_64 单独提供辅助
@@ -31,4 +32,5 @@ Daytona 跑完整验收前需确认其当前 Docker/Compose 能力。
 
 - [方案入口](mingjing-codex-engineering-v1/README.md)
 - [P1 运行与复现说明](p1-walking-skeleton/README.md)
+- [P2 接口与操作手册](core/README.md)
 - [开发流程的来源与适配说明](docs/development.md#采用依据与核验版本)
