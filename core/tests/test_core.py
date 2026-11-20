@@ -413,7 +413,10 @@ def test_concurrent_resubmission_can_retry_a_failed_start(rig, monkeypatch):
         assert status == 202
         run = started["run"]
         assert run["temporal_run_id"] and run["engine_state"] == "running"
-        assert http.submit("write_note", fields, "concurrent-start") == (202, started)
+        lock = rig.service.lock_engine_start(UUID(started["task_id"]))
+        assert lock is not None
+        with lock:
+            assert http.submit("write_note", fields, "concurrent-start") == (202, started)
 
 
 @pytest.mark.parametrize("submission", [True, False])

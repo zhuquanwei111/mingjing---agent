@@ -3,6 +3,9 @@ set -eu
 cd "$(dirname "$0")/.."
 action=${1:-}
 env_file=${P2_ENV_FILE:-.runtime/dev.env}
+if [ -z "${P2_ENV_FILE:-}" ] && [ ! -e "$env_file" ] && [ -f ../p2-core/.runtime/dev.env ]; then
+    env_file=../p2-core/.runtime/dev.env
+fi
 if [ ! -e "$env_file" ]; then
     [ "$action" != clean ] || exit 0
     [ "$action" = init ] || { echo 'Run sh core/infra/dev.sh init first.' >&2; exit 1; }
@@ -52,7 +55,7 @@ case "$action" in
         rm "$env_file"
         ;;
     *)
-        echo 'usage: sh infra/dev.sh init|test|run|status|stop|clean' >&2
+        echo 'usage: sh core/infra/dev.sh init|test|run|status|stop|clean' >&2
         exit 2
         ;;
 esac

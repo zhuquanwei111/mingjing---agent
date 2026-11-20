@@ -14,6 +14,14 @@ init 创建专用项目名称和合成数据库密码，使用 PostgreSQL 17.12�
 
 从根目录执行 `sh core/infra/dev.sh run`，它在数据库和 Temporal 就绪并执行迁移后启动 API 与 Worker。API 容器内地址为 `127.0.0.1:8080`。`sh core/infra/dev.sh stop` 停止此项目容器，开发卷供下次启动复用。迁移和凭据开通使用专用的 `MINGJING_MIGRATION_DSN`。应用角色通过受限认证函数读取身份，凭据开通和撤销由迁移角色管理。
 
+已有开发栈升级后，脚本在 `core/.runtime/dev.env` 缺失时读取原来的 `p2-core/.runtime/dev.env`。迁移配置时在原 checkout 的 Git 根目录运行以下命令，沿用同一项目名、凭据、命名空间和开发卷。两处配置都存在时，默认使用 `core/.runtime/dev.env`。
+
+    sh core/infra/dev.sh stop &&
+      mkdir -p core/.runtime &&
+      test ! -e core/.runtime/dev.env &&
+      mv p2-core/.runtime/dev.env core/.runtime/dev.env &&
+      sh core/infra/dev.sh run
+
 ### API v1
 
 除 /healthz 外，接口使用短期高熵 Bearer 凭据。主体和租户来自产品库中的有效凭据，服务端每次验证其有效期和撤销状态。用受信的交互式终端执行 python -m mingjing add-identity TENANT SUBJECT [--administrator] 创建开发凭据，命令使用隐藏输入。数据库只保存凭据摘要。合成验收使用独立租户和临时凭据。
@@ -32,7 +40,7 @@ init 创建专用项目名称和合成数据库密码，使用 PostgreSQL 17.12�
 
 结构化错误含 schema_version 和 code。API 中出现引擎不可用时，原调用方可用相同请求键重试提交，数据库与引擎 ID 保持稳定。审批决策在发送信号前提交，Workflow 定期查看数据库审批状态。取消采用同样的先持久化原则。
 
-引擎启动尝试和命名空间先写入产品库。并发提交遇到正在启动的同一任务时可收到 HTTP 503 `engine_start_in_progress`，客户端可在五分钟窗口内用原幂等键和请求体重试。已记录 Run ID 时只查询该 Run。窗口外先向所属命名空间核实，引擎确认历史不可取得且业务收据缺失时，产品状态显示为 `unknown`。开发命名空间保留一天历史。
+引擎启动尝试和命名空间先写入产品库。并发提交遇到正在启动且尚无 Run ID 的同一任务时可收到 HTTP 503 `engine_start_in_progress`，客户端可在五分钟窗口内用原幂等键和请求体重试。已记录 Run ID 时只查询该 Run。窗口外先向所属命名空间核实，引擎确认历史不可取得且业务收据缺失时，产品状态显示为 `unknown`。开发命名空间保留一天历史。
 
 ### 开发能力与扩展
 

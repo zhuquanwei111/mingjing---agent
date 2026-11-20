@@ -112,6 +112,9 @@ class TemporalAdapter:
         task_id = UUID(view["task_id"])
         if view["environment"] != self.service.catalog.environment:
             return
+        if view["run"]["temporal_run_id"]:
+            await self.refresh(view)
+            return
         lock = await asyncio.to_thread(self.service.lock_engine_start, task_id)
         if lock is None:
             raise Fault("engine_start_in_progress", 503)
