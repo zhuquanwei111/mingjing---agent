@@ -1,0 +1,69 @@
+name: Verify
+
+# Keep this required check present for every PR, including documentation changes.
+on:
+  push:
+    branches: [main]
+  pull_request:
+  merge_group:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: verify-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  p1-acceptance:
+    name: P1 acceptance
+    # ARM64 is the required acceptance platform; AMD64 feedback is independent.
+    # https://docs.github.com/en/actions/reference/runners/github-hosted-runners
+    runs-on: ubuntu-24.04-arm
+    timeout-minutes: 45
+    steps:
+      - name: Check out source
+        id: checkout
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          persist-credentials: false
+
+      - name: Check source syntax and whitespace
+        run: make check
+
+      - name: Run isolated P1 acceptance and recovery
+        run: make acceptance
+
+      # The Make target also cleans up on failure. Retry here after cancellation
+      # or an interrupted step; a cleanup failure must still fail the job.
+      - name: Clean current isolated project
+        if: ${{ always() && steps.checkout.outcome == 'success' }}
+        timeout-minutes: 5
+        run: make cleanup
+
+      # Do not upload .p1/ or test artifacts: runtime.env contains generated
+      # credentials, and dumps/history belong only to this disposable runner.
+
+  p1-regression-amd64:
+    name: P1 regression (amd64, advisory)
+    # Keep failures visible without making AMD64 a required acceptance platform.
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    steps:
+      - name: Check out source
+        id: checkout
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          persist-credentials: false
+
+      - name: Check source syntax and whitespace
+        run: make check
+
+      - name: Run isolated P1 regression and recovery
+        run: make acceptance
+
+      - name: Clean current isolated project
+        if: ${{ always() && steps.checkout.outcome == 'success' }}
+        timeout-minutes: 5
+        run: make cleanup
