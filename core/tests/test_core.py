@@ -418,6 +418,22 @@ def test_concurrent_resubmission_can_retry_a_failed_start(rig, monkeypatch):
         with lock:
             assert http.submit("write_note", fields, "concurrent-start") == (202, started)
 
+        submit = rig.service.submit
+
+        def submit_before_cancel(*args, **kwargs):
+            view = submit(*args, **kwargs)
+            rig.service.cancel(rig.tokens["author"], UUID(view["task_id"]))
+            return view
+
+        async def disconnected():
+            raise RPCError("synthetic Temporal outage", RPCStatusCode.UNAVAILABLE, b"")
+
+        monkeypatch.setattr(rig.service, "submit", submit_before_cancel)
+        monkeypatch.setattr(temporal_adapter, "connect", disconnected)
+        status, cancelled = http.submit("write_note", fields, "concurrent-start")
+        assert status == 200 and cancelled["state"] == "cancelled"
+        assert cancelled["run"]["temporal_run_id"] == run["temporal_run_id"]
+
 
 @pytest.mark.parametrize("submission", [True, False])
 def test_task_reads_retry_serialization_failure_with_fresh_authorization(rig, monkeypatch, submission):

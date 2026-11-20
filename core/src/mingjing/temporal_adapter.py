@@ -113,7 +113,10 @@ class TemporalAdapter:
         if view["environment"] != self.service.catalog.environment:
             return
         if view["run"]["temporal_run_id"]:
-            await self.refresh(view)
+            try:
+                await self.refresh(view)
+            except (RPCError, RuntimeError):
+                pass
             return
         lock = await asyncio.to_thread(self.service.lock_engine_start, task_id)
         if lock is None:

@@ -3,7 +3,8 @@ set -eu
 cd "$(dirname "$0")/.."
 action=${1:-}
 env_file=${P2_ENV_FILE:-.runtime/dev.env}
-if [ -z "${P2_ENV_FILE:-}" ] && [ ! -e "$env_file" ] && [ -f ../p2-core/.runtime/dev.env ]; then
+if [ "$action" != clean ] && [ -z "${P2_ENV_FILE:-}" ] &&
+    [ ! -e "$env_file" ] && [ -f ../p2-core/.runtime/dev.env ]; then
     env_file=../p2-core/.runtime/dev.env
 fi
 if [ ! -e "$env_file" ]; then
