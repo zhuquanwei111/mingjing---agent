@@ -101,7 +101,7 @@ class TemporalAdapter:
 
     def owns(self, view: dict) -> bool:
         return (view["environment"] == self.service.catalog.environment
-                and view["run"]["namespace"] in (None, os.environ["TEMPORAL_NAMESPACE"]))
+                and view["run"]["namespace"] == os.environ["TEMPORAL_NAMESPACE"])
 
     @staticmethod
     def start_window_closed(view: dict) -> bool:
@@ -110,27 +110,33 @@ class TemporalAdapter:
 
     async def start(self, view: dict) -> None:
         task_id = UUID(view["task_id"])
-        if not self.owns(view):
+        if view["environment"] != self.service.catalog.environment:
             return
-        view = await asyncio.to_thread(self.service.bind_engine_start, task_id, os.environ["TEMPORAL_NAMESPACE"])
-        if not self.owns(view) or view["state"] in TERMINAL:
+        lock = await asyncio.to_thread(self.service.lock_engine_start, task_id)
+        if lock is None:
             return
-        if view["run"]["temporal_run_id"] or self.start_window_closed(view):
-            await self.refresh(view)
-            return
-        client = await connect()
-        cap = self.service.catalog.implementation(view["capability_id"], view["version"])
         try:
-            handle = await client.start_workflow(
-                TaskWorkflow.run, TaskJob(str(task_id), cap.kind == Kind.AGENT),
-                id=view["run"]["workflow_id"], task_queue=self.queue,
-                id_reuse_policy=WorkflowIDReusePolicy.REJECT_DUPLICATE,
-                execution_timeout=timedelta(hours=24), rpc_timeout=timedelta(seconds=5),
-            )
-        except WorkflowAlreadyStartedError:
-            await self.refresh(view)
-        else:
-            await asyncio.to_thread(self.service.engine, task_id, "running", handle.first_execution_run_id)
+            view = await asyncio.to_thread(self.service.bind_engine_start, task_id, os.environ["TEMPORAL_NAMESPACE"])
+            if not self.owns(view) or view["state"] in TERMINAL:
+                return
+            if not view["run"]["temporal_run_id"] and not self.start_window_closed(view):
+                client = await connect()
+                cap = self.service.catalog.implementation(view["capability_id"], view["version"])
+                try:
+                    handle = await client.start_workflow(
+                        TaskWorkflow.run, TaskJob(str(task_id), cap.kind == Kind.AGENT),
+                        id=view["run"]["workflow_id"], task_queue=self.queue,
+                        id_reuse_policy=WorkflowIDReusePolicy.REJECT_DUPLICATE,
+                        execution_timeout=timedelta(hours=24), rpc_timeout=timedelta(seconds=5),
+                    )
+                except WorkflowAlreadyStartedError:
+                    pass
+                else:
+                    await asyncio.to_thread(self.service.engine, task_id, "running", handle.first_execution_run_id)
+                    return
+        finally:
+            await asyncio.to_thread(lock.close)
+        await self.refresh(view)
 
     async def refresh(self, view: dict) -> None:
         if not self.owns(view):

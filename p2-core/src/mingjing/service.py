@@ -19,6 +19,7 @@ ENGINE_TERMINAL = {"completed", "failed", "cancelled", "terminated", "timed_out"
 ENGINE_FINAL = sorted(ENGINE_TERMINAL | {"history_unavailable"})
 TRACER = trace.get_tracer("mingjing.core")
 EXECUTION_LOCK_SEED = 687202
+START_LOCK_SEED = 687203
 
 
 @dataclass(frozen=True)
@@ -187,26 +188,35 @@ class Service:
         return task_view(connection, load_task(connection, stored["id"]))
 
     def get(self, token: str, task: UUID) -> dict:
-        with self.db.open() as connection:
-            connection.execute("SET TRANSACTION ISOLATION LEVEL REPEATABLE READ")
-            _, row = require_task(connection, token, task, Action.READ, read_only=True)
-            return task_view(connection, row)
+        return self.read_task(token, task, submission=False)[1]
 
     def submission_response(self, token: str, task_id: UUID) -> tuple[int, dict]:
-        with self.db.open() as connection:
-            connection.execute("SET TRANSACTION ISOLATION LEVEL REPEATABLE READ")
-            identity, task = require_task(connection, token, task_id, Action.EXECUTE, read_only=True)
-            status = 200 if task["state"] in TERMINAL else 202
+        return self.read_task(token, task_id, submission=True)
+
+    def read_task(self, token: str, task_id: UUID, *, submission: bool) -> tuple[int, dict]:
+        action = Action.EXECUTE if submission else Action.READ
+        for attempt in range(3):
             try:
-                require_grant(
-                    connection, identity, task["capability"], task["version"], task["resource"], Action.READ,
-                )
-            except Fault:
-                return status, {
-                    "schema_version": 1, "task_id": str(task_id),
-                    "run": {"run_id": str(task["run_id"])},
-                }
-            return status, task_view(connection, task)
+                with self.db.open() as connection:
+                    connection.execute("SET TRANSACTION ISOLATION LEVEL REPEATABLE READ")
+                    identity, task = require_task(connection, token, task_id, action, read_only=True)
+                    status = 200
+                    if submission:
+                        status = 200 if task["state"] in TERMINAL else 202
+                        try:
+                            require_grant(
+                                connection, identity, task["capability"], task["version"], task["resource"], Action.READ,
+                            )
+                        except Fault:
+                            return status, {
+                                "schema_version": 1, "task_id": str(task_id),
+                                "run": {"run_id": str(task["run_id"])},
+                            }
+                    return status, task_view(connection, task)
+            except psycopg.errors.SerializationFailure:
+                if attempt == 2:
+                    raise
+        raise AssertionError("unreachable read retry exit")
 
     def system_view(self, task: UUID) -> dict:
         with self.db.open() as connection:
@@ -261,13 +271,31 @@ class Service:
                 raise Fault("artifact_corrupt", 503)
             return Artifact(data, row["media_type"])
 
+    def lock_engine_start(self, task_id: UUID) -> psycopg.Connection | None:
+        connection = self.db.open()
+        try:
+            acquired = connection.execute(
+                "SELECT pg_try_advisory_lock(hashtextextended(%s,%s)) AS acquired",
+                (str(task_id), START_LOCK_SEED),
+            ).fetchone()["acquired"]
+            connection.commit()
+        except BaseException:
+            connection.close()
+            raise
+        if not acquired:
+            connection.close()
+            return None
+        return connection
+
     def bind_engine_start(self, task_id: UUID, namespace: str) -> dict:
         with self.db.open() as connection:
             task = load_task(connection, task_id)
             if (task["workflow_id"] and task["state"] not in TERMINAL
-                    and task["environment"] == self.catalog.environment and not task["engine_namespace"]):
+                    and task["environment"] == self.catalog.environment
+                    and not task["engine_namespace"] and not task["first_start_at"]
+                    and not task["temporal_run_id"]):
                 connection.execute(
-                    """UPDATE runs SET engine_namespace=%s, first_start_at=COALESCE(first_start_at,clock_timestamp())
+                    """UPDATE runs SET engine_namespace=%s, first_start_at=clock_timestamp()
                        WHERE task_id=%s AND engine_namespace IS NULL""", (namespace, task_id),
                 )
                 task = load_task(connection, task_id)
@@ -276,8 +304,15 @@ class Service:
     def engine(self, task_id: UUID, status: str, temporal_run_id: str | None, *, wait=True) -> None:
         try:
             with self.db.open() as connection:
+                if status == "history_unavailable" and not connection.execute(
+                    "SELECT pg_try_advisory_xact_lock(hashtextextended(%s,%s)) AS acquired",
+                    (str(task_id), START_LOCK_SEED),
+                ).fetchone()["acquired"]:
+                    return
                 task = load_task(connection, task_id, wait=wait)
                 if not task["workflow_id"]:
+                    return
+                if status == "history_unavailable" and task["temporal_run_id"] != temporal_run_id:
                     return
                 closed = status in ENGINE_FINAL
                 updated = connection.execute(
@@ -409,6 +444,8 @@ class Service:
                 if cap.kind != Kind.AGENT and agent_tool is not None:
                     raise Fault("agent_tool_denied", 403)
             except Fault as fault:
+                if fault.code == "execution_deadline":
+                    raise
                 if fault.code == "approval_pending":
                     set_state(connection, task, "waiting")
                 else:
@@ -456,7 +493,7 @@ class Service:
                     record_receipt(connection, task, "succeeded", outcome, attempt)
                     before_write()
             except Fault as fault:
-                if fault.code not in {"execution_deadline", "unauthenticated", "approval_unavailable"}:
+                if fault.code not in {"unauthenticated", "approval_unavailable"}:
                     raise
                 self.reject(connection, task, fault)
             return None

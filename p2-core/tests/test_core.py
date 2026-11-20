@@ -14,7 +14,7 @@ import pytest
 from temporalio.service import RPCError, RPCStatusCode
 
 from conftest import RESOURCE
-from mingjing import artifacts, temporal_adapter
+from mingjing import artifacts, service as service_module, temporal_adapter
 from mingjing.catalog import Catalog
 from mingjing.contracts import Action, Fault, Model, Result
 from mingjing.db import Database
@@ -306,14 +306,22 @@ def test_slow_preparation_cannot_write_after_authorization_or_deadline(rig, boun
     if boundary == "approval_expiry":
         with rig.owner.open() as conn:
             conn.execute("UPDATE approvals SET expires_at=%s WHERE task_id=%s", (expires_at, task_id))
-    rig.service.execute(task_id, deadline=expires_at if boundary == "activity_deadline" else None)
+    if boundary == "activity_deadline":
+        with pytest.raises(Fault, match="execution_deadline"):
+            rig.service.execute(task_id, deadline=expires_at)
+    else:
+        rig.service.execute(task_id)
     result = rig.service.system_view(task_id)
-    assert prepared == [True] and result["state"] == "denied"
-    assert result["receipt"]["code"] == (
-        "execution_deadline" if boundary == "activity_deadline" else "approval_unavailable"
-    )
+    assert prepared == [True]
     with rig.db.open() as conn:
         assert not conn.execute("SELECT 1 FROM example_notes WHERE tenant=%s", (rig.tenant,)).fetchone()
+    if boundary == "activity_deadline":
+        assert result["receipt"] is None
+        rig.catalog.entries[name, 1] = cap
+        rig.service.execute(task_id, deadline=datetime.now(UTC) + timedelta(seconds=5))
+        assert rig.service.system_view(task_id)["state"] == "succeeded"
+    else:
+        assert result["state"] == "denied" and result["receipt"]["code"] == "approval_unavailable"
 
 
 def test_wrong_namespace_does_not_refresh_a_task(rig, monkeypatch):
@@ -329,6 +337,70 @@ def test_wrong_namespace_does_not_refresh_a_task(rig, monkeypatch):
 
     monkeypatch.setattr(temporal_adapter, "connect", connect)
     assert rig.api.get(rig.tokens["author"], task_id)["run"]["engine_state"] == "running"
+
+
+def test_old_unbound_task_is_not_claimed_by_current_namespace(rig, monkeypatch):
+    rig.publish("write_note")
+    fields = {"content": "old task"}
+    original = rig.service.submit(rig.tokens["author"], "write_note", 1, RESOURCE, fields, "migration")
+    with rig.owner.open() as conn:
+        conn.execute(
+            "UPDATE runs SET first_start_at=clock_timestamp()-interval '6 minutes' WHERE task_id=%s",
+            (UUID(original["task_id"]),),
+        )
+
+    async def connect():
+        pytest.fail("legacy routes require a trusted namespace binding")
+
+    monkeypatch.setattr(temporal_adapter, "connect", connect)
+    with rig.http() as http:
+        status, view = http.submit("write_note", fields, key="migration")
+        assert status == 202 and view["run"]["namespace"] is None
+        assert http.request("GET", "/v1/tasks/" + view["task_id"]) == (200, view)
+        assert view["state"] == "queued"
+
+
+def test_unavailable_history_cannot_close_an_inflight_start_or_unseen_run(rig):
+    rig.publish("write_note")
+    fields = {"content": "starting"}
+    original = rig.service.submit(rig.tokens["author"], "write_note", 1, RESOURCE, fields, "inflight")
+    task_id = UUID(original["task_id"])
+    rig.service.bind_engine_start(task_id, os.environ["TEMPORAL_NAMESPACE"])
+    lock = rig.service.lock_engine_start(task_id)
+    assert lock is not None
+    try:
+        rig.service.engine(task_id, "history_unavailable", None, wait=False)
+        assert rig.service.system_view(task_id)["state"] == "queued"
+        run_id = str(uuid4())
+        rig.service.engine(task_id, "running", run_id)
+    finally:
+        lock.close()
+    rig.service.engine(task_id, "history_unavailable", None, wait=False)
+    refreshed = rig.service.system_view(task_id)
+    assert refreshed["state"] == "queued"
+    assert refreshed["run"]["temporal_run_id"] == run_id and refreshed["run"]["engine_state"] == "running"
+
+
+@pytest.mark.parametrize("submission", [True, False])
+def test_task_reads_retry_serialization_failure_with_fresh_authorization(rig, monkeypatch, submission):
+    rig.publish("write_note")
+    view = rig.service.submit(rig.tokens["author"], "write_note", 1, RESOURCE, {"content": "read"}, "read")
+    task_id = UUID(view["task_id"])
+    original = service_module.require_task
+    observed = []
+
+    def check(connection, *args, **kwargs):
+        observed.append(connection)
+        if len(observed) == 1:
+            raise psycopg.errors.SerializationFailure("synthetic conflict with updated grant")
+        return original(connection, *args, **kwargs)
+
+    monkeypatch.setattr(service_module, "require_task", check)
+    if submission:
+        assert rig.service.submission_response(rig.tokens["author"], task_id) == (202, view)
+    else:
+        assert rig.service.get(rig.tokens["author"], task_id) == view
+    assert len(observed) == 2 and observed[0] is not observed[1]
 
 
 def test_failed_engine_refresh_does_not_return_a_revoked_read(rig, monkeypatch):

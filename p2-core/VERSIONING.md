@@ -16,7 +16,7 @@
 
 稳定引擎入口为 MingjingTaskV1，Activity 名称采用 mingjing.check.v1 和 mingjing.execute.v1，Agent 图注册名为 mingjing.agent.v1。Workflow 输入只包含产品任务 ID 和受信的执行形态，数据库查询和副作用处于 Activity。产品运行状态由 PostgreSQL 保存，Temporal History 用于引擎恢复。
 
-首个启动尝试绑定任务环境和命名空间，同键启动重试限于五分钟。该窗口须短于实际配置的命名空间历史保留期。已记录的 Run ID 保持固定。迁移对旧任务按创建时间保守记录启动窗口，历史未知的任务由运维核实。
+首个启动尝试绑定任务环境和命名空间，同键启动重试限于五分钟。该窗口须短于实际配置的命名空间历史保留期。运行中的启动调用持有 PostgreSQL 会话锁，防止并发查询将其误判为历史缺失。已记录的 Run ID 保持固定。旧任务缺少原命名空间时保留产品状态，由运维核实后再登记绑定。
 
 开发 Compose 用当前固定版本执行。Worker 支持 MINGJING_WORKER_DEPLOYMENT 和 MINGJING_WORKER_BUILD，两个值成对设置后使用固定 Worker Deployment 版本。正式升级时，应在隔离环境先对新/旧已完成历史做同版本重放，再使用固定版本路由并保留旧 Worker 直到其在途任务结束。回滚通过切换新任务路由并保留已有执行所属 Worker 完成。P1 已实测直接跨插件版本重放与节点改名会导致非确定性错误。 [P1 AT10](../p1-walking-skeleton/evidence/lima/AT10.json)
 
