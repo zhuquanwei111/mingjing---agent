@@ -17,6 +17,8 @@ concurrency:
 
 jobs:
   p1-acceptance:
+    # Keep this existing server-required context stable. It now covers BOTH
+    # P1 recovery and P2 public-layer acceptance on native ARM64.
     name: P1 acceptance
     # ARM64 is the required acceptance platform; AMD64 feedback is independent.
     # https://docs.github.com/en/actions/reference/runners/github-hosted-runners
@@ -29,11 +31,19 @@ jobs:
         with:
           persist-credentials: false
 
-      - name: Check source syntax and whitespace
+      - name: Confirm native ARM64 host
+        run: |
+          uname -sm
+          test "$(uname -m)" = aarch64
+
+      - name: Check source, architecture boundaries, and development docs
         run: make check
 
       - name: Run isolated P1 acceptance and recovery
         run: make acceptance
+
+      - name: Run isolated P2 public layer acceptance (ARM64)
+        run: make p2-acceptance
 
       # The Make target also cleans up on failure. Retry here after cancellation
       # or an interrupted step; a cleanup failure must still fail the job.
@@ -57,7 +67,7 @@ jobs:
         with:
           persist-credentials: false
 
-      - name: Check source syntax and whitespace
+      - name: Check source, architecture boundaries, and development docs
         run: make check
 
       - name: Run isolated P1 regression and recovery
@@ -69,7 +79,8 @@ jobs:
         run: make cleanup
 
   p2-amd64:
-    name: P2 public layer (amd64)
+    name: P2 regression (amd64, advisory)
+    # Optional feedback only; the required ARM64 job above runs the same tests.
     runs-on: ubuntu-24.04
     timeout-minutes: 20
     steps:
@@ -78,7 +89,7 @@ jobs:
         with:
           persist-credentials: false
 
-      - name: Check source syntax and whitespace
+      - name: Check source, architecture boundaries, and development docs
         run: make check
 
       - name: Run isolated P2 tests
