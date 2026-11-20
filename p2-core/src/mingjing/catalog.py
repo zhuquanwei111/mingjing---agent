@@ -65,9 +65,10 @@ class Catalog:
             identity = authenticate(connection, token=token)
             if not identity.administrator:
                 raise Fault("administration_required", 403)
-            capability = self.implementation(name, version)
-            key = self.key(identity.tenant, capability)
+            key = (identity.tenant, name, version)
+            capability = None if target == "disable" else self.implementation(name, version)
             if target == "register":
+                assert capability is not None
                 inserted = connection.execute(
                     """INSERT INTO releases VALUES (%s,%s,%s,'registered',%s,%s)
                        ON CONFLICT DO NOTHING RETURNING state""",
@@ -76,14 +77,16 @@ class Catalog:
                 if not inserted:
                     raise Fault("already_registered")
                 state = inserted["state"]
+                contract = capability.description()
             else:
                 release = connection.execute(
                     "SELECT * FROM releases WHERE tenant=%s AND capability=%s AND version=%s FOR UPDATE", key,
                 ).fetchone()
                 if not release:
                     raise Fault("release_not_found", 404)
-                if release["fingerprint"] != capability.fingerprint:
+                if capability is not None and release["fingerprint"] != capability.fingerprint:
                     raise Fault("contract_drift", 503)
+                contract = release["contract"]
                 if target == "validate":
                     if release["state"] != "registered":
                         raise Fault("invalid_transition")
@@ -96,7 +99,7 @@ class Catalog:
             audit(connection, identity.tenant, identity.subject, f"capability_{state}", details={
                 "capability_id": name, "version": version, "environment": self.environment,
             })
-            return {**capability.description(), "state": state, "environment": self.environment}
+            return {**contract, "state": state, "environment": self.environment}
 
     def update_publication(self, connection, key: tuple, registration: str, target: str) -> str:
         if registration != "validated":

@@ -79,7 +79,7 @@ class API:
             try:
                 asyncio.run(self.engine.refresh(view))
             except (RPCError, RuntimeError):
-                return view
+                pass
             view = self.service.get(token, task)
         return view
 

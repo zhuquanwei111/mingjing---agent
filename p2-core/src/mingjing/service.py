@@ -1,6 +1,8 @@
 from __future__ import annotations
 
+from collections.abc import Callable
 from dataclasses import dataclass
+from datetime import UTC, datetime
 from uuid import UUID, uuid4
 
 import psycopg
@@ -14,6 +16,7 @@ from .db import Database, audit, authenticate
 
 TERMINAL = {"succeeded", "denied", "unknown", "cancelled", "failed"}
 ENGINE_TERMINAL = {"completed", "failed", "cancelled", "terminated", "timed_out"}
+ENGINE_FINAL = sorted(ENGINE_TERMINAL | {"history_unavailable"})
 TRACER = trace.get_tracer("mingjing.core")
 EXECUTION_LOCK_SEED = 687202
 
@@ -24,12 +27,13 @@ class Artifact:
     media_type: str
 
 
-def load_task(connection, task_id: UUID, tenant: str | None = None):
+def load_task(connection, task_id: UUID, tenant: str | None = None, *, read_only=False, wait=True):
+    lock = "" if read_only else "FOR UPDATE OF t" if wait else "FOR UPDATE OF t NOWAIT"
     row = connection.execute(
-        """SELECT t.*,r.id AS run_id,r.workflow_id,r.temporal_run_id,r.engine_state,
-                  r.started_at,r.ended_at
+        f"""SELECT t.*,r.id AS run_id,r.workflow_id,r.temporal_run_id,r.engine_state,
+                   r.started_at,r.ended_at,r.engine_namespace,r.first_start_at
            FROM tasks t JOIN runs r ON r.task_id=t.id
-           WHERE t.id=%s AND (%s::text IS NULL OR t.tenant=%s) FOR UPDATE OF t""",
+           WHERE t.id=%s AND (%s::text IS NULL OR t.tenant=%s) {lock}""",
         (task_id, tenant, tenant),
     ).fetchone()
     if not row:
@@ -52,10 +56,12 @@ def task_view(connection, task) -> dict:
     return {
         "schema_version": 1, "task_id": str(task["id"]), "operation_id": str(task["operation_id"]),
         "capability_id": task["capability"], "version": task["version"], "state": task["state"],
+        "environment": task["environment"],
         "cancel_requested": task["cancel_requested"], "created_at": task["created_at"],
         "run": {
             "run_id": str(task["run_id"]), "workflow_id": task["workflow_id"], "temporal_run_id": task["temporal_run_id"],
             "engine_state": task["engine_state"], "started_at": task["started_at"], "ended_at": task["ended_at"],
+            "namespace": task["engine_namespace"], "first_start_at": task["first_start_at"],
         },
         "approval": approval, "receipt": {
             "state": receipt["state"], "attempt_id": str(receipt["attempt_id"]) if receipt["attempt_id"] else None,
@@ -65,22 +71,24 @@ def task_view(connection, task) -> dict:
 
 
 class TransactionNotes:
-    def __init__(self, connection, context: CapabilityContext):
+    def __init__(self, connection, context: CapabilityContext, before_write: Callable[[], None]):
         self.connection = connection
         self.context = context
+        self.before_write = before_write
 
     def append(self, context: CapabilityContext, value: str) -> None:
         if context is not self.context:
             raise Fault("execution_context_mismatch", 403)
+        self.before_write()
         self.connection.execute(
             "INSERT INTO example_notes VALUES (%s,%s,%s,%s)",
             (context.tenant, context.operation_id, context.resource, value),
         )
 
 
-def require_task(connection, token: str, task_id: UUID, action: Action):
+def require_task(connection, token: str, task_id: UUID, action: Action, *, read_only=False):
     identity = authenticate(connection, token=token)
-    task = load_task(connection, task_id, identity.tenant)
+    task = load_task(connection, task_id, identity.tenant, read_only=read_only)
     require_grant(connection, identity, task["capability"], task["version"], task["resource"], action)
     return identity, task
 
@@ -180,12 +188,14 @@ class Service:
 
     def get(self, token: str, task: UUID) -> dict:
         with self.db.open() as connection:
-            _, row = require_task(connection, token, task, Action.READ)
+            connection.execute("SET TRANSACTION ISOLATION LEVEL REPEATABLE READ")
+            _, row = require_task(connection, token, task, Action.READ, read_only=True)
             return task_view(connection, row)
 
     def submission_response(self, token: str, task_id: UUID) -> tuple[int, dict]:
         with self.db.open() as connection:
-            identity, task = require_task(connection, token, task_id, Action.EXECUTE)
+            connection.execute("SET TRANSACTION ISOLATION LEVEL REPEATABLE READ")
+            identity, task = require_task(connection, token, task_id, Action.EXECUTE, read_only=True)
             status = 200 if task["state"] in TERMINAL else 202
             try:
                 require_grant(
@@ -251,27 +261,41 @@ class Service:
                 raise Fault("artifact_corrupt", 503)
             return Artifact(data, row["media_type"])
 
-    def engine(self, task_id: UUID, status: str, temporal_run_id: str | None) -> None:
+    def bind_engine_start(self, task_id: UUID, namespace: str) -> dict:
         with self.db.open() as connection:
             task = load_task(connection, task_id)
-            if not task["workflow_id"]:
-                return
-            closed = status in ENGINE_TERMINAL or status == "history_unavailable"
-            if task["engine_state"] in ENGINE_TERMINAL and status not in ENGINE_TERMINAL:
-                return
-            if task["engine_state"] == "history_unavailable" and status not in ENGINE_TERMINAL:
-                return
-            connection.execute(
-                """UPDATE runs SET temporal_run_id=COALESCE(%s,temporal_run_id),engine_state=%s,
-                    started_at=COALESCE(started_at,clock_timestamp()),
-                    ended_at=CASE WHEN %s THEN COALESCE(ended_at,clock_timestamp()) ELSE ended_at END
-                    WHERE task_id=%s""",
-                (temporal_run_id, status, closed, task_id),
-            )
-            if closed and task["state"] not in TERMINAL and not load_receipt(connection, task):
-                state = {"cancelled": "cancelled", "history_unavailable": "unknown"}.get(status, "failed")
-                set_state(connection, task, state)
-                audit(connection, task["tenant"], task["subject"], f"orchestration_{state}", task)
+            if (task["workflow_id"] and task["state"] not in TERMINAL
+                    and task["environment"] == self.catalog.environment and not task["engine_namespace"]):
+                connection.execute(
+                    """UPDATE runs SET engine_namespace=%s, first_start_at=COALESCE(first_start_at,clock_timestamp())
+                       WHERE task_id=%s AND engine_namespace IS NULL""", (namespace, task_id),
+                )
+                task = load_task(connection, task_id)
+            return task_view(connection, task)
+
+    def engine(self, task_id: UUID, status: str, temporal_run_id: str | None, *, wait=True) -> None:
+        try:
+            with self.db.open() as connection:
+                task = load_task(connection, task_id, wait=wait)
+                if not task["workflow_id"]:
+                    return
+                closed = status in ENGINE_FINAL
+                updated = connection.execute(
+                    """UPDATE runs SET temporal_run_id=COALESCE(temporal_run_id,%s),engine_state=%s,
+                        started_at=COALESCE(started_at,clock_timestamp()),
+                        ended_at=CASE WHEN %s THEN COALESCE(ended_at,clock_timestamp()) ELSE ended_at END
+                        WHERE task_id=%s AND NOT engine_state=ANY(%s)
+                          AND (temporal_run_id IS NULL OR %s::text IS NULL OR temporal_run_id=%s)
+                        RETURNING id""",
+                    (temporal_run_id, status, closed, task_id, ENGINE_FINAL, temporal_run_id, temporal_run_id),
+                ).fetchone()
+                if updated and closed and task["state"] not in TERMINAL and not load_receipt(connection, task):
+                    state = {"cancelled": "cancelled", "history_unavailable": "unknown"}.get(status, "failed")
+                    set_state(connection, task, state)
+                    audit(connection, task["tenant"], task["subject"], f"orchestration_{state}", task)
+        except psycopg.errors.LockNotAvailable:
+            if wait:
+                raise
 
     def require_pinned_contract(self, task, cap: Capability) -> None:
         if (task["environment"] != self.catalog.environment or task["contract_hash"] != cap.fingerprint):
@@ -340,7 +364,7 @@ class Service:
                 {"code": fault.code}, attempt,
             )
 
-    def execute(self, task_id: UUID, *, agent_tool: str | None = None) -> bool:
+    def execute(self, task_id: UUID, *, agent_tool: str | None = None, deadline: datetime | None = None) -> bool:
         with TRACER.start_as_current_span("mingjing.execute") as span:
             # Keep a session lock over the reservation and the separate send
             # transaction. A closed session releases it even if the process died.
@@ -352,12 +376,12 @@ class Service:
                 if not acquired["acquired"]:
                     return False
                 lock.commit()
-                external = self.start_execution(task_id, span, agent_tool)
+                external = self.start_execution(task_id, span, agent_tool, deadline)
                 if external:
                     self.send(task_id, *external)
                 return True
 
-    def start_execution(self, task_id: UUID, span, agent_tool: str | None):
+    def start_execution(self, task_id: UUID, span, agent_tool: str | None, deadline: datetime | None):
         with self.db.open() as connection:
             task = load_task(connection, task_id)
             span.set_attributes({key: str(task[field]) for key, field in (
@@ -372,9 +396,14 @@ class Service:
                 if previous["state"] == "dispatching":
                     self.mark_unknown(connection, task, previous["attempt_id"])
                 return None
+            def before_write() -> None:
+                self.gate(connection, task, cap)
+                if deadline is not None and datetime.now(UTC) >= deadline:
+                    raise Fault("execution_deadline")
+
             try:
                 cap = self.catalog.implementation(task["capability"], task["version"])
-                self.gate(connection, task, cap)
+                before_write()
                 if cap.kind == Kind.AGENT and agent_tool != "append_note":
                     raise Fault("agent_tool_denied", 403)
                 if cap.kind != Kind.AGENT and agent_tool is not None:
@@ -404,21 +433,32 @@ class Service:
                 )
                 record_receipt(connection, task, "dispatching", {"code": "dispatch_inflight"}, attempt)
                 return attempt, cap
-            connection.execute(
-                "INSERT INTO attempts(id,operation_id,state,reserved,actual) VALUES (%s,%s,'settled',0,0)",
-                (attempt, task["operation_id"]),
-            )
             context = context_for(task, attempt)
             assert cap.handler is not None
-            result = cap.handler(cap.validate_input(task["payload"]), context, TransactionNotes(connection, context))
-            outcome = {"value": cap.validate_output(result.value)}
-            if result.artifact is not None:
-                if not cap.produces_artifact:
-                    raise Fault("artifact_contract_mismatch", 503)
-                artifact = save_artifact(connection, self.blobs, task, result.artifact)
-                outcome["artifact_id"] = artifact
-                span.set_attribute("artifact_id", artifact)
-            record_receipt(connection, task, "succeeded", outcome, attempt)
+            try:
+                with connection.transaction():
+                    connection.execute(
+                        "INSERT INTO attempts(id,operation_id,state,reserved,actual) VALUES (%s,%s,'settled',0,0)",
+                        (attempt, task["operation_id"]),
+                    )
+                    result = cap.handler(
+                        cap.validate_input(task["payload"]), context, TransactionNotes(connection, context, before_write),
+                    )
+                    outcome = {"value": cap.validate_output(result.value)}
+                    before_write()
+                    if result.artifact is not None:
+                        if not cap.produces_artifact:
+                            raise Fault("artifact_contract_mismatch", 503)
+                        artifact = save_artifact(connection, self.blobs, task, result.artifact)
+                        outcome["artifact_id"] = artifact
+                        span.set_attribute("artifact_id", artifact)
+                        before_write()
+                    record_receipt(connection, task, "succeeded", outcome, attempt)
+                    before_write()
+            except Fault as fault:
+                if fault.code not in {"execution_deadline", "unauthenticated", "approval_unavailable"}:
+                    raise
+                self.reject(connection, task, fault)
             return None
 
     def send(self, task_id: UUID, attempt: UUID, cap: Capability) -> None:

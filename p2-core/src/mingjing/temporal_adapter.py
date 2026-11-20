@@ -1,6 +1,6 @@
 import asyncio
 import os
-from datetime import timedelta
+from datetime import UTC, datetime, timedelta
 from typing import TypedDict
 from uuid import UUID
 
@@ -15,8 +15,10 @@ from temporalio.service import RPCError, RPCStatusCode
 from temporalio.worker import Worker, WorkerDeploymentConfig
 
 from .contracts import Kind
-from .service import Service
+from .service import Service, TERMINAL
 from .workflows import OPTIONS, TaskJob, TaskWorkflow
+
+START_RETRY_WINDOW = timedelta(minutes=5)
 
 
 class AgentState(TypedDict, total=False):
@@ -28,6 +30,17 @@ class AgentState(TypedDict, total=False):
 async def choose_note_tool(state: AgentState) -> dict:
     return {"tool": "append_note"}
 
+def activity_deadline() -> datetime | None:
+    info = activity.info()
+    possible = [
+        timestamp + timeout
+        for timestamp, timeout in (
+            (info.started_time, info.start_to_close_timeout),
+            (info.scheduled_time, info.schedule_to_close_timeout),
+        ) if timeout is not None
+    ]
+    return min(possible, default=None)
+
 
 def make_worker(client: Client, queue: str, service: Service, deployment=None) -> Worker:
     @activity.defn(name="mingjing.check.v1")
@@ -38,11 +51,13 @@ def make_worker(client: Client, queue: str, service: Service, deployment=None) -
 
     @activity.defn(name="mingjing.execute.v1")
     async def execute(task: str) -> None:
-        if not await asyncio.to_thread(service.execute, UUID(task)):
+        if not await asyncio.to_thread(service.execute, UUID(task), deadline=activity_deadline()):
             raise ApplicationError("execution in progress", type="ExecutionInProgress")
 
     async def use_note_tool(state: AgentState) -> dict:
-        if not await asyncio.to_thread(service.execute, UUID(state["task_id"]), agent_tool=state["tool"]):
+        if not await asyncio.to_thread(
+            service.execute, UUID(state["task_id"]), agent_tool=state["tool"], deadline=activity_deadline(),
+        ):
             raise ApplicationError("execution in progress", type="ExecutionInProgress")
         return {"done": True}
 
@@ -84,16 +99,30 @@ class TemporalAdapter:
         self.service = service
         self.queue = queue
 
+    def owns(self, view: dict) -> bool:
+        return (view["environment"] == self.service.catalog.environment
+                and view["run"]["namespace"] in (None, os.environ["TEMPORAL_NAMESPACE"]))
+
+    @staticmethod
+    def start_window_closed(view: dict) -> bool:
+        first = view["run"]["first_start_at"]
+        return first is not None and datetime.now(UTC) >= first + START_RETRY_WINDOW
+
     async def start(self, view: dict) -> None:
-        if view["run"]["temporal_run_id"]:
+        task_id = UUID(view["task_id"])
+        if not self.owns(view):
+            return
+        view = await asyncio.to_thread(self.service.bind_engine_start, task_id, os.environ["TEMPORAL_NAMESPACE"])
+        if not self.owns(view) or view["state"] in TERMINAL:
+            return
+        if view["run"]["temporal_run_id"] or self.start_window_closed(view):
             await self.refresh(view)
             return
         client = await connect()
-        task_id = view["task_id"]
         cap = self.service.catalog.implementation(view["capability_id"], view["version"])
         try:
             handle = await client.start_workflow(
-                TaskWorkflow.run, TaskJob(task_id, cap.kind == Kind.AGENT),
+                TaskWorkflow.run, TaskJob(str(task_id), cap.kind == Kind.AGENT),
                 id=view["run"]["workflow_id"], task_queue=self.queue,
                 id_reuse_policy=WorkflowIDReusePolicy.REJECT_DUPLICATE,
                 execution_timeout=timedelta(hours=24), rpc_timeout=timedelta(seconds=5),
@@ -101,9 +130,11 @@ class TemporalAdapter:
         except WorkflowAlreadyStartedError:
             await self.refresh(view)
         else:
-            await asyncio.to_thread(self.service.engine, UUID(task_id), "running", handle.first_execution_run_id)
+            await asyncio.to_thread(self.service.engine, task_id, "running", handle.first_execution_run_id)
 
     async def refresh(self, view: dict) -> None:
+        if not self.owns(view):
+            return
         client = await connect()
         recorded_run = view["run"]["temporal_run_id"]
         handle = client.get_workflow_handle(view["run"]["workflow_id"], run_id=recorded_run)
@@ -112,15 +143,19 @@ class TemporalAdapter:
         except RPCError as error:
             if error.status != RPCStatusCode.NOT_FOUND:
                 raise
-            if recorded_run:
+            if recorded_run or self.start_window_closed(view):
                 await asyncio.to_thread(
-                    self.service.engine, UUID(view["task_id"]), "history_unavailable", recorded_run,
+                    self.service.engine, UUID(view["task_id"]), "history_unavailable", recorded_run, wait=False,
                 )
             return
         if info.status:
-            await asyncio.to_thread(self.service.engine, UUID(view["task_id"]), info.status.name.lower(), info.run_id)
+            await asyncio.to_thread(
+                self.service.engine, UUID(view["task_id"]), info.status.name.lower(), info.run_id, wait=False,
+            )
 
     async def control(self, view: dict, *, cancel: bool = False) -> None:
+        if not self.owns(view):
+            return
         client = await connect()
         handle = client.get_workflow_handle(view["run"]["workflow_id"])
         try:

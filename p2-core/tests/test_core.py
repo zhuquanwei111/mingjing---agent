@@ -1,4 +1,5 @@
 import asyncio
+import os
 from concurrent.futures import ThreadPoolExecutor
 from dataclasses import replace
 from datetime import UTC, date, datetime, timedelta
@@ -242,14 +243,23 @@ def test_expiration_is_rechecked_after_approval_grant_lock_wait(rig, expiration)
         assert not conn.execute("SELECT 1 FROM example_notes WHERE tenant=%s", (rig.tenant,)).fetchone()
 
 
-def test_retained_run_mapping_prevents_restart_when_engine_history_is_gone(rig, monkeypatch):
+@pytest.mark.parametrize("known_run", [True, False])
+def test_retained_start_prevents_restart_when_engine_history_is_gone(rig, monkeypatch, known_run):
     name = "write_note"
     rig.publish(name)
     fields = {"content": "retained product task"}
     task = rig.service.submit(rig.tokens["author"], name, 1, RESOURCE, fields, "old")
     task_id = UUID(task["task_id"])
-    temporal_run = str(uuid4())
-    rig.service.engine(task_id, "running", temporal_run)
+    temporal_run = str(uuid4()) if known_run else None
+    rig.service.bind_engine_start(task_id, os.environ["TEMPORAL_NAMESPACE"])
+    if temporal_run:
+        rig.service.engine(task_id, "running", temporal_run)
+    else:
+        with rig.owner.open() as conn:
+            conn.execute(
+                "UPDATE runs SET first_start_at=clock_timestamp()-interval '6 minutes' WHERE task_id=%s",
+                (task_id,),
+            )
 
     class AbsentHistory:
         async def describe(self, *, rpc_timeout):
@@ -273,6 +283,85 @@ def test_retained_run_mapping_prevents_restart_when_engine_history_is_gone(rig, 
         assert observed["state"] == "unknown" and observed["receipt"] is None
         assert observed["run"]["engine_state"] == "history_unavailable"
         assert http.submit(name, fields, key="old") == (200, observed)
+
+
+@pytest.mark.parametrize("boundary", ["approval_expiry", "activity_deadline"])
+def test_slow_preparation_cannot_write_after_authorization_or_deadline(rig, boundary):
+    name = "write_note"
+    cap = rig.catalog.implementation(name, 1)
+    prepared = []
+    expires_at: datetime
+
+    def slow(data, context, notes):
+        prepared.append(True)
+        sleep(max(0, (expires_at - datetime.now(UTC)).total_seconds()) + 0.02)
+        return cap.handler(data, context, notes)
+
+    rig.catalog.entries[name, 1] = replace(cap, handler=slow)
+    rig.publish(name)
+    task = rig.service.submit(rig.tokens["author"], name, 1, RESOURCE, {"content": "late"}, "late-write")
+    task_id = UUID(task["task_id"])
+    rig.service.approval(rig.tokens["approver"], task_id, "approved")
+    expires_at = datetime.now(UTC) + timedelta(seconds=1)
+    if boundary == "approval_expiry":
+        with rig.owner.open() as conn:
+            conn.execute("UPDATE approvals SET expires_at=%s WHERE task_id=%s", (expires_at, task_id))
+    rig.service.execute(task_id, deadline=expires_at if boundary == "activity_deadline" else None)
+    result = rig.service.system_view(task_id)
+    assert prepared == [True] and result["state"] == "denied"
+    assert result["receipt"]["code"] == (
+        "execution_deadline" if boundary == "activity_deadline" else "approval_unavailable"
+    )
+    with rig.db.open() as conn:
+        assert not conn.execute("SELECT 1 FROM example_notes WHERE tenant=%s", (rig.tenant,)).fetchone()
+
+
+def test_wrong_namespace_does_not_refresh_a_task(rig, monkeypatch):
+    rig.publish("write_note")
+    task = rig.service.submit(rig.tokens["author"], "write_note", 1, RESOURCE, {"content": "note"}, "bound")
+    task_id = UUID(task["task_id"])
+    rig.service.bind_engine_start(task_id, os.environ["TEMPORAL_NAMESPACE"])
+    rig.service.engine(task_id, "running", str(uuid4()))
+    monkeypatch.setenv("TEMPORAL_NAMESPACE", "different-namespace")
+
+    async def connect():
+        pytest.fail("refresh must not call a different namespace")
+
+    monkeypatch.setattr(temporal_adapter, "connect", connect)
+    assert rig.api.get(rig.tokens["author"], task_id)["run"]["engine_state"] == "running"
+
+
+def test_failed_engine_refresh_does_not_return_a_revoked_read(rig, monkeypatch):
+    rig.publish("write_note")
+    task = rig.service.submit(rig.tokens["author"], "write_note", 1, RESOURCE, {"content": "note"}, "revoked")
+
+    async def unavailable(view):
+        rig.grant("write_note", "author", Action.READ, False)
+        raise RPCError("synthetic unavailable", RPCStatusCode.UNAVAILABLE, b"")
+
+    monkeypatch.setattr(rig.engine, "refresh", unavailable)
+    with rig.http() as http:
+        assert http.request("GET", "/v1/tasks/" + task["task_id"]) == (
+            403, {"schema_version": 1, "code": "permission_denied"},
+        )
+
+
+def test_task_reads_and_engine_refresh_do_not_wait_for_execution_and_terminal_is_preserved(rig, monkeypatch):
+    rig.publish("write_note")
+    task = rig.service.submit(rig.tokens["author"], "write_note", 1, RESOURCE, {"content": "note"}, "execution")
+    task_id, run_id = UUID(task["task_id"]), str(uuid4())
+    rig.service.engine(task_id, "running", run_id)
+
+    async def observe(view):
+        rig.service.engine(task_id, "completed", run_id, wait=False)
+
+    monkeypatch.setattr(rig.engine, "refresh", observe)
+    with rig.owner.open() as held:
+        held.execute("SELECT 1 FROM tasks WHERE id=%s FOR UPDATE", (task_id,))
+        assert rig.api.get(rig.tokens["author"], task_id)["run"]["engine_state"] == "running"
+    assert rig.api.get(rig.tokens["author"], task_id)["run"]["engine_state"] == "completed"
+    rig.service.engine(task_id, "running", run_id)
+    assert rig.service.get(rig.tokens["author"], task_id)["run"]["engine_state"] == "completed"
 
 
 def test_credential_revocation_and_cancellation_preserve_committed_receipt(rig):
@@ -470,7 +559,8 @@ def test_contract_versions_and_disable_gate(rig):
         rig.catalog.transition(admin, name, 2, action)
     assert [item["version"] for item in rig.catalog.discover(author, RESOURCE)] == [1]
     pending = rig.service.submit(author, name, 1, RESOURCE, {"text": "before disable"}, "before")
-    rig.catalog.transition(admin, name, 1, "disable")
+    emergency_catalog = Catalog(rig.db, "dev", ())
+    assert emergency_catalog.transition(admin, name, 1, "disable")["state"] == "disabled"
     rig.service.execute(UUID(pending["task_id"]))
     refused = rig.service.system_view(UUID(pending["task_id"]))
     assert refused["state"] == "denied" and refused["receipt"]["code"] == "release_unavailable"
