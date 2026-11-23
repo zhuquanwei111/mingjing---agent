@@ -1,0 +1,29 @@
+name: AgentOS recovery comparison
+on:
+  pull_request:
+    branches: [lab/architecture-20261123-compare]
+    paths: ['lab/agno-agentos/**', '.github/workflows/agno-round.yml']
+permissions:
+  contents: read
+jobs:
+  integration:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 16
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          persist-credentials: false
+      - run: make check
+      - name: Test real AgentOS on disposable PostgreSQL services
+        env:
+          TEST_HEAD: ${{ github.event.pull_request.head.sha }}
+          LAB_OUT: ${{ runner.temp }}/agno-evidence
+          AGNO_TELEMETRY: 'false'
+        run: bash lab/agno-agentos/run.sh
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: agno-round-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/agno-evidence
+          if-no-files-found: error
