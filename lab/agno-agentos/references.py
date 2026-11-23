@@ -12,9 +12,10 @@ CREATE TABLE guarded_value(scope text REFERENCES policy, kind text, token text P
 def hide(c, scope, kind, value):
     if scope != PROFILE:
         return value
+    prefix = "call_" if kind == "call" else "opaque_"
     row = c.execute("""INSERT INTO guarded_value VALUES(%s,%s,%s,%s)
                     ON CONFLICT(scope,kind,value) DO UPDATE SET value=EXCLUDED.value RETURNING token""",
-                    (scope, kind, "opaque_" + uuid.uuid4().hex, value)).fetchone()
+                    (scope, kind, prefix + uuid.uuid4().hex, value)).fetchone()
     return row["token"]
 
 

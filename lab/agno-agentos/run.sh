@@ -21,3 +21,18 @@ export PRODUCT_DSN="postgresql://postgres:$p@127.0.0.1:15432/postgres"
 export WITNESS_DSN="postgresql://postgres:$w@127.0.0.1:15433/postgres"
 cd lab/agno-agentos
 "$stage/venv/bin/python" -u trial.py
+# Preserve the same decoded synthetic records in the repository after artifact expiry.
+"$stage/venv/bin/python" - "$LAB_OUT" <<'PY'
+import base64, hashlib, io, os, pathlib, sys, zipfile
+root = pathlib.Path(sys.argv[1])
+buffer = io.BytesIO()
+with zipfile.ZipFile(buffer, "w", compression=zipfile.ZIP_DEFLATED, compresslevel=9) as bundle:
+    for path in sorted(root.iterdir()):
+        if path.is_file() and path.suffix in {".txt", ".json", ".jsonl"}:
+            bundle.writestr(path.name, path.read_bytes())
+data = buffer.getvalue()
+print("AGNO_ARCHIVE_SHA256", hashlib.sha256(data).hexdigest())
+encoded = base64.b64encode(data).decode("ascii")
+for offset in range(0, len(encoded), 2000):
+    print("AGNO_ARCHIVE_PART", offset, encoded[offset:offset + 2000])
+PY
