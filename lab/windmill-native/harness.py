@@ -1,6 +1,7 @@
 """Real Windmill public APIs, independent ledgers, and process fault controller."""
 import json
 import os
+import re
 import subprocess
 import sys
 import time
@@ -45,15 +46,19 @@ def wait(label, fn, seconds=100):
     raise TimeoutError(label)
 
 
-def worker():
+def worker(helper=False):
     global WORKER
     name = "wmn-worker" if WORKER is None else WORKER+"-next"
+    if helper:
+        name=WORKER+"-helper"
     cli("docker","run","-d","--name",name,"--hostname",name,"--network","host","-e","DATABASE_URL",
         "-e","BASE_URL","-e","BASE_INTERNAL_URL=http://127.0.0.1:8000","-e","MODE=worker",
         "-e","WORKER_GROUP=default","-e","ALLOW_PRIVATE_AI_BASE_URLS","-e","FAVOR_UNSHARE_PID=false",
         "-e","DISABLE_NSJAIL=true","-e","SLEEP_QUEUE=100",os.environ["CE_DIGEST"])
-    WORKER = name
+    if not helper:
+        WORKER = name
     note("worker_started",container=name,pid=cli("docker","inspect","-f","{{.State.Pid}}",name))
+    return name
 
 
 def register():
@@ -63,8 +68,12 @@ def register():
     PREFIX = "u/"+user["username"]+"/wmn_"
     schema = {"type":"object","properties":{"operation":{"type":"string"}},"required":["operation"]}
     for key in ["tool","deliver"]:
+        script_schema=json.loads(json.dumps(schema))
+        if key=="deliver":
+            script_schema["properties"]["verdict"]={"type":"string"}
+            script_schema["required"].append("verdict")
         hashed = call("/scripts/create",{"path":PREFIX+key,"summary":key,"content":Path(key+".bun.ts").read_text(),
-            "language":"bun","schema":schema})
+            "language":"bun","schema":script_schema})
         note("registered_script",name=key,hash=str(hashed))
     expr = {"type":"javascript","expr":"flow_input.operation"}
     def step(key):
@@ -75,11 +84,14 @@ def register():
              "value":step("tool")}],"input_transforms":{
              "provider":fixed({"kind":"customai","model":"fixture","resource":{"base_url":RECEIVER+"/v1"}}),
              "max_iterations":fixed(3),"streaming":fixed(False),"user_message":expr}}
-    value = {"modules":[{"id":"agent","value":brain},{"id":"deliver","value":step("deliver")}]}
+    delivery=step("deliver")
+    delivery["input_transforms"]["verdict"]={"type":"javascript","expr":"results.agent.output"}
+    value = {"modules":[{"id":"agent","value":brain},{"id":"deliver","value":delivery}]}
     spec = {"path":PREFIX+"flow","summary":"Native CE comparison","schema":schema,"value":value}
     (OUT/"registered-flow.json").write_text(json.dumps(spec,indent=2))
     note("registered_flow",response=call("/flows/create",spec))
-    wait("deployed scripts and flow dependencies",lambda:pg("select count(*) from v2_job_queue")=="0",100)
+    assert re.fullmatch(r"u/[a-zA-Z0-9_-]+/wmn_",PREFIX)
+    wait("deployed scripts and flow dependencies",lambda:pg(f"select count(*) from v2_job_queue q join v2_job j using(id) where j.runnable_path like '{PREFIX}%'")=="0",100)
 
 
 def logs(op):
@@ -109,7 +121,7 @@ def lineage(root):
         select id,parent_job,kind from v2_job where id='{root}' union all
         select j.id,j.parent_job,j.kind from v2_job j join branch b on j.parent_job=b.id)
     select coalesce(json_agg(to_jsonb(t))::text,'[]') from (
-        select b.*,q.worker,q.running,q.suspend,c.status,zc.counter
+        select b.*,q.worker,q.running,q.suspend,c.status,c.worker as completed_worker,zc.counter
         from branch b left join v2_job_queue q on q.id=b.id left join v2_job_completed c on c.id=b.id
         left join zombie_job_counter zc on zc.job_id=b.id)t"""
     return json.loads(pg(query))
@@ -154,6 +166,7 @@ def run_case(tag):
     for ident in (agent,tooljob):
         assert jobrows[ident]["running"] and not jobrows[ident]["status"],jobrows
     assert jobrows[tooljob]["parent_job"]==agent
+    helper=None
     if tag!="baseline":
         # The sole worker container owns BOTH live job rows, and the only eligible runner is killed.
         assert jobrows[agent]["worker"] and jobrows[agent]["worker"]==jobrows[tooljob]["worker"],jobrows
@@ -163,12 +176,17 @@ def run_case(tag):
         note("killed",pid=original_pid,container=old,agent=agent,tool=tooljob,
              worker=jobrows[agent]["worker"],exit=cli("docker","inspect","-f","{{.State.ExitCode}}",old))
         worker()
+        helper=worker(helper=True)
         recovered=wait("new native job attempt or terminal status",
             lambda:next((j for j in lineage(root) if j["id"]==agent and
                          ((j["worker"] and j["worker"]!=jobrows[agent]["worker"]) or j["status"])),None),180)
         state(op,root,"replacement")
         assert recovered["worker"] and recovered["worker"]!=jobrows[agent]["worker"],recovered
+        wait("reentry tool queried the still unknown receipt",
+             lambda:counts(op)["entries"]>1 and any(e["kind"]=="query" and e["value"]=="unknown"
+                 for e in logs(op)["events"][len(boundary["ledger"]["events"]):]),90)
         if tag=="cancel":
+            time.sleep(2)
             before=state(op,root,"unknown")["counts"]
             assert (before["held"],before["spent"],before["models"],before["delivery"])==(3,0,1,0)
             http(PRODUCT+"/cancel/"+op,{})
@@ -185,6 +203,10 @@ def run_case(tag):
     c=final["counts"]
     assert (c["http_post"],c["effect"],c["simulated_charge"],c["held"],c["spent"])==(1,1,1,0,1),c
     assert (c["models"],c["paired"],c["delivery"])==((1,0,0) if tag=="cancel" else (2,1,1)),c
+    root_state=next(j["status"] for j in final["jobs"] if j["id"]==root)
+    assert root_state==("canceled" if tag=="cancel" else "success"),root_state
+    if helper:
+        cli("docker","stop","--time","1",helper)
     return op
 
 

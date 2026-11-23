@@ -40,7 +40,7 @@ def start(name):
     if name == "product":
         db.executescript("""
         create table ops(op text primary key, sent integer default 0, held integer default 3,
-                         spent integer default 0, canceled integer default 0, receipt text, version integer default 1);
+                         spent integer default 0, canceled integer default 0, receipt text, version integer default 1, delivered integer default 0);
         create table entries(op text, job text, claim integer, at text default current_timestamp);
         """)
     else:
@@ -97,9 +97,18 @@ def start(name):
             if tool:
                 original = db.execute("select call_id from models where op=? order by rowid limit 1",(op,)).fetchone()
                 job = db.execute("select receipt from jobs where op=?",(op,)).fetchone()
-                paired = bool(original and job and job[0] and tool.get("tool_call_id") == original[0]
-                              and job[0] in json.dumps(tool["content"]))
-                delta, finish = {"role":"assistant","content":"complete" if paired else "unpaired"}, "stop"
+                calls = [call for message in messages for call in message.get("tool_calls",[]) if message["role"]=="assistant"]
+                raw = tool["content"]
+                if isinstance(raw, list):
+                    raw = next((p["text"] for p in raw if p["type"]=="text"),None)
+                try:
+                    value = json.loads(raw)
+                except (ValueError,TypeError):
+                    value = raw
+                paired = bool(original and job and job[0] and tool.get("tool_call_id")==original[0]
+                              and len(calls)==1 and calls[0]["id"]==original[0]
+                              and calls[0]["function"]["name"]=="async_operation" and value==job[0])
+                delta, finish = {"role":"assistant","content":("complete_"+job[0]) if paired else "unpaired"}, "stop"
             else:
                 fn = body["tools"][0]["function"]["name"]
                 delta = {"role":"assistant","tool_calls":[{"index":0,"type":"function","id":call_id,
@@ -159,8 +168,11 @@ def product_action(db, action, op, body):
         return {"receipt":receipt}, 200
     elif action == "deliver":
         row = db.execute("select * from ops where op=?", (op,)).fetchone()
-        if row and row["receipt"] and not row["canceled"] and row["version"] == 1:
-            return http(RECEIVER+"/deliver/"+op, {"receipt":row["receipt"]}), 200
+        if (row and row["receipt"] and not row["canceled"] and row["version"] == 1
+                and body.get("verdict")=="complete_"+row["receipt"]):
+            if db.execute("update ops set delivered=1 where op=? and delivered=0",(op,)).rowcount:
+                return http(RECEIVER+"/deliver/"+op, {"receipt":row["receipt"]}), 200
+            return {"already_delivered":True}, 200
         return {"denied":True}, 403
     else:
         raise ValueError(action)
