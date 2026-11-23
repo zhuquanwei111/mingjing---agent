@@ -6,6 +6,7 @@ import multiprocessing as mp
 import os
 import socket
 import time
+from threading import Event
 from pathlib import Path
 
 import psycopg
@@ -81,11 +82,22 @@ def write_frame(sock, scope):
     return time.monotonic_ns()
 
 
-def attempted_send(conn, sock, scope):
-    permitted = authority(conn, scope, True)
-    handed = write_frame(sock, scope) if permitted else None
-    conn.commit()
-    return handed
+def request(conn, sock, scope, before_write, stale=False):
+    # The negative control intentionally lets a previous permission outlive its transaction.
+    with conn.transaction():
+        allowed = authority(conn, scope, not stale)
+        handoff = None
+        if allowed and not stale:
+            before_write()
+            handoff = write_frame(sock, scope)
+    if allowed and stale:
+        before_write()
+        handoff = write_frame(sock, scope)
+    sock.shutdown(socket.SHUT_WR)
+    if allowed:
+        with sock.makefile("rb") as reader:
+            assert reader.readline(16) == b"ack\n"
+    return handoff
 
 
 def sample(role, order, index):
@@ -103,46 +115,53 @@ def sample(role, order, index):
             monitor.autocommit = True
             sid, rid = sender.info.backend_pid, revoker.info.backend_pid
             held_by = []
-            with concurrent.futures.ThreadPoolExecutor(max_workers=1) as pool:
+            at_write, proceed = Event(), Event()
+
+            def before_write():
+                at_write.set()
+                if not proceed.wait(TIMEOUT):
+                    raise TimeoutError("write barrier")
+
+            with concurrent.futures.ThreadPoolExecutor(max_workers=2) as pool:
                 if order == "revocation-first":
                     revoker.execute("UPDATE grant_state SET allowed=false WHERE scope=%s", (scope,))
-                    future = pool.submit(attempted_send, sender, sock, scope)
+                send_future = pool.submit(request, sender, sock, scope, before_write, order == "stale-unlocked")
+                if order == "revocation-first":
                     held_by = waiting(monitor, sid, rid)
                     revoker.commit()
                     revoked = time.monotonic_ns()
-                    handoff = future.result(timeout=TIMEOUT)
-                elif order == "handoff-first":
-                    assert authority(sender, scope, True)
-                    future = pool.submit(revoke, revoker, scope)
-                    held_by = waiting(monitor, rid, sid)
-                    handoff = write_frame(sock, scope)
-                    sender.commit()
-                    revoked = future.result(timeout=TIMEOUT)
+                    proceed.set()
                 else:
-                    assert authority(sender, scope, False)
-                    sender.commit()
-                    revoked = revoke(revoker, scope)
-                    handoff = write_frame(sock, scope)
-            sock.shutdown(socket.SHUT_WR)
-            observed = receive(pipe)
-            assert authority(monitor, scope, False) is False
-            expected_bytes = b"" if order == "revocation-first" else (scope + "\n").encode()
-            assert observed["eof"] and observed["bytes"] == len(expected_bytes)
-            assert observed["frames"] == expected_bytes.count(b"\n")
-            assert observed["sha256"] == hashlib.sha256(expected_bytes).hexdigest()
-            if order == "revocation-first":
-                assert handoff is None and observed["frame"] == "" and rid in held_by
-            else:
-                assert observed["frame"] == scope and handoff is not None
-                assert (handoff < revoked) if order == "handoff-first" else (revoked < handoff)
-                if order == "handoff-first":
-                    assert sid in held_by
-                pipe.send("allow-reply")
-                with sock.makefile("rb") as reader:
-                    assert reader.readline(16) == b"ack\n"
+                    if not at_write.wait(TIMEOUT):
+                        raise TimeoutError("permission was not granted")
+                    revocation = pool.submit(revoke, revoker, scope)
+                    if order == "handoff-first":
+                        held_by = waiting(monitor, rid, sid)
+                        proceed.set()
+                    revoked = revocation.result(timeout=TIMEOUT)
+                    if order == "stale-unlocked":
+                        proceed.set()
+                observed = receive(pipe)
+                assert authority(monitor, scope, False) is False
+                expected_bytes = b"" if order == "revocation-first" else (scope + "\n").encode()
+                assert observed["eof"] and observed["bytes"] == len(expected_bytes)
+                assert observed["frames"] == expected_bytes.count(b"\n")
+                assert observed["sha256"] == hashlib.sha256(expected_bytes).hexdigest()
+                pending_during_ack_hold = not send_future.done()
+                if order != "revocation-first":
+                    assert pending_during_ack_hold and observed["frame"] == scope
+                    pipe.send("allow-reply")
+                handoff = send_future.result(timeout=TIMEOUT)
+                if order == "revocation-first":
+                    assert handoff is None and rid in held_by
+                elif order == "handoff-first":
+                    assert sid in held_by and handoff < revoked
+                else:
+                    assert revoked < handoff
             finished = time.monotonic_ns()
             return dict(scope=scope, order=order, role=role, sender=sid, revoker=rid, blockers=held_by,
                         handoff_ns=handoff, revoked_observed_ns=revoked, receiver=observed,
+                        pending_during_ack_hold=pending_during_ack_hold,
                         reply_or_eof_observed_ns=finished)
     finally:
         pipe.close()
