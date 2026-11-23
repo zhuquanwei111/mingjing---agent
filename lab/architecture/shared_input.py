@@ -25,4 +25,4 @@ BASE = [{"name": "read_manifest", "fields": ["resource"], "description": "Read t
 
 def challenge():
     h = hashlib.sha256(("sealed-capability/" + os.environ["LAB_REV"]).encode()).hexdigest()
-    return {"name": "inspect_" + h[:12], "fields": ["ref_" + h[12:19], "kind_" + h[19:24]], "description": "Verify both opaque fields and return their canonical JSON."}
+    return {"name": "inspect_" + h[:12], "fields": ["ref_" + h[12:19], "kind_" + h[19:24]], "description": "Verify both opaque fields and return their receipt identifier."}

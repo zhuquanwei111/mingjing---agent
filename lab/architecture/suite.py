@@ -16,7 +16,7 @@ scopes = []
 handles = []
 scope_namespace = os.environ["LAB_NS"]
 names = [s["name"] for s in BASE]
-prompt = "Use read_manifest with resource bundle first. Use its returned value as key for item_state. After receiving item_state, finish with a brief answer. Call one tool per turn."
+prompt = "Verify the current item status in the resource named bundle. Its lookup key is private to this run. Obtain the evidence you need, use only observed values, and report what you can verify."
 def emit(tag, data): print(tag, json.dumps(data, ensure_ascii=False, default=str), flush=True)
 
 
