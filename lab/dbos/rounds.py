@@ -195,8 +195,12 @@ def main():
         signal.signal(signal.SIGUSR1,lambda *_: requested.set())
         print('WORKER_READY',action,scope,os.getpid(),flush=True)
         requested.wait()
-        recovered=DBOS.recover_workflows(['round-'+scope])
-        print('EXPLICIT_RECOVER',json.dumps([h.get_workflow_id() for h in recovered]),flush=True)
+        try:
+            recovered=DBOS.recover_workflows(['round-'+scope])
+            answer={'ids':[h.get_workflow_id() for h in recovered],'error':None}
+        except Exception as exc:
+            answer={'ids':[],'error':type(exc).__name__}
+        print('EXPLICIT_RECOVER',json.dumps(answer),flush=True)
         signal.pause()
         return
     elif action != 'recover':

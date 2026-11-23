@@ -60,8 +60,8 @@ def run(scope,client):
         os.kill(standby.pid,signal.SIGUSR1)
         wait(scope,standby,lambda s: 'EXPLICIT_RECOVER ' in log.read_text())
         returned=json.loads(log.read_text().split('EXPLICIT_RECOVER ',1)[1].splitlines()[0])
-        if not automatic:
-            assert returned==['run-'+scope]
+        if scope=='takeover' and not automatic:
+            assert returned=={'ids':['run-'+scope],'error':None}
         if scope=='takeover':
             s=wait(scope,standby,lambda s: s['task']['state']=='delivered' and engine(client,scope)['status']=='SUCCESS')
             end=write_stage(scope,'final',s,client)
@@ -89,8 +89,15 @@ def run(scope,client):
                 assert a==b
         entries=[t for t in s['trace'] if t['kind']=='send-step']
         assert len({(t['wf'],t['step']) for t in entries})==1 and entries[0]['pid']==old.pid
-        if scope=='takeover':
-            assert [t['pid'] for t in entries]==[old.pid,standby.pid]
+        pids=[t['pid'] for t in entries]
+        if scope=='takeover' or (scope=='false_recovery' and counts(s)==[2,1,2,1,0] and end['executor']=='standby-'+scope):
+            assert pids==[old.pid,standby.pid]
+        if scope=='false_recovery' and counts(s)==[2,1,2,1,0]:
+            # A re-enqueued workflow is available to any compatible worker. Attribute each actual send by PID.
+            assert len(pids)==2 and pids[1] in (old.pid,standby.pid)
+            acknowledgements=[t['pid'] for t in s['trace'] if t['kind']=='accepted']
+            assert acknowledgements==pids
+            data['second_sender']='standby' if pids[1]==standby.pid else 'original'
         data.update(explicit_at_seconds=start_request,returned_workflows=returned,final_status=end['status'],
                     final_executor=end['executor'],counts=counts(s),final_old_exit=old.poll(),final_standby_exit=standby.poll(),
                     reentry_pids=[t['pid'] for t in entries],op=s['task']['op'])
