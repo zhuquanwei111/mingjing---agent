@@ -13,3 +13,9 @@
 | [#17](https://github.com/zhuquanwei111/mingjing---agent/pull/17) | Agno AgentOS 的公开外部执行/续跑接口，验证完整应用宿主、持久运行及业务接收出口。 |
 
 每条路线使用独立工程、服务和合成数据。为避免分数失真，确认工具业务实际效果和收费、原调用配对、取消后的模型实收及交付；逐项标明其适配与未测范围。未知结果、不能启动的装置和真实不合格分别记录。评审完成后只更新技术决策和证据，W0 实施、MVP 和真实流量继续暂停。
+
+## 同题证据与独立评审
+
+[总决策、具体验收条件和全产品独立裁决入口](../designs/whole-product-decision.md)。本轮 #12、#13、#15、#16、#17 的定向集成均有成功记录和固定测试代码。启动、编排和观察装置的失败及改动保留在各草稿；旧 W0 的标准和证据范围保留。整体裁决以本任务草稿 PR 的固定修订和独立回流为准。
+
+[B 原始记录](https://github.com/zhuquanwei111/mingjing---agent/tree/554367bf8528a9500a88bac4033ad15a5983b4de/lab/product-review/evidence/45190768318) · [Windmill 报告](https://github.com/zhuquanwei111/mingjing---agent/blob/c847da6c10608f33ba0d88277d20400885afc04d/lab/windmill-native/REPORT.md) · [DBOS 报告及失败记录](https://github.com/zhuquanwei111/mingjing---agent/blob/75d6fccf821c5ebcd70cd837f8fa52a3e78cf936/lab/dbos/RESULT.md) · [Mastra 报告与完整锁](https://github.com/zhuquanwei111/mingjing---agent/blob/a9b6570419f6f6877e824a4abcb889e3867e6517/lab/mastra/RESULT.md) · [Agno 报告与原始事件](https://github.com/zhuquanwei111/mingjing---agent/blob/60dc1965c4cea6d4e976ed40875f82403dbb386f/lab/agno-agentos/REPORT.md)

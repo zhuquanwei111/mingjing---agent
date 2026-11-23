@@ -32,3 +32,9 @@
 #12 的合成标记和原始工具调用号是检查引擎载荷的探针。应报告何者为受限正文、何者是可替换的普通关联号、引擎的读取权归谁；仅见普通随机运行 ID 不自动推导泄露客户数据。真实产品判据来自 FR-32/33/35 和 NFR-02，试验约定及未测的真实治理分别记录。一个引擎在有授权的受治理网关加入一次性操作账后通过，须明示依赖该改造；所有候选适用相同口径。
 
 相同模型/业务测试夹具及实验控制器不计作某个候选的生产自研。分别列上游直接提供的可运行职责、必需的业务和公共适配、是否修改上游核心、部署服务和特殊拓扑要求。物理行数只描述对应试件，不能跨不同统计范围换算工期，也不把研究阶段已有代码投入当作采纳加分。有合格候选而数据尚不足以区分关键选择时，逐个列关闭条件，允许暂缓整体采纳；不为等真实商业账单或全年流量永久悬置已足够的职责选择。
+
+## 已完成的验证
+
+实测复用、产品自研、部署差异、样本计数及限制按同一口径列在[完整产品决策的跨路线实测表](whole-product-decision.md#跨路线实测结果)。可按如下入口查看原始记录、依赖和失败过程。
+
+[B 原始记录](https://github.com/zhuquanwei111/mingjing---agent/tree/554367bf8528a9500a88bac4033ad15a5983b4de/lab/product-review/evidence/45190768318) · [Windmill 报告](https://github.com/zhuquanwei111/mingjing---agent/blob/c847da6c10608f33ba0d88277d20400885afc04d/lab/windmill-native/REPORT.md) · [DBOS 报告及失败记录](https://github.com/zhuquanwei111/mingjing---agent/blob/75d6fccf821c5ebcd70cd837f8fa52a3e78cf936/lab/dbos/RESULT.md) · [Mastra 报告与完整锁](https://github.com/zhuquanwei111/mingjing---agent/blob/a9b6570419f6f6877e824a4abcb889e3867e6517/lab/mastra/RESULT.md) · [Agno 报告与原始事件](https://github.com/zhuquanwei111/mingjing---agent/blob/60dc1965c4cea6d4e976ed40875f82403dbb386f/lab/agno-agentos/REPORT.md)
