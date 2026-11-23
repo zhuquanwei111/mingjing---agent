@@ -19,11 +19,11 @@
 
 - [v1 历史工程交付包](../mingjing-codex-engineering-v1/README.md) 仍暂存仓库根目录。这是**历史来源**，不应单凭其 `03_TECH_STACK.md` 或启动词确定新开发路线；其中仍被根 AGENTS 引用的安全/阶段约束必须在迁移前识别并保留。
 - [v2 路线 B 开发包候选 PR #6](https://github.com/zhuquanwei111/mingjing---agent/pull/6) 是**未合并的候选交付**，当前 main 不含该目录；不能用 PR 描述等同于独立架构评审完成。
-- [整体架构评审与最短贯通草案 PR #7](https://github.com/zhuquanwei111/mingjing---agent/pull/7) 仍为单独的审查任务草案。最终评审结果和是否接受路线，须以有版本、问题处置与批准状态的正式记录为准。
+- [整体架构评审与最短贯通草案 PR #7](https://github.com/zhuquanwei111/mingjing---agent/pull/7) 仍是 Draft；[独立架构终审原文](https://github.com/zhuquanwei111/mingjing---agent/pull/7#issuecomment-7099754918) 已回传，结论是**“需修订后复审；路线 B 可保留为条件性 W0 候选”**。RB-01–RB-07 的必要修正与实测、原设计者回应、复审和用户重大取舍均未获完成证明；不能当成架构准入通过。
 - [独立 Reviewer 机制修改 PR #8](https://github.com/zhuquanwei111/mingjing---agent/pull/8) 不等同于路线 B 选型通过。
 - [A/B 隔离实验 PR #5](https://github.com/zhuquanwei111/mingjing---agent/pull/5) 保存两路实际实验材料；它不是合并到 main 的产品实现。
 
-**统一现行架构入口尚待独立评审结论同步。** 在此之前不擅自将某份旧报告或候选包提升为“唯一正式架构”，也不把本目录治理文档当作恢复开发的许可。
+**统一现行架构入口仍未获最终批准。** 独立评审已结束但要求修订后复审，当前不将路线 B 候选包提升为“唯一正式架构”，也不把本目录治理文档当作恢复开发的许可。
 
 ## 目录治理及资料规则
 
