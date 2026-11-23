@@ -1,0 +1,1424 @@
+{
+  "a": {
+    "ISOLATION": [
+      "a a own marker read back",
+      "a a database rejected credentials",
+      "a b database rejected credentials"
+    ],
+    "REAL_MODEL": [
+      {
+        "tools": [
+          "item_state"
+        ],
+        "result": {
+          "completed": [],
+          "evidence": {},
+          "finished": true,
+          "missing": [
+            "item_state",
+            "read_manifest"
+          ],
+          "turns": 2,
+          "version": "v1"
+        },
+        "turns": 2
+      }
+    ],
+    "GROUP": [
+      {
+        "group": "V01",
+        "result": "pass"
+      },
+      {
+        "group": "V02",
+        "result": "pass"
+      },
+      {
+        "group": "V03",
+        "result": "pass"
+      },
+      {
+        "group": "V04",
+        "result": "pass"
+      },
+      {
+        "group": "V05",
+        "result": "pass"
+      },
+      {
+        "group": "V06",
+        "result": "pass"
+      }
+    ],
+    "FROZEN_CORE": [
+      {
+        "before": {
+          "__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "flow.py": "4e1cdba3cdb213174b0e85192c36061533ea8e8a181d54416b78ed5819062d22",
+          "runtime.py": "4138edb5247a7eaa9d0912cc38735b47e9eb72b880c752f8b38c2c13cad8dd15"
+        },
+        "after": {
+          "__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "flow.py": "4e1cdba3cdb213174b0e85192c36061533ea8e8a181d54416b78ed5819062d22",
+          "runtime.py": "4138edb5247a7eaa9d0912cc38735b47e9eb72b880c752f8b38c2c13cad8dd15"
+        },
+        "business_package_sha": "fc231dce45fb6e41e392fb3b246036c1b788772c58badd7ea8b3cc97cd655f7d"
+      }
+    ],
+    "EXTENSION": [
+      {
+        "spec": {
+          "name": "inspect_a86cf2ac33d4",
+          "fields": [
+            "ref_1cc4226",
+            "kind_c1a16"
+          ],
+          "description": "Verify both opaque fields and return their receipt identifier."
+        },
+        "receiver_calls": 3,
+        "runtime_changes_after_challenge": 0
+      }
+    ],
+    "RECOVERY": [
+      {
+        "mode": "confirm",
+        "account": {
+          "product": "active",
+          "op": [
+            "confirmed",
+            1
+          ],
+          "spent": 2,
+          "held": 0
+        },
+        "events": [
+          "supplier_send",
+          "barrier",
+          "lookup",
+          "downstream"
+        ]
+      },
+      {
+        "mode": "unknown",
+        "account": {
+          "product": "active",
+          "op": [
+            "unknown",
+            0
+          ],
+          "spent": 0,
+          "held": 3
+        },
+        "events": [
+          "supplier_send",
+          "barrier",
+          "lookup"
+        ]
+      },
+      {
+        "mode": "cancel",
+        "account": {
+          "product": "cancelled",
+          "op": [
+            "confirmed",
+            1
+          ],
+          "spent": 2,
+          "held": 0
+        },
+        "events": [
+          "supplier_send",
+          "barrier",
+          "lookup",
+          "lookup"
+        ]
+      }
+    ],
+    "QUALITY": [
+      {
+        "input": {
+          "items": [
+            "left"
+          ],
+          "version": "v1",
+          "validator": true
+        },
+        "rule": "v1",
+        "state": "review",
+        "reason": "missing"
+      },
+      {
+        "input": {
+          "items": [
+            "left",
+            "right"
+          ],
+          "version": "v0",
+          "validator": true
+        },
+        "rule": "v1",
+        "state": "review",
+        "reason": "version"
+      },
+      {
+        "input": {
+          "items": [
+            "left",
+            "right"
+          ],
+          "version": "v1",
+          "validator": false
+        },
+        "rule": "v1",
+        "state": "review",
+        "reason": "unavailable"
+      },
+      {
+        "input": {
+          "items": [
+            "left",
+            "right"
+          ],
+          "version": "v1",
+          "validator": true
+        },
+        "rule": "v1",
+        "state": "succeeded",
+        "reason": "complete"
+      }
+    ],
+    "BUDGET_TRANSITIONS": [
+      [
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          3
+        ],
+        [
+          2,
+          0
+        ],
+        [
+          2,
+          3
+        ],
+        [
+          4,
+          0
+        ]
+      ],
+      [
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          3
+        ],
+        [
+          0,
+          3
+        ]
+      ],
+      [
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          3
+        ],
+        [
+          0,
+          3
+        ],
+        [
+          2,
+          0
+        ]
+      ]
+    ],
+    "SHARED_BUDGET": [
+      {
+        "hold": "reserved",
+        "state": {
+          "product": "cancelled",
+          "op": null,
+          "spent": 0,
+          "held": 3
+        },
+        "summary": [
+          "unknown"
+        ]
+      },
+      {
+        "hold": "charged",
+        "state": {
+          "product": "cancelled",
+          "op": null,
+          "spent": 2,
+          "held": 0
+        },
+        "summary": [
+          "settled"
+        ]
+      }
+    ],
+    "RESULT": [
+      {
+        "route": "a",
+        "groups": {
+          "V01": "pass",
+          "V02": "pass",
+          "V03": "pass",
+          "V04": "pass",
+          "V05": "pass",
+          "V06": "pass"
+        }
+      }
+    ],
+    "scopes": {
+      "chain": {
+        "receivers": {
+          "model": 3,
+          "model_reply": 3,
+          "tool": 2
+        },
+        "effects": [],
+        "ledger": {
+          "product": "active",
+          "op": null,
+          "spent": 0,
+          "held": 0
+        }
+      },
+      "alternate": {
+        "receivers": {
+          "model": 2,
+          "model_reply": 2,
+          "tool": 1
+        },
+        "effects": [],
+        "ledger": {
+          "product": "active",
+          "op": null,
+          "spent": 0,
+          "held": 0
+        }
+      },
+      "stop": {
+        "receivers": {
+          "model": 1,
+          "model_reply": 1
+        },
+        "effects": [],
+        "ledger": {
+          "product": "active",
+          "op": null,
+          "spent": 0,
+          "held": 0
+        }
+      },
+      "real": {
+        "receivers": {
+          "model": 2,
+          "model_reply": 2,
+          "tool": 1
+        },
+        "effects": [],
+        "ledger": {
+          "product": "active",
+          "op": null,
+          "spent": 0,
+          "held": 0
+        },
+        "model_tools": [
+          "item_state"
+        ],
+        "tool_returns": [
+          "{\"value\": \"invalid-key\"}"
+        ]
+      },
+      "new": {
+        "receivers": {
+          "tool": 3,
+          "model": 5,
+          "model_reply": 5
+        },
+        "effects": [],
+        "ledger": {
+          "product": "active",
+          "op": null,
+          "spent": 0,
+          "held": 0
+        }
+      },
+      "allow-staged": {
+        "receivers": {
+          "read": 1,
+          "model": 1,
+          "model_reply": 1,
+          "tool": 1,
+          "commit": 1,
+          "deliver": 1
+        },
+        "effects": [],
+        "ledger": {
+          "product": "active",
+          "op": null,
+          "spent": 0,
+          "held": 0
+        }
+      },
+      "revoke-staged-read": {
+        "receivers": {},
+        "effects": [],
+        "ledger": {
+          "product": "denied",
+          "op": null,
+          "spent": 0,
+          "held": 0
+        }
+      },
+      "revoke-staged-model": {
+        "receivers": {
+          "read": 1
+        },
+        "effects": [],
+        "ledger": {
+          "product": "denied",
+          "op": null,
+          "spent": 0,
+          "held": 0
+        }
+      },
+      "revoke-staged-tool_out": {
+        "receivers": {
+          "read": 1,
+          "model": 1,
+          "model_reply": 1
+        },
+        "effects": [],
+        "ledger": {
+          "product": "denied",
+          "op": null,
+          "spent": 0,
+          "held": 0
+        }
+      },
+      "revoke-staged-commit": {
+        "receivers": {
+          "read": 1,
+          "model": 1,
+          "model_reply": 1,
+          "tool": 1
+        },
+        "effects": [],
+        "ledger": {
+          "product": "denied",
+          "op": null,
+          "spent": 0,
+          "held": 0
+        }
+      },
+      "revoke-staged-deliver": {
+        "receivers": {
+          "read": 1,
+          "model": 1,
+          "model_reply": 1,
+          "tool": 1,
+          "commit": 1
+        },
+        "effects": [],
+        "ledger": {
+          "product": "denied",
+          "op": null,
+          "spent": 0,
+          "held": 0
+        }
+      },
+      "allow-continuous": {
+        "receivers": {
+          "read": 1,
+          "model": 1,
+          "model_reply": 1,
+          "tool": 1,
+          "commit": 1,
+          "deliver": 1
+        },
+        "effects": [],
+        "ledger": {
+          "product": "active",
+          "op": null,
+          "spent": 0,
+          "held": 0
+        }
+      },
+      "revoke-continuous-read": {
+        "receivers": {
+          "barrier": 1
+        },
+        "effects": [],
+        "ledger": {
+          "product": "denied",
+          "op": null,
+          "spent": 0,
+          "held": 0
+        }
+      },
+      "revoke-continuous-model": {
+        "receivers": {
+          "read": 1,
+          "barrier": 1
+        },
+        "effects": [],
+        "ledger": {
+          "product": "denied",
+          "op": null,
+          "spent": 0,
+          "held": 0
+        }
+      },
+      "revoke-continuous-tool_out": {
+        "receivers": {
+          "read": 1,
+          "model": 1,
+          "model_reply": 1,
+          "barrier": 1
+        },
+        "effects": [],
+        "ledger": {
+          "product": "denied",
+          "op": null,
+          "spent": 0,
+          "held": 0
+        }
+      },
+      "revoke-continuous-commit": {
+        "receivers": {
+          "read": 1,
+          "model": 1,
+          "model_reply": 1,
+          "tool": 1,
+          "barrier": 1
+        },
+        "effects": [],
+        "ledger": {
+          "product": "denied",
+          "op": null,
+          "spent": 0,
+          "held": 0
+        }
+      },
+      "revoke-continuous-deliver": {
+        "receivers": {
+          "read": 1,
+          "model": 1,
+          "model_reply": 1,
+          "tool": 1,
+          "commit": 1,
+          "barrier": 1
+        },
+        "effects": [],
+        "ledger": {
+          "product": "denied",
+          "op": null,
+          "spent": 0,
+          "held": 0
+        }
+      },
+      "native-revoke-model": {
+        "receivers": {
+          "model": 1,
+          "model_reply": 1,
+          "tool": 1,
+          "barrier": 1
+        },
+        "effects": [],
+        "ledger": {
+          "product": "active",
+          "op": null,
+          "spent": 0,
+          "held": 0
+        }
+      },
+      "native-revoke-tool_out": {
+        "receivers": {
+          "model": 2,
+          "model_reply": 2,
+          "tool": 1,
+          "barrier": 1
+        },
+        "effects": [],
+        "ledger": {
+          "product": "active",
+          "op": null,
+          "spent": 0,
+          "held": 0
+        }
+      },
+      "supplier-revoked": {
+        "receivers": {
+          "barrier": 1
+        },
+        "effects": [],
+        "ledger": {
+          "product": "active",
+          "op": [
+            "denied",
+            0
+          ],
+          "spent": 0,
+          "held": 0
+        }
+      },
+      "confirm": {
+        "receivers": {
+          "supplier_send": 1,
+          "barrier": 1,
+          "lookup": 1,
+          "downstream": 1
+        },
+        "effects": [
+          [
+            "confirm-05a1eaa6",
+            "supplier_send"
+          ]
+        ],
+        "ledger": {
+          "product": "active",
+          "op": [
+            "confirmed",
+            1
+          ],
+          "spent": 2,
+          "held": 0
+        }
+      },
+      "unknown": {
+        "receivers": {
+          "supplier_send": 1,
+          "barrier": 1,
+          "lookup": 1
+        },
+        "effects": [
+          [
+            "unknown-9e2325fa",
+            "supplier_send"
+          ]
+        ],
+        "ledger": {
+          "product": "active",
+          "op": [
+            "unknown",
+            0
+          ],
+          "spent": 0,
+          "held": 3
+        }
+      },
+      "cancel": {
+        "receivers": {
+          "supplier_send": 1,
+          "barrier": 1,
+          "lookup": 2
+        },
+        "effects": [
+          [
+            "cancel-65fea5d6",
+            "supplier_send"
+          ]
+        ],
+        "ledger": {
+          "product": "cancelled",
+          "op": [
+            "confirmed",
+            1
+          ],
+          "spent": 2,
+          "held": 0
+        }
+      },
+      "quality": {
+        "receivers": {
+          "tool": 3,
+          "quality_policy": 1,
+          "commit": 1,
+          "deliver": 1
+        },
+        "effects": [],
+        "ledger": {
+          "product": "succeeded",
+          "op": null,
+          "spent": 0,
+          "held": 0
+        }
+      },
+      "race": {
+        "receivers": {
+          "barrier": 1,
+          "budget_denied": 3,
+          "charge": 2
+        },
+        "effects": [
+          [
+            "three",
+            "charge"
+          ],
+          [
+            "extra",
+            "charge"
+          ]
+        ],
+        "ledger": {
+          "product": "active",
+          "op": null,
+          "spent": 4,
+          "held": 0
+        }
+      },
+      "late-reserved": {
+        "receivers": {
+          "barrier": 1,
+          "charge_lookup": 1,
+          "budget_denied": 1
+        },
+        "effects": [],
+        "ledger": {
+          "product": "cancelled",
+          "op": null,
+          "spent": 0,
+          "held": 3
+        }
+      },
+      "late-charged": {
+        "receivers": {
+          "charge": 1,
+          "barrier": 1,
+          "charge_lookup": 1,
+          "budget_denied": 1
+        },
+        "effects": [
+          [
+            "only",
+            "charge"
+          ]
+        ],
+        "ledger": {
+          "product": "cancelled",
+          "op": null,
+          "spent": 2,
+          "held": 0
+        }
+      }
+    },
+    "workflow_histories": 42,
+    "raw_cases": 30
+  },
+  "b": {
+    "ISOLATION": [
+      "b a database rejected credentials",
+      "b b own marker read back",
+      "b b database rejected credentials"
+    ],
+    "REAL_MODEL": [
+      {
+        "tools": [
+          "item_state"
+        ],
+        "result": {
+          "completed": [],
+          "evidence": {},
+          "finished": true,
+          "missing": [
+            "item_state",
+            "read_manifest"
+          ],
+          "turns": 2,
+          "version": "v1"
+        },
+        "turns": 2
+      }
+    ],
+    "GROUP": [
+      {
+        "group": "V01",
+        "result": "pass"
+      },
+      {
+        "group": "V02",
+        "result": "pass"
+      },
+      {
+        "group": "V03",
+        "result": "pass"
+      },
+      {
+        "group": "V04",
+        "result": "pass"
+      },
+      {
+        "group": "V05",
+        "result": "pass"
+      },
+      {
+        "group": "V06",
+        "result": "pass"
+      }
+    ],
+    "FROZEN_CORE": [
+      {
+        "before": {
+          "__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "flow.py": "d70cc3c59aaeacb1cd8fd6ba14f9f2971b710a985423b3f108212e6b0252ef8c",
+          "runtime.py": "e4730bd7e4178f785364fcc213ea1970c730d006e44efd039486074e31e08dd4"
+        },
+        "after": {
+          "__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "flow.py": "d70cc3c59aaeacb1cd8fd6ba14f9f2971b710a985423b3f108212e6b0252ef8c",
+          "runtime.py": "e4730bd7e4178f785364fcc213ea1970c730d006e44efd039486074e31e08dd4"
+        },
+        "business_package_sha": "fc231dce45fb6e41e392fb3b246036c1b788772c58badd7ea8b3cc97cd655f7d"
+      }
+    ],
+    "EXTENSION": [
+      {
+        "spec": {
+          "name": "inspect_a86cf2ac33d4",
+          "fields": [
+            "ref_1cc4226",
+            "kind_c1a16"
+          ],
+          "description": "Verify both opaque fields and return their receipt identifier."
+        },
+        "receiver_calls": 3,
+        "runtime_changes_after_challenge": 0
+      }
+    ],
+    "RECOVERY": [
+      {
+        "mode": "confirm",
+        "account": {
+          "product": "active",
+          "op": [
+            "confirmed",
+            1
+          ],
+          "spent": 2,
+          "held": 0
+        },
+        "events": [
+          "supplier_send",
+          "barrier",
+          "lookup",
+          "downstream"
+        ]
+      },
+      {
+        "mode": "unknown",
+        "account": {
+          "product": "active",
+          "op": [
+            "unknown",
+            0
+          ],
+          "spent": 0,
+          "held": 3
+        },
+        "events": [
+          "supplier_send",
+          "barrier",
+          "lookup"
+        ]
+      },
+      {
+        "mode": "cancel",
+        "account": {
+          "product": "cancelled",
+          "op": [
+            "confirmed",
+            1
+          ],
+          "spent": 2,
+          "held": 0
+        },
+        "events": [
+          "supplier_send",
+          "barrier",
+          "lookup",
+          "lookup"
+        ]
+      }
+    ],
+    "QUALITY": [
+      {
+        "input": {
+          "items": [
+            "left"
+          ],
+          "version": "v1",
+          "validator": true
+        },
+        "rule": "v1",
+        "state": "review",
+        "reason": "missing"
+      },
+      {
+        "input": {
+          "items": [
+            "left",
+            "right"
+          ],
+          "version": "v0",
+          "validator": true
+        },
+        "rule": "v1",
+        "state": "review",
+        "reason": "version"
+      },
+      {
+        "input": {
+          "items": [
+            "left",
+            "right"
+          ],
+          "version": "v1",
+          "validator": false
+        },
+        "rule": "v1",
+        "state": "review",
+        "reason": "unavailable"
+      },
+      {
+        "input": {
+          "items": [
+            "left",
+            "right"
+          ],
+          "version": "v1",
+          "validator": true
+        },
+        "rule": "v1",
+        "state": "succeeded",
+        "reason": "complete"
+      }
+    ],
+    "BUDGET_TRANSITIONS": [
+      [
+        [
+          0,
+          3
+        ],
+        [
+          2,
+          0
+        ],
+        [
+          2,
+          3
+        ],
+        [
+          4,
+          0
+        ]
+      ],
+      [
+        [
+          0,
+          3
+        ]
+      ],
+      [
+        [
+          0,
+          3
+        ],
+        [
+          2,
+          0
+        ]
+      ]
+    ],
+    "SHARED_BUDGET": [
+      {
+        "hold": "reserved",
+        "state": {
+          "product": "cancelled",
+          "op": null,
+          "spent": 0,
+          "held": 3
+        },
+        "summary": [
+          "unknown"
+        ]
+      },
+      {
+        "hold": "charged",
+        "state": {
+          "product": "cancelled",
+          "op": null,
+          "spent": 2,
+          "held": 0
+        },
+        "summary": [
+          "settled"
+        ]
+      }
+    ],
+    "RESULT": [
+      {
+        "route": "b",
+        "groups": {
+          "V01": "pass",
+          "V02": "pass",
+          "V03": "pass",
+          "V04": "pass",
+          "V05": "pass",
+          "V06": "pass"
+        }
+      }
+    ],
+    "scopes": {
+      "chain": {
+        "receivers": {
+          "model": 3,
+          "model_reply": 3,
+          "tool": 2
+        },
+        "effects": [],
+        "ledger": {
+          "product": "active",
+          "op": null,
+          "spent": 0,
+          "held": 0
+        }
+      },
+      "alternate": {
+        "receivers": {
+          "model": 2,
+          "model_reply": 2,
+          "tool": 1
+        },
+        "effects": [],
+        "ledger": {
+          "product": "active",
+          "op": null,
+          "spent": 0,
+          "held": 0
+        }
+      },
+      "stop": {
+        "receivers": {
+          "model": 1,
+          "model_reply": 1
+        },
+        "effects": [],
+        "ledger": {
+          "product": "active",
+          "op": null,
+          "spent": 0,
+          "held": 0
+        }
+      },
+      "real": {
+        "receivers": {
+          "model": 2,
+          "model_reply": 2,
+          "tool": 1
+        },
+        "effects": [],
+        "ledger": {
+          "product": "active",
+          "op": null,
+          "spent": 0,
+          "held": 0
+        },
+        "model_tools": [
+          "item_state"
+        ],
+        "tool_returns": [
+          "{\"value\":\"invalid-key\"}"
+        ]
+      },
+      "new": {
+        "receivers": {
+          "tool": 3,
+          "model": 6,
+          "model_reply": 6
+        },
+        "effects": [],
+        "ledger": {
+          "product": "active",
+          "op": null,
+          "spent": 0,
+          "held": 0
+        }
+      },
+      "allow-staged": {
+        "receivers": {
+          "read": 1,
+          "model": 1,
+          "model_reply": 1,
+          "tool": 1,
+          "commit": 1,
+          "deliver": 1
+        },
+        "effects": [],
+        "ledger": {
+          "product": "active",
+          "op": null,
+          "spent": 0,
+          "held": 0
+        }
+      },
+      "revoke-staged-read": {
+        "receivers": {},
+        "effects": [],
+        "ledger": {
+          "product": "denied",
+          "op": null,
+          "spent": 0,
+          "held": 0
+        }
+      },
+      "revoke-staged-model": {
+        "receivers": {
+          "read": 1
+        },
+        "effects": [],
+        "ledger": {
+          "product": "denied",
+          "op": null,
+          "spent": 0,
+          "held": 0
+        }
+      },
+      "revoke-staged-tool_out": {
+        "receivers": {
+          "read": 1,
+          "model": 1,
+          "model_reply": 1
+        },
+        "effects": [],
+        "ledger": {
+          "product": "denied",
+          "op": null,
+          "spent": 0,
+          "held": 0
+        }
+      },
+      "revoke-staged-commit": {
+        "receivers": {
+          "read": 1,
+          "model": 1,
+          "model_reply": 1,
+          "tool": 1
+        },
+        "effects": [],
+        "ledger": {
+          "product": "denied",
+          "op": null,
+          "spent": 0,
+          "held": 0
+        }
+      },
+      "revoke-staged-deliver": {
+        "receivers": {
+          "read": 1,
+          "model": 1,
+          "model_reply": 1,
+          "tool": 1,
+          "commit": 1
+        },
+        "effects": [],
+        "ledger": {
+          "product": "denied",
+          "op": null,
+          "spent": 0,
+          "held": 0
+        }
+      },
+      "allow-continuous": {
+        "receivers": {
+          "read": 1,
+          "model": 1,
+          "model_reply": 1,
+          "tool": 1,
+          "commit": 1,
+          "deliver": 1
+        },
+        "effects": [],
+        "ledger": {
+          "product": "active",
+          "op": null,
+          "spent": 0,
+          "held": 0
+        }
+      },
+      "revoke-continuous-read": {
+        "receivers": {
+          "barrier": 1
+        },
+        "effects": [],
+        "ledger": {
+          "product": "denied",
+          "op": null,
+          "spent": 0,
+          "held": 0
+        }
+      },
+      "revoke-continuous-model": {
+        "receivers": {
+          "read": 1,
+          "barrier": 1
+        },
+        "effects": [],
+        "ledger": {
+          "product": "denied",
+          "op": null,
+          "spent": 0,
+          "held": 0
+        }
+      },
+      "revoke-continuous-tool_out": {
+        "receivers": {
+          "read": 1,
+          "model": 1,
+          "model_reply": 1,
+          "barrier": 1
+        },
+        "effects": [],
+        "ledger": {
+          "product": "denied",
+          "op": null,
+          "spent": 0,
+          "held": 0
+        }
+      },
+      "revoke-continuous-commit": {
+        "receivers": {
+          "read": 1,
+          "model": 1,
+          "model_reply": 1,
+          "tool": 1,
+          "barrier": 1
+        },
+        "effects": [],
+        "ledger": {
+          "product": "denied",
+          "op": null,
+          "spent": 0,
+          "held": 0
+        }
+      },
+      "revoke-continuous-deliver": {
+        "receivers": {
+          "read": 1,
+          "model": 1,
+          "model_reply": 1,
+          "tool": 1,
+          "commit": 1,
+          "barrier": 1
+        },
+        "effects": [],
+        "ledger": {
+          "product": "denied",
+          "op": null,
+          "spent": 0,
+          "held": 0
+        }
+      },
+      "native-revoke-model": {
+        "receivers": {
+          "model": 1,
+          "model_reply": 1,
+          "tool": 1,
+          "barrier": 1
+        },
+        "effects": [],
+        "ledger": {
+          "product": "active",
+          "op": null,
+          "spent": 0,
+          "held": 0
+        }
+      },
+      "native-revoke-tool_out": {
+        "receivers": {
+          "model": 2,
+          "model_reply": 2,
+          "tool": 1,
+          "barrier": 1
+        },
+        "effects": [],
+        "ledger": {
+          "product": "active",
+          "op": null,
+          "spent": 0,
+          "held": 0
+        }
+      },
+      "supplier-revoked": {
+        "receivers": {
+          "barrier": 1
+        },
+        "effects": [],
+        "ledger": {
+          "product": "active",
+          "op": [
+            "unknown",
+            0
+          ],
+          "spent": 0,
+          "held": 0
+        }
+      },
+      "confirm": {
+        "receivers": {
+          "supplier_send": 1,
+          "barrier": 1,
+          "lookup": 1,
+          "downstream": 1
+        },
+        "effects": [
+          [
+            "confirm-9504f870",
+            "supplier_send"
+          ]
+        ],
+        "ledger": {
+          "product": "active",
+          "op": [
+            "confirmed",
+            1
+          ],
+          "spent": 2,
+          "held": 0
+        }
+      },
+      "unknown": {
+        "receivers": {
+          "supplier_send": 1,
+          "barrier": 1,
+          "lookup": 1
+        },
+        "effects": [
+          [
+            "unknown-b0fd3b85",
+            "supplier_send"
+          ]
+        ],
+        "ledger": {
+          "product": "active",
+          "op": [
+            "unknown",
+            0
+          ],
+          "spent": 0,
+          "held": 3
+        }
+      },
+      "cancel": {
+        "receivers": {
+          "supplier_send": 1,
+          "barrier": 1,
+          "lookup": 2
+        },
+        "effects": [
+          [
+            "cancel-20fc201a",
+            "supplier_send"
+          ]
+        ],
+        "ledger": {
+          "product": "cancelled",
+          "op": [
+            "confirmed",
+            1
+          ],
+          "spent": 2,
+          "held": 0
+        }
+      },
+      "quality": {
+        "receivers": {
+          "tool": 3,
+          "quality_policy": 1,
+          "commit": 1,
+          "deliver": 1
+        },
+        "effects": [],
+        "ledger": {
+          "product": "succeeded",
+          "op": null,
+          "spent": 0,
+          "held": 0
+        }
+      },
+      "race": {
+        "receivers": {
+          "barrier": 1,
+          "budget_denied": 3,
+          "charge": 2
+        },
+        "effects": [
+          [
+            "one",
+            "charge"
+          ],
+          [
+            "extra",
+            "charge"
+          ]
+        ],
+        "ledger": {
+          "product": "active",
+          "op": null,
+          "spent": 4,
+          "held": 0
+        }
+      },
+      "late-reserved": {
+        "receivers": {
+          "barrier": 1,
+          "charge_lookup": 1,
+          "budget_denied": 1
+        },
+        "effects": [],
+        "ledger": {
+          "product": "cancelled",
+          "op": null,
+          "spent": 0,
+          "held": 3
+        }
+      },
+      "late-charged": {
+        "receivers": {
+          "charge": 1,
+          "barrier": 1,
+          "charge_lookup": 1,
+          "budget_denied": 1
+        },
+        "effects": [
+          [
+            "only",
+            "charge"
+          ]
+        ],
+        "ledger": {
+          "product": "cancelled",
+          "op": null,
+          "spent": 2,
+          "held": 0
+        }
+      }
+    },
+    "workflow_histories": 42,
+    "raw_cases": 30
+  }
+}

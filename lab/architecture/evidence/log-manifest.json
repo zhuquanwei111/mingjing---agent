@@ -1,0 +1,66 @@
+{
+  "01-control-a.log": {
+    "bytes": 61208,
+    "sha256": "d097ce23c3495838a52abbd4faf7d69a2b52d2e118bb45708c72281365a5103f"
+  },
+  "01-control-b.log": {
+    "bytes": 61314,
+    "sha256": "245d6959a7b48ab771230c3b8ddf0b47227d250804dee729e81b69ce15f0c613"
+  },
+  "02-preflight-a.log": {
+    "bytes": 61556,
+    "sha256": "ab7b27fd03fcfb07666fdb787ebf8c12c615f1e228284d3f122a2f92f1c4d9f3"
+  },
+  "02-preflight-b.log": {
+    "bytes": 59990,
+    "sha256": "8c1fb6f5d3647b5b9be8664095f5a4c70be44b986b3a6e514788e08d3cfaac84"
+  },
+  "03-initial-a.log": {
+    "bytes": 118655,
+    "sha256": "63e3e801b31008f1ab45e5a5868fb6e9adedd022f9f7b066897c1aa27551aa91"
+  },
+  "03-initial-b.log": {
+    "bytes": 155012,
+    "sha256": "5e4a73d954518d7211f223524b9a35c235ed69f3e85857ad537619e3839f7337"
+  },
+  "04-extended-a.log": {
+    "bytes": 131915,
+    "sha256": "f4302239b2f59b88d11171a7e3b30c61803b8f6f9a9644330408365d5d1e7ada"
+  },
+  "04-extended-b.log": {
+    "bytes": 182408,
+    "sha256": "d886ac5a41d6ddcf1d428ef35f20182f353de217cfdd9255e03f2e736f521c20"
+  },
+  "04-repo-check.log": {
+    "bytes": 16670,
+    "sha256": "4dd33ba9dad3d5eeb14bfa1fc055cbadbd5680232326f2e212a82091ebbf47e7"
+  },
+  "05-final-a.log": {
+    "bytes": 132471,
+    "sha256": "41426b389edf6df1db2e15d59fb7ba621f5dbec479778c1bb7d94104d7a21041"
+  },
+  "05-final-b.log": {
+    "bytes": 183537,
+    "sha256": "7d3bdefb67e57b90dda6aefe20b141029ad055f78d579d63f06f904aa61a20ab"
+  },
+  "06-final-a.log": {
+    "bytes": 132800,
+    "sha256": "a6eb001e11f1a7bf9800e3248e0bbf2eb7d07979146651209e413678c64dac54"
+  },
+  "06-final-b.log": {
+    "bytes": 184089,
+    "sha256": "1c7ae16be2c29ae58929418657f26aa4302d6e9f814c2cda3535fbb7a401914c"
+  },
+  "06-repo-p1-amd64.log": {
+    "bytes": 92913,
+    "sha256": "2517a9143c960b1488604bd6114319d9c532649bbf42c6d2acfb54b2416020c6"
+  },
+  "06-repo-p1-arm64.log": {
+    "bytes": 93267,
+    "sha256": "c50544f410d93abbb284a406a895817006e1ee1aaf1c2579ef3e4334c00b030a"
+  },
+  "06-repo-p2-amd64.log": {
+    "bytes": 62049,
+    "sha256": "0d4493a6721362281b685e8a2da3094d79a36b9e4715a93d32bd0c669211a4f7"
+  }
+}

@@ -1,0 +1,41 @@
+{
+  "baseline": "fdf04240eba747a9a681a1dad627da22d4b89cdd",
+  "core_tree": "2232ad6f3f2c8158719aa67f299891c349dc95ef",
+  "verified_files": 35,
+  "inputs": [
+    {
+      "name": "明镜智能体应用_通用工程架构需求书.docx",
+      "sha256": "75ac634a98393b5f99fb28901a6a91bc7431290143b6458bbf1f9a2af5f23062"
+    },
+    {
+      "name": "明镜智能体独立综合调研报告.md",
+      "sha256": "3edf5db5db3d0b5ab9dbaf53b9e6bb7f8496e2f2bad1a0d5146d8242c7254d64"
+    },
+    {
+      "name": "明镜智能体应用_独立智能体综合调研报告_V2.0.md",
+      "sha256": "b6bc2efff3d835cd77de8f2498490472e48ef6512648296cbd96da4a2dda5548"
+    },
+    {
+      "name": "明镜智能体独立综合调研报告_V2.0.md",
+      "sha256": "4447d442df290b10d198e91d7b96dd547d5fa9be93e79bb93e7644d0ed80048b"
+    }
+  ],
+  "upstream": [
+    {
+      "url": "https://github.com/temporalio/ai-integrations/blob/python/langgraph/v1.0.0/python/langgraph/README.md",
+      "git_blob_sha": "f8b29e560bf6be44b6e70259eeffabcc4f85e4f4"
+    },
+    {
+      "url": "https://github.com/pydantic/pydantic-ai/blob/v2.71.0/pydantic_ai_slim/pydantic_ai/durable_exec/temporal/__init__.py",
+      "git_blob_sha": "bd35dec886121e3ddce94177a77c8dfbe41a8896"
+    },
+    {
+      "url": "https://github.com/pydantic/pydantic-ai/blob/v2.71.0/pydantic_ai_slim/pydantic_ai/durable_exec/temporal/_model.py",
+      "git_blob_sha": "d523135fc6d85c41422f43443936a2054293baf2"
+    },
+    {
+      "url": "https://github.com/dapr/dapr-agents/blob/v1.1.1/quickstarts/02_durable_agent_trigger_within_workflow.py",
+      "git_blob_sha": "6f8cbc2602ad429bb7dd34b5794ac898723c4996"
+    }
+  ]
+}

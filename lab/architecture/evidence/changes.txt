@@ -1,0 +1,20 @@
+P2 base  fdf04240eba747a9a681a1dad627da22d4b89cdd
+Runtime head  bb55c843b8dd2e9ad646e982a38cda350b3df952
+
+Measured against baseline using git diff --numstat HEAD in an isolated fixed-SHA checkout.
+Added / removed / path
+30	0	.github/workflows/architecture-lab.yml
+0	0	lab/architecture/a/__init__.py
+45	0	lab/architecture/a/flow.py
+296	0	lab/architecture/a/runtime.py
+5	0	lab/architecture/b/Dockerfile
+0	0	lab/architecture/b/__init__.py
+47	0	lab/architecture/b/flow.py
+32	0	lab/architecture/b/linux-amd64.lock
+3	0	lab/architecture/b/requirements.txt
+248	0	lab/architecture/b/runtime.py
+7	0	lab/architecture/plugin_fixture.py
+
+A and B each add an implementation, an independent workflow definition and an empty package marker. B also has its own image and dependency locks. No baseline core file changed. Tests, provider fixture and shared CI runner are excluded from each route-specific runtime-size subtotal.
+
+V02 extension (both): 7-line external business implementation in plugin_fixture.py; descriptor + release/grants inserted at runtime; no schema migration, framework change or route Python-file change after deployment. FROZEN_CORE entries in each final raw log include before/after file digests and the business package digest. This covers the tested protocol only.

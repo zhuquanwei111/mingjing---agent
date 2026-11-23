@@ -1,0 +1,737 @@
+diff --git a/lab/architecture/a/__init__.py b/lab/architecture/a/__init__.py
+new file mode 100644
+index 0000000..e69de29
+diff --git a/lab/architecture/a/flow.py b/lab/architecture/a/flow.py
+new file mode 100644
+index 0000000..90f384c
+--- /dev/null
++++ b/lab/architecture/a/flow.py
+@@ -0,0 +1,45 @@
++import asyncio
++from datetime import timedelta
++from temporalio import workflow
++from temporalio.common import RetryPolicy
++
++
++@workflow.defn(name="AExecution")
++class Execution:
++    def __init__(self):
++        self.paused_at = ""
++        self.released = False
++
++    @workflow.signal(name="release")
++    def release(self):
++        self.released = True
++
++    @workflow.query(name="paused")
++    def paused(self) -> str:
++        return self.paused_at
++
++    @workflow.run
++    async def run(self, req: dict):
++        async def activity(kind, args):
++            return await workflow.execute_activity("a_execute", {"case": req["case"], "kind": kind, "args": args},
++                                                   start_to_close_timeout=timedelta(
++                                                       seconds=150 if kind == "agent" else 14),
++                                                   retry_policy=RetryPolicy(maximum_attempts=3 if kind in ("supplier", "child") else 1,
++                                                                            initial_interval=timedelta(seconds=1)))
++        cmd, args = req["kind"], req.get("args", {})
++        if cmd == "supervise":
++            return await workflow.execute_child_workflow("AExecution", {"case": req["case"], "kind": "supplier"}, id=workflow.info().workflow_id + "-supplier")
++        if cmd == "family":
++            return await asyncio.gather(*(workflow.execute_child_workflow("AExecution",
++                                                                          {"case": req["case"], "kind": "child", "args": n}, id=workflow.info().workflow_id + "-" + n) for n in args))
++        if cmd == "staged":
++            for action in args["steps"]:
++                if action == args.get("pause"):
++                    self.paused_at = action
++                    await workflow.wait_condition(lambda: self.released)
++                    self.paused_at = ""
++                answer = await activity("stage", action)
++                if answer != "ok":
++                    return answer
++            return "ok"
++        return await activity(cmd, args)
+diff --git a/lab/architecture/a/runtime.py b/lab/architecture/a/runtime.py
+new file mode 100644
+index 0000000..f8c6844
+--- /dev/null
++++ b/lab/architecture/a/runtime.py
+@@ -0,0 +1,296 @@
++import json, os, uuid
++from datetime import UTC, datetime, timedelta
++from pathlib import Path
++from typing import TypedDict
++import psycopg
++from langgraph.graph import END, START, StateGraph
++from mingjing.artifacts import BlobStore
++from mingjing.catalog import Catalog
++from mingjing.contracts import Action, Capability, Kind, Result
++from mingjing.db import Database
++from mingjing.service import Service
++from shared_input import Output, schema, tool_descriptions
++from ports import barrier, model_http, sink
++
++
++def db(): return psycopg.connect(os.environ["LAB_APP_DSN"])
++
++
++def setup():
++    with db() as c:
++        c.execute("""create table descriptors(name text primary key,spec jsonb);
++            create table rights(scope text,action text,allowed boolean,primary key(scope,action));
++            create table products(scope text primary key,state text,cache text);
++            create table agent_evidence(ref uuid primary key,scope text,name text,observed text);
++            create table quality_decisions(scope text primary key, reason text,rule text);
++            create table operations(scope text primary key,state text,settles int default 0);
++            create table pools(scope text primary key,available int default 5,spent int default 0,closed boolean default false, check(available>=0 and spent>=0 and available+spent<=5));
++            create table snapshots(scope text,spent int,held int);
++            create function budget_snapshot() returns trigger language plpgsql as $$ begin
++            insert into snapshots values(new.scope,new.spent,5-new.available-new.spent);return new;end;$$;
++            create trigger capture after insert or update on pools for each row execute function budget_snapshot();
++            create table holds(scope text,child text,units int,paid int,primary key(scope,child))""")
++    owner = Database(os.environ["MINGJING_MIGRATION_DSN"])
++    owner.add_identity("outside", "outsider",
++                       os.environ["LAB_OUTSIDER"], datetime.now(UTC) + timedelta(hours=2))
++    for who, key in (("admin", "LAB_ADMIN_TOKEN"), ("user", "LAB_TOKEN")):
++        owner.add_identity("lab", who, os.environ[key], datetime.now(
++            UTC) + timedelta(hours=2), administrator=who == "admin")
++
++
++def authorized_io(case, action, call):
++    barrier(case, "agent_" + action)
++    with db() as con:
++        row = con.execute("select allowed from rights where scope=%s and action=%s for share",
++                          (case, action)).fetchone()
++        if not row or not row[0]:
++            raise PermissionError(action)
++        return call()
++
++
++def capability(spec):
++    def handle(data, context, notes):
++        return Result(authorized_io(context.resource, "tool_out", lambda: sink(context.resource, "tool", {"name": spec["name"], "args": data.model_dump()})))
++    return Capability(spec["name"], 1, Kind.DIRECT, schema(spec), Output, handler=handle)
++
++
++def entries():
++    with db() as c:
++        return [r[0] for r in c.execute("select spec from descriptors order by name")]
++
++
++def services():
++    database = Database(os.environ["MINGJING_DB_DSN"])
++    cat = Catalog(database, "dev", [capability(s) for s in entries()])
++    return cat, Service(database, cat, BlobStore(Path("/tmp/lab-a-blobs")))
++
++
++def install(spec, published):
++    from psycopg.types.json import Jsonb
++    with db() as c:
++        c.execute("insert into descriptors values(%s,%s) on conflict do nothing", (spec["name"], Jsonb(spec)))
++    cat, _ = services()
++    for stage in (["register", "validate", "publish"] if published else ["register"]):
++        cat.transition(os.environ["LAB_ADMIN_TOKEN"], spec["name"], 1, stage)
++
++
++def allow_tool(case, name, yes=True):
++    cat, _ = services()
++    for action in (Action.EXECUTE, Action.READ):
++        cat.grant(os.environ["LAB_ADMIN_TOKEN"], "user", name, 1, case, action, yes)
++
++
++def tool(case, name, args, token):
++    _, service = services()
++    task = service.submit(token, name, 1, case, args, uuid.uuid4().hex)
++    key = uuid.UUID(task["task_id"])
++    service.execute(key)
++    receipt = service.get(token, key)["receipt"]
++    if receipt["state"] != "succeeded":
++        raise PermissionError(receipt["state"])
++    return receipt["value"]
++
++
++class Turn(TypedDict):
++    messages: list
++    decisions: int
++
++
++def agent(case, cmd):
++    specs = {s["name"]: s for s in entries()}
++    tools = tool_descriptions([specs[n] for n in cmd["names"]])
++
++    evidence = {}
++
++    def decide(state):
++        msg = authorized_io(case, "model", lambda: model_http(case, cmd["backend"], state["messages"], tools))
++        return {"messages": state["messages"] + [msg], "decisions": state["decisions"] + 1}
++
++    def dispatch(state):
++        msgs = list(state["messages"])
++        for call in msgs[-1]["tool_calls"]:
++            f = call["function"]
++            if f["name"] not in cmd["names"]:
++                raise ValueError("outside offered tools")
++            data = tool(case, f["name"], json.loads(f["arguments"]), os.environ["LAB_TOKEN"])
++            ref = uuid.uuid4()
++            with db() as conn:
++                conn.execute("insert into agent_evidence values(%s,%s,%s,%s)",
++                             (ref, case, f["name"], data["value"]))
++            rule = cmd["required"].get(f["name"])
++            if rule is None or data["value"] == rule:
++                evidence[f["name"]] = str(ref)
++            msgs.append({"role": "tool", "tool_call_id": call["id"], "content": json.dumps(data)})
++        return {"messages": msgs}
++    graph = StateGraph(Turn)
++    graph.add_node("model", decide)
++    graph.add_node("tools", dispatch)
++    graph.add_edge(START, "model")
++    graph.add_conditional_edges(
++        "model", lambda s: "tools" if s["messages"][-1].get("tool_calls") and s["decisions"] < 6 else END)
++    graph.add_edge("tools", "model")
++    result = graph.compile().invoke({"messages": [{"role": "user", "content": cmd["prompt"]}], "decisions": 0})
++    return {"turns": result["decisions"], "finished": not bool(result["messages"][-1].get("tool_calls")),
++            "version": cmd["version"], "completed": sorted(evidence), "missing": sorted(cmd["required"].keys() - evidence.keys()),
++            "evidence": evidence}
++
++
++def prepare(case):
++    with db() as c:
++        c.execute("insert into products values(%s,'active',null)", (case,))
++        c.execute("insert into pools(scope) values(%s)", (case,))
++        for name in ("read", "model", "tool_out", "commit", "deliver"):
++            c.execute("insert into rights values(%s,%s,true)", (case, name))
++
++
++def revoke(case, action):
++    with db() as c:
++        c.execute("update rights set allowed=false where scope=%s and action=%s", (case, action))
++
++
++def stage(case, action):
++    barrier(case, action)
++    with db() as c:
++        right = c.execute("select allowed from rights where scope=%s and action=%s for share",
++                          (case, action)).fetchone()
++        if not right or not right[0]:
++            c.execute("update products set state='denied' where scope=%s", (case,))
++            return "denied"
++        cache = c.execute("select cache from products where scope=%s", (case,)).fetchone()[0]
++        if action == "model":
++            model_http(case, "controlled", [{"role": "user", "content": cache or ""}], [])
++            return "ok"
++        if action == "tool_out":
++            tool(case, "item_state", {"key": cache or ""}, os.environ["LAB_TOKEN"])
++            return "ok"
++        result = sink(case, action, {"marker": cache})
++        if action == "read":
++            c.execute("update products set cache=%s where scope=%s", (result["value"], case))
++        return "ok"
++
++
++def quality(case, options):
++    credential = os.environ["LAB_TOKEN"]
++    key = tool(case, "read_manifest", {"resource": "bundle"}, credential)["value"]
++    evidence = tool(case, "item_state", {"key": key}, credential)
++    data = json.loads(evidence["value"])
++    from urllib.error import URLError
++    try:
++        policy = sink(case, "quality_policy")
++    except URLError:
++        policy = None
++    data["validator"] = bool(policy)
++    valid = data["validator"] and data["version"] == policy["version"] and set(
++        data["items"]) >= set(policy["required"])
++    reason = "unavailable" if not policy else (
++        "version" if data["version"] != policy["version"] else ("missing" if not valid else "complete"))
++    status = "review"
++    if valid and stage(case, "commit") == "ok" and stage(case, "deliver") == "ok":
++        status = "succeeded"
++    with db() as c:
++        c.execute("update products set state=%s where scope=%s", (status, case))
++        c.execute("insert into quality_decisions values(%s,%s,'v1')", (case, reason))
++    return status
++
++
++def verdict(case):
++    with db() as con:
++        return con.execute("select reason,rule from quality_decisions where scope=%s", (case,)).fetchone()
++
++
++def supplier(case):
++    with db() as c:
++        first = c.execute(
++            "insert into operations(scope,state) values(%s,'sending') on conflict do nothing returning scope", (case,)).fetchone()
++        if first:
++            ok = c.execute(
++                "update pools set available=available-3 where scope=%s and available>=3 and not closed returning scope", (case,)).fetchone()
++            if not ok:
++                raise RuntimeError("reservation denied")
++    if first:
++        barrier(case, "supplier_gate")
++        with db() as con:
++            allowed = con.execute(
++                "select allowed from rights where scope=%s and action='commit' for share", (case,)).fetchone()
++            product = con.execute("select state from products where scope=%s for share", (case,)).fetchone()
++            if not allowed or not allowed[0] or product[0] == "cancelled":
++                con.execute("update operations set state='denied' where scope=%s", (case,))
++                con.execute("update pools set available=available+3 where scope=%s", (case,))
++                return "denied"
++            reply = sink(case, "supplier_send", {"op": case})
++    else:
++        reply = sink(case, "lookup", {"op": case})
++    if first:
++        barrier(case, "after_effect")
++    return callback(case, reply["known"])
++
++
++def callback(case, known):
++    with db() as c:
++        current = c.execute("select state from operations where scope=%s for update", (case,)).fetchone()[0]
++        if known:
++            if current != "confirmed":
++                c.execute("update pools set spent=spent+2,available=available+1 where scope=%s", (case,))
++            c.execute("update operations set state='confirmed',settles=1 where scope=%s", (case,))
++        elif current != "confirmed":
++            c.execute("update operations set state='unknown' where scope=%s", (case,))
++        alive = c.execute("select state from products where scope=%s for update",
++                          (case,)).fetchone()[0] != "cancelled"
++        if known and alive and current != "confirmed":
++            sink(case, "downstream")
++    return "confirmed" if known else "unknown"
++
++
++def late_callback(case):
++    reply = sink(case, "lookup", {"op": case})
++    return callback(case, reply["known"])
++
++
++def cancel(case):
++    with db() as c:
++        c.execute("update pools set closed=true where scope=%s", (case,))
++        c.execute("update products set state='cancelled' where scope=%s", (case,))
++
++
++def child(case, name):
++    with db() as c:
++        pool = c.execute("select available,closed from pools where scope=%s for update", (case,)).fetchone()
++        old = c.execute("select paid from holds where scope=%s and child=%s", (case, name)).fetchone()
++        if old and old[0] is not None:
++            return "settled"
++        if not old and (pool[1] or pool[0] < 3):
++            sink(case, "budget_denied", {"child": name})
++            return "blocked"
++        if not old:
++            c.execute("update pools set available=available-3 where scope=%s", (case,))
++            c.execute("insert into holds values(%s,%s,3,null)", (case, name))
++    barrier(case, "reserved")
++    if old:
++        response = sink(case, "charge_lookup", {"op": name})
++        if not response["known"]:
++            return "unknown"
++    else:
++        with db() as c:
++            closed = c.execute("select closed from pools where scope=%s for share", (case,)).fetchone()[0]
++            if closed:
++                return "held"
++            response = sink(case, "charge", {"op": name})
++        barrier(case, "charged")
++    with db() as c:
++        c.execute("select scope from pools where scope=%s for update", (case,))
++        units = response["units"]
++        if type(units) is not int or not 0 <= units <= 3:
++            raise ValueError("receipt exceeds reservation")
++        changed = c.execute(
++            "update holds set paid=%s,units=0 where scope=%s and child=%s and paid is null returning child", (units, case, name)).fetchone()
++        if changed:
++            c.execute("update pools set available=available+3-%s,spent=spent+%s where scope=%s", (units, units, case))
++    return "settled"
++
++
++def state(case):
++    with db() as c:
++        product = c.execute("select state from products where scope=%s", (case,)).fetchone()[0]
++        op = c.execute("select state,settles from operations where scope=%s", (case,)).fetchone()
++        spent, held = c.execute("select spent,5-available-spent from pools where scope=%s", (case,)).fetchone()
++        return dict(product=product, op=op, spent=spent, held=held)
+diff --git a/lab/architecture/b/Dockerfile b/lab/architecture/b/Dockerfile
+new file mode 100644
+index 0000000..a6c3440
+--- /dev/null
++++ b/lab/architecture/b/Dockerfile
+@@ -0,0 +1,5 @@
++FROM docker.io/library/python@sha256:0f086103b026048cc50cb5da25ec435c023c5241a83fc44daea593377abc61c4
++WORKDIR /lab
++COPY linux-amd64.lock /tmp/
++RUN python -m pip install --require-hashes --only-binary=:all: --report /opt/installed.json -r /tmp/linux-amd64.lock && python -m pip check
++USER 10102:10102
+diff --git a/lab/architecture/b/__init__.py b/lab/architecture/b/__init__.py
+new file mode 100644
+index 0000000..e69de29
+diff --git a/lab/architecture/b/flow.py b/lab/architecture/b/flow.py
+new file mode 100644
+index 0000000..fe47a4e
+--- /dev/null
++++ b/lab/architecture/b/flow.py
+@@ -0,0 +1,47 @@
++import asyncio
++from datetime import timedelta
++from temporalio import workflow
++from temporalio.common import RetryPolicy
++
++
++@workflow.defn(name="BExecution")
++class Execution:
++    def __init__(self):
++        self.paused_at = ""
++        self.released = False
++
++    @workflow.signal(name="release")
++    def release(self):
++        self.released = True
++
++    @workflow.query(name="paused")
++    def paused(self) -> str:
++        return self.paused_at
++
++    @workflow.run
++    async def run(self, request: dict):
++        scope = request["case"]
++        op = request["kind"]
++        params = request.get("args", {})
++        if op == "supervise":
++            return await workflow.execute_child_workflow("BExecution", {"case": request["case"], "kind": "supplier"}, id=workflow.info().workflow_id + "-supplier")
++        if op == "family":
++            children = []
++            for child in params:
++                children.append(await workflow.start_child_workflow("BExecution",
++                                                                    {"case": scope, "kind": "child", "args": child}, id=f"{workflow.info().workflow_id}-{child}"))
++            return await asyncio.gather(*children)
++        operations = [("stage", name) for name in params["steps"]] if op == "staged" else [(op, params)]
++        for action, arg in operations:
++            if op == "staged" and params.get("pause") == arg:
++                self.paused_at = arg
++                await workflow.wait_condition(lambda: self.released)
++                self.paused_at = ""
++            result = await workflow.execute_activity("b_execute", {"case": scope, "kind": action, "args": arg},
++                                                     start_to_close_timeout=timedelta(
++                                                         seconds=150 if action == "agent" else 14),
++                                                     retry_policy=RetryPolicy(maximum_attempts=3 if action in ("supplier", "child") else 1,
++                                                                              initial_interval=timedelta(seconds=1)))
++            if result == "denied":
++                break
++        return result
+diff --git a/lab/architecture/b/linux-amd64.lock b/lab/architecture/b/linux-amd64.lock
+new file mode 100644
+index 0000000..6bf283e
+--- /dev/null
++++ b/lab/architecture/b/linux-amd64.lock
+@@ -0,0 +1,32 @@
++annotated-types==0.8.0 --hash=sha256:f072f4d804ea359e4eaf198b1af7a8b0943881a87f31bb764f8bf219bb9419e0
++anyio==4.16.0 --hash=sha256:c66ae634e0b8228396b801741beb3294326d4b6102f7bba4041c0dfb58c29026
++certifi==2026.11.20 --hash=sha256:7422df25243767b9877031a2248cb14d09ddac9beee846f4cef3d5c9191d488f
++charset-normalizer==3.5.3 --hash=sha256:e5e4785d8a0adeadfbdf75f4efc357911842674651cbafd7e97f69b11ec3cbc6
++genai-prices==0.2.5 --hash=sha256:864883e3b52031840b8240283c0a3b4ba22315b588e7fe2876025e38194179fc
++griffelib==2.4.1 --hash=sha256:76bc562f936ad1ce198d2cf6d0731bd5c92a7d934b69ef828ef22ee0ffdb62ce
++h11==0.16.0 --hash=sha256:63cf8bbe7522de3bf65932fda1d9c2772064ffb3dae62d55932da54b31cb6c86
++httpcore2==2.16.2 --hash=sha256:16051ae2a42f776007543f32de9349a317b23d2cbb4e1456b4bac0e88b87419a
++httpx2==2.16.2 --hash=sha256:f05c13aade4c45dbf1c9060647a1058f0acad62398fad96e741269edb33d46f5
++idna==3.20 --hash=sha256:ab7ae7122974553370f0bdb919e1a960b2cd1bc1ef0276416d896db81c14582c
++jiter==0.19.0 --hash=sha256:0956b5f58b804221dfb929c120e6d4032138fed20c1cc0ef683a2d1326255e46
++logfire-api==6.0.0 --hash=sha256:413471382e691ece5185b40bfdd4ba79c9fd7decb46a6f4f4a7490e547eea9e1
++nexus-rpc==1.5.0 --hash=sha256:5d6e856972be812573948df02da2257344c407a8eaa99977b5d38be54448305a
++openai==3.57.0 --hash=sha256:f97bc74024c06ced8428b56c4a3594066709d3082779bf9d0b4b6092fbf587a8
++opentelemetry-api==1.45.2 --hash=sha256:2cbd737377e710ee740d261c94e93fa0f08e6d037c18f17513cc0a2d94479a34
++protobuf==7.36.2 --hash=sha256:89f23aa53c24553a2416fd4fd1ec06f74fa42b14b546d8883128813f775bbfd2
++psycopg-binary==3.3.9 --hash=sha256:a99f0b9a19ed7a56bf5d6776456b8f15f5364db8853b0f5d184db394a45c391d
++psycopg[binary]==3.3.9 --hash=sha256:d2d7d04a1ce6dab4f5b27316bea3b52585cafa2f2d631e5b09dd69823f5c26f6
++pydantic-ai-slim[openai]==2.71.0 --hash=sha256:9ad364aff7bbf9c97919d037c6193de97d7d6392284ccb7e856ac8cc37a22d85
++pydantic-graph==2.71.0 --hash=sha256:5fc631ff115b2b7c6debc0ed5e4d748f393a9d21cffe52f8b0c97bd5b2231677
++pydantic==2.14.4 --hash=sha256:653a2ad9f6d8858529c77c72717d0ea991d6c6837fe683246b2f4b2bbfc3fadc
++pydantic_core==2.50.5 --hash=sha256:470bbc2495367f60d3ca849a8039e4c164701d10637e7743f4427d92651bdb6d
++regex==2026.11.19 --hash=sha256:8a966a5afe94ed9fb06deeecd9e3e51c3a5ab7d920e13f8128338e3fcdfed2b0
++requests==2.34.2 --hash=sha256:2a0d60c172f83ac6ab31e4554906c0f3b3588d37b5cb939b1c061f4907e278e0
++sniffio==1.3.1 --hash=sha256:2f6da418d1f1e0fddd844478f41680e794e6051915791a034ff65e5f100525a2
++temporalio==1.36.1 --hash=sha256:5ce0ddfaf35316271eee632e1579890be6f3c0f1de7fddfd1f3086f3f83d6b78
++tiktoken==0.14.0 --hash=sha256:7896eea257fe497a2b7134474d909156c6744ce8da35bce88011a960e008aa0d
++truststore==0.10.5 --hash=sha256:9aaaedaefaf06d8b206278cf8b5012bc897f485a874503501e12d776df78951c
++types-protobuf==7.35.1.20261122 --hash=sha256:b4e002599d9d7e8e377dd0faa5e70d133081148a0e370ba920f93c402526ed90
++typing-inspection==0.4.5 --hash=sha256:bc210535442b39e1bf2805e0c7a17dfd6a4ace760c84c7f7d16245d23a6b1c39
++typing_extensions==4.16.0 --hash=sha256:481caa481374e813c1b176ada14e97f1f67a4539ce9cfeb3f350d78d6370c2e8
++urllib3==2.8.0 --hash=sha256:0cf3cae568d36aa9576b28dfb35f11328f1cb974ca7647d9475ebb86c75ac6e3
+diff --git a/lab/architecture/b/requirements.txt b/lab/architecture/b/requirements.txt
+new file mode 100644
+index 0000000..e64f70a
+--- /dev/null
++++ b/lab/architecture/b/requirements.txt
+@@ -0,0 +1,3 @@
++pydantic-ai-slim[openai]==2.71.0
++psycopg[binary]==3.3.9
++temporalio==1.36.1
+diff --git a/lab/architecture/b/runtime.py b/lab/architecture/b/runtime.py
+new file mode 100644
+index 0000000..fe77696
+--- /dev/null
++++ b/lab/architecture/b/runtime.py
+@@ -0,0 +1,248 @@
++import json, os, hashlib, uuid
++import psycopg
++from psycopg.types.json import Jsonb
++from pydantic_ai import Agent, Tool, UsageLimits
++from pydantic_ai.models.openai import OpenAIChatModel
++from pydantic_ai.providers.openai import OpenAIProvider
++from ports import FIXTURE, barrier, sink, model_http
++from shared_input import Output, schema
++
++
++def connect(): return psycopg.connect(os.environ["LAB_APP_DSN"])
++
++
++def setup():
++    with connect() as conn:
++        conn.execute("""create table packages(id text primary key, contract jsonb, live boolean);
++          create table agent_observations(id uuid primary key,scope text,capability text,result text);
++          create table identities(digest text primary key,tenant text,member text);
++          create table licenses(target text,package text,tenant text,member text,primary key(target,package,tenant,member));
++          create table jobs(id text primary key,denied text[] default '{}',status text default 'active',memo text,assessment jsonb);
++          create table dispatch(id text primary key,ack boolean default false);
++          create table budget(id text,worker text,allocated integer,consumed integer,primary key(id,worker));
++          create table snapshots(scope text,spent int,held int);
++          create function budget_snapshot() returns trigger language plpgsql as $$ begin
++          insert into snapshots select new.id,coalesce(sum(consumed),0),coalesce(sum(allocated) filter(where consumed is null),0)
++          from budget where id=new.id;return new;end;$$;
++          create trigger capture after insert or update on budget for each row execute function budget_snapshot()""")
++        for tenant, member, key in (("lab", "user", "LAB_TOKEN"), ("outside", "outsider", "LAB_OUTSIDER")):
++            conn.execute("insert into identities values(%s,%s,%s)",
++                         (hashlib.sha256(os.environ[key].encode()).hexdigest(), tenant, member))
++
++
++def install(spec, published):
++    with connect() as conn:
++        conn.execute("insert into packages values(%s,%s,%s)", (spec["name"], Jsonb(spec), published))
++
++
++def allow_tool(case, name, yes=True):
++    with connect() as conn:
++        if yes:
++            conn.execute("insert into licenses values(%s,%s,'lab','user') on conflict do nothing", (case, name))
++        else:
++            conn.execute("delete from licenses where target=%s and package=%s", (case, name))
++
++
++def tool(case, name, args, token):
++    barrier(case, "agent_tool_out")
++    with connect() as conn:
++        permission = conn.execute("select denied from jobs where id=%s for share", (case,)).fetchone()
++        if not permission or "tool_out" in permission[0]:
++            raise PermissionError("tool_out")
++        found = conn.execute("""select contract from packages join licenses on package=id
++                              join identities using (tenant,member) where id=%s and target=%s and live
++                              and digest=%s for share""", (name, case, hashlib.sha256(token.encode()).hexdigest())).fetchone()
++        if found is None:
++            raise PermissionError("unpublished or unauthorized")
++        validated = schema(found[0]).model_validate(args)
++        result = sink(case, "tool", {"name": name, "args": validated.model_dump()})
++        return Output.model_validate(result).model_dump()
++
++
++def agent(case, cmd):
++    with connect() as conn:
++        all_specs = dict(conn.execute("select id,contract from packages"))
++
++    satisfied = {}
++
++    def adapt(spec):
++        def invoke(**kwargs):
++            output = tool(case, spec["name"], kwargs, os.environ["LAB_TOKEN"])
++            name = spec["name"]
++            reference = uuid.uuid4()
++            with connect() as conn:
++                conn.execute("insert into agent_observations values(%s,%s,%s,%s)",
++                             (reference, case, name, output["value"]))
++            if name in cmd["required"] and cmd["required"][name] in (None, output["value"]):
++                satisfied[name] = str(reference)
++            return output
++        return Tool.from_schema(invoke, name=spec["name"], description=spec["description"],
++                                json_schema=schema(spec).model_json_schema(), takes_ctx=False)
++    provider = OpenAIProvider(base_url=f"{FIXTURE}/{case}/{cmd['backend']}/v1", api_key="fixture-only")
++
++    class AuthorizedModel(OpenAIChatModel):
++        async def request(self, *args, **kwargs):
++            barrier(case, "agent_model")
++            with connect() as conn:
++                rules = conn.execute("select denied from jobs where id=%s for share", (case,)).fetchone()
++                if not rules or "model" in rules[0]:
++                    raise PermissionError("model")
++                return await super().request(*args, **kwargs)
++    model = AuthorizedModel("qwen2.5:1.5b", provider=provider)
++    agent_instance = Agent(model, tools=[adapt(all_specs[n]) for n in cmd["names"]], model_settings={
++                           "temperature": 0, "max_tokens": 160})
++    result = agent_instance.run_sync(cmd["prompt"], usage_limits=UsageLimits(request_limit=6))
++    return {"turns": result.usage.requests, "finished": True, "version": cmd["version"], "evidence": satisfied,
++            "completed": sorted(satisfied), "missing": sorted(n for n in cmd["required"] if n not in satisfied)}
++
++
++def prepare(case):
++    with connect() as conn:
++        conn.execute("insert into jobs(id) values(%s)", (case,))
++
++
++def revoke(case, action):
++    with connect() as conn:
++        conn.execute("update jobs set denied=array_append(denied,%s) where id=%s", (action, case))
++
++
++def stage(case, action):
++    barrier(case, action)
++    with connect() as conn:
++        refusals, memo = conn.execute("select denied,memo from jobs where id=%s for share", (case,)).fetchone()
++        if action in refusals:
++            conn.execute("update jobs set status='denied' where id=%s", (case,))
++            return "denied"
++        if action == "model":
++            model_http(case, "controlled", [{"role": "user", "content": memo or ""}], [])
++        elif action == "tool_out":
++            tool(case, "item_state", {"key": memo or ""}, os.environ["LAB_TOKEN"])
++        else:
++            outcome = sink(case, action, {"marker": memo})
++            if action == "read":
++                conn.execute("update jobs set memo=%s where id=%s", (outcome["value"], case))
++        return "ok"
++
++
++def quality(case, options):
++    credential = os.environ["LAB_TOKEN"]
++    key = tool(case, "read_manifest", {"resource": "bundle"}, credential)["value"]
++    evidence = tool(case, "item_state", {"key": key}, credential)
++    data = json.loads(evidence["value"])
++    from urllib.error import URLError
++    try:
++        policy = sink(case, "quality_policy")
++    except URLError:
++        policy = None
++    data["validator"] = bool(policy)
++    required = set(policy["required"]) if policy else set()
++    reasons = required.difference(data["items"])
++    ok = data["validator"] and data["version"] == policy["version"] and not reasons
++    if ok:
++        for action in ("commit", "deliver"):
++            if stage(case, action) != "ok":
++                return "denied"
++    outcome = "succeeded" if ok else "review"
++    code = "complete" if ok else "unavailable" if not policy else "version" if data[
++        "version"] != policy["version"] else "missing"
++    with connect() as conn:
++        conn.execute("update jobs set status=%s,assessment=%s where id=%s",
++                     (outcome, Jsonb({"reason": code, "rule": "v1"}), case))
++    return outcome
++
++
++def verdict(case):
++    with connect() as conn:
++        data = conn.execute("select assessment from jobs where id=%s", (case,)).fetchone()[0]
++        return data["reason"], data["rule"]
++
++
++def supplier(case):
++    with connect() as conn:
++        inserted = conn.execute(
++            "insert into dispatch(id) values(%s) on conflict do nothing returning id", (case,)).fetchone()
++        if inserted:
++            conn.execute("select id from jobs where id=%s for update", (case,))
++            if conn.execute("select coalesce(sum(coalesce(consumed,allocated)),0) from budget where id=%s", (case,)).fetchone()[0] > 2:
++                raise RuntimeError("over budget")
++            conn.execute("insert into budget values(%s,'supplier',3,null)", (case,))
++    if inserted:
++        barrier(case, "supplier_gate")
++        with connect() as conn:
++            status, denied = conn.execute(
++                "select status,denied from jobs where id=%s for share", (case,)).fetchone()
++            if status == "cancelled" or "commit" in denied:
++                conn.execute("delete from budget where id=%s and worker='supplier'", (case,))
++                return "denied"
++            response = sink(case, "supplier_send", {"op": case})
++        barrier(case, "after_effect")
++    else:
++        response = sink(case, "lookup", {"op": case})
++    return callback(case, response["known"])
++
++
++def callback(case, known):
++    with connect() as conn:
++        job = conn.execute("select status from jobs where id=%s for update", (case,)).fetchone()[0]
++        if known:
++            fresh = conn.execute(
++                "update dispatch set ack=true where id=%s and not ack returning id", (case,)).fetchone()
++            if fresh:
++                conn.execute("update budget set consumed=2 where id=%s and worker='supplier'", (case,))
++                if job != "cancelled":
++                    sink(case, "downstream")
++    return "confirmed" if known else "unknown"
++
++
++def late_callback(case):
++    reply = sink(case, "lookup", {"op": case})
++    return callback(case, reply["known"])
++
++
++def cancel(case):
++    with connect() as conn:
++        conn.execute("update jobs set status='cancelled' where id=%s", (case,))
++
++
++def child(case, name):
++    with connect() as conn:
++        job = conn.execute("select status from jobs where id=%s for update", (case,)).fetchone()[0]
++        current = conn.execute(
++            "select allocated,consumed from budget where id=%s and worker=%s", (case, name)).fetchone()
++        if current and current[1] is not None:
++            return "settled"
++        if current is None:
++            total = conn.execute(
++                "select coalesce(sum(coalesce(consumed,allocated)),0) from budget where id=%s", (case,)).fetchone()[0]
++            if job == "cancelled" or total + 3 > 5:
++                sink(case, "budget_denied", {"child": name})
++                return "blocked"
++            conn.execute("insert into budget values(%s,%s,3,null)", (case, name))
++    barrier(case, "reserved")
++    if current:
++        receipt = sink(case, "charge_lookup", {"op": name})
++        if not receipt["known"]:
++            return "unknown"
++    else:
++        with connect() as conn:
++            job = conn.execute("select status from jobs where id=%s for share", (case,)).fetchone()[0]
++            if job == "cancelled":
++                return "held"
++            receipt = sink(case, "charge", {"op": name})
++        barrier(case, "charged")
++    with connect() as conn:
++        actual = receipt["units"]
++        if type(actual) is not int or actual not in range(4):
++            raise ValueError("invalid charge receipt")
++        conn.execute("update budget set consumed=%s where id=%s and worker=%s and consumed is null",
++                     (actual, case, name))
++    return "settled"
++
++
++def state(case):
++    with connect() as conn:
++        status = conn.execute("select status from jobs where id=%s", (case,)).fetchone()[0]
++        ack = conn.execute("select ack from dispatch where id=%s", (case,)).fetchone()
++        used, held = conn.execute(
++            "select coalesce(sum(consumed),0),coalesce(sum(allocated) filter(where consumed is null),0) from budget where id=%s", (case,)).fetchone()
++        return dict(product=status, op=(("confirmed", 1) if ack[0] else ("unknown", 0)) if ack else None, spent=int(used), held=int(held))
+diff --git a/lab/architecture/plugin_fixture.py b/lab/architecture/plugin_fixture.py
+new file mode 100644
+index 0000000..71e2d91
+--- /dev/null
++++ b/lab/architecture/plugin_fixture.py
+@@ -0,0 +1,7 @@
++"""Sealed external business implementation. Installed only after both runtimes freeze."""
++from hashlib import sha256
++
++
++def verify_receipt(fields):
++    ordered = [value[::-1] for key, value in sorted(fields.items())]
++    return "receipt-" + sha256("|".join(ordered).encode()).hexdigest()
