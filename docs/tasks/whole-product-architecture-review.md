@@ -25,3 +25,16 @@
 逐编号填证、23 组候选横向对照、方案判断按[原表验证结果](../requirements/whole-product-acceptance-results.md)回流。计费观测只作为特定硬门槛的证据。首轮暂缓的两个窗按 [#12 事前预注册](https://github.com/zhuquanwei111/mingjing---agent/blob/041c9683df779732b82f3e9c8161e509bac9dcbd/lab/product-review/round-gate/PLAN.md)执行。
 
 独立验收审查按原件和冻结主表，要求统一正式交付故障的 W0a 时点、拆出模型/工具两种实际传输、为 A/B 写入对称的真实模型和扩展证据、移除原件未要求的无限类型零改动标准。已按固定记录修正。#12 的两个相邻窗口、旧回归与持久原件已进入逐编号表。
+
+最终独立总评对 8a26591 和 #12 固定证据裁决“调整指定组件后采纳路线 B 为完整产品开发基线”。原件逐号独审独立完成全表实质复核和四点修正复验。目标正式 W0、MVP 实施未开始。
+
+## 证据复查
+
+| 实验归档提交 | 同一提交重新运行的定向验收 | 同一提交的仓库回归 |
+| --- | --- | --- |
+| [#13 · c847da6c](https://github.com/zhuquanwei111/mingjing---agent/pull/13) | [真实集成 45193190934](https://github.com/zhuquanwei111/mingjing---agent/actions/runs/45193190934) | [Verify 45193190978](https://github.com/zhuquanwei111/mingjing---agent/actions/runs/45193190978) |
+| [#15 · 75d6fccf](https://github.com/zhuquanwei111/mingjing---agent/pull/15) | [真实集成 45194266215](https://github.com/zhuquanwei111/mingjing---agent/actions/runs/45194266215) | [Verify 45194266672](https://github.com/zhuquanwei111/mingjing---agent/actions/runs/45194266672) |
+| [#16 · a9b65704](https://github.com/zhuquanwei111/mingjing---agent/pull/16) | [真实集成 45194249778](https://github.com/zhuquanwei111/mingjing---agent/actions/runs/45194249778) | [Verify 45194249601](https://github.com/zhuquanwei111/mingjing---agent/actions/runs/45194249601) |
+| [#17 · 60dc1965](https://github.com/zhuquanwei111/mingjing---agent/pull/17) | [真实集成 45194292791](https://github.com/zhuquanwei111/mingjing---agent/actions/runs/45194292791) | [Verify 45194292841](https://github.com/zhuquanwei111/mingjing---agent/actions/runs/45194292841) |
+
+[#12 补测归档提交的复跑](https://github.com/zhuquanwei111/mingjing---agent/actions/runs/45196243746) · [同一提交原用例复跑](https://github.com/zhuquanwei111/mingjing---agent/actions/runs/45196243719) · [仓库 Verify](https://github.com/zhuquanwei111/mingjing---agent/actions/runs/45196244064)
