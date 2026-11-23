@@ -48,6 +48,8 @@ GitHub 正式 ARM64 作业沿用 `P1 acceptance` 名称，同时运行 P1 与本
 
 ### 开发能力与扩展
 
+接入路线 B 的新能力，先看[完整产品开发者接入指南](../docs/designs/whole-product-decision.md#capability-onboarding)。本节的类、URL 和测试对应 P2 隔离实现。
+
 定义 Model 的输入输出类型和 CapabilityContext 上下文，再在应用加载配置中注册 Capability。业务函数通过 NotesPort 使用同库事务。普通程序 normalize_text 返回产物，固定 Workflow 的 write_note 审批后记一条合成笔记，Agent 的 draft_note 使用固定决策和受控工具复用同一笔记实现。业务函数的签名与 Temporal 和 LangGraph 无关。应用根据可信契约决定执行入口。
 
 外部适配器的 send 和 lookup 接口使用稳定 operation_id。开发示例 fake_delivery 以第二次数据库提交模拟外部接收，能验证发送与结算之间的未知态。真实适配器必须指定可信成本上界，且只从其结果查询确认外部回执。

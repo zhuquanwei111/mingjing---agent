@@ -8,6 +8,7 @@
 | --- | --- | --- |
 | 仓库状态与使用方法 | [根 README](../README.md) 与 [根 AGENTS](../AGENTS.md) | 开发前检查实际分支、工作区和相关 PR |
 | 已合并 P2 的代码和行为 | [P2 操作说明](../core/README.md) 与 [旧版本说明](../core/VERSIONING.md) | 只代表对应代码版本，不等于新路线 B 已完成 |
+| 新能力开发者从这里开始 | [通用契约、四类适配、发布与接入验收](designs/whole-product-decision.md#capability-onboarding) | 区分现有 P2 可复现接口、路线 B 设计和待执行的 AC-17 独立盲接 |
 | P1 验证与可复现环境 | [P1 说明](../p1-walking-skeleton/README.md)、[P1 历史报告](../p1-walking-skeleton/P1_REPORT.md) | 历史记录以原 SHA 和 CI 为准 |
 | 通用 Codex 工程规范 | [通用规范包](../engineering-standard/README.md) | 含执行脚本、Skills、模板，不是明镜业务交付包 |
 | 明镜如何采用工程规范 | [项目接入说明](engineering-standard.md)、[执行性审查](engineering-standard-execution.md) | 通用层与项目例外分开 |
