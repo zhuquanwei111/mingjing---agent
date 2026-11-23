@@ -79,6 +79,9 @@ class Receiver(BaseHTTPRequestHandler):
                                     (scope, op, digest, self.headers.get("x-stainless-retry-count"))).fetchone()
             conn.execute("INSERT INTO effect(op,scope,digest) VALUES (%s,%s,%s) ON CONFLICT (op) DO NOTHING", (op,scope,digest))
             conn.execute("INSERT INTO charge VALUES (%s,%s,1)", (arrival,scope))
+            if not drop or prev:
+                # Every acknowledged POST publishes the same authoritative lookup, in either group.
+                conn.execute("UPDATE fixtures SET published=true WHERE scope=%s", (scope,))
         if drop and not prev:
             self.close_connection = True
             self.connection.shutdown(socket.SHUT_RDWR)

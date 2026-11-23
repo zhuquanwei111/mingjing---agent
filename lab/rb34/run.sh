@@ -38,3 +38,12 @@ dc up -d experiment-worker
   dc exec -T db psql -At -U postgres -c 'SHOW server_version'
 } | tee "$RB34_OUT/versions.txt"
 dc run --rm -T --no-deps controller | tee "$RB34_OUT/experiment.log"
+# Mirror the exact evidence file through the job log for permanent Git archival with digest verification.
+python3 - "$RB34_OUT" <<'PY'
+import base64, gzip, hashlib, pathlib, sys
+root = pathlib.Path(sys.argv[1])
+for file in [root / "versions.txt", *sorted(root.glob("*-history.json")), root / "raw.jsonl"]:
+    data = file.read_bytes()
+    encoded = base64.b64encode(gzip.compress(data, mtime=0)).decode("ascii")
+    print("RB34_COPY", file.name, hashlib.sha256(data).hexdigest(), encoded)
+PY

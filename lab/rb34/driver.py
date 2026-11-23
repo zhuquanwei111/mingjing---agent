@@ -40,6 +40,7 @@ def snapshot(scope):
     with witness() as conn:
         def rows(statement):
             return conn.execute(statement, (scope,)).fetchall()
+        published, = rows("SELECT published FROM fixtures WHERE scope=%s")[0]
         arrivals = rows("SELECT id,op,digest,sdk_retry FROM arrival WHERE scope=%s ORDER BY id")
         effects = rows("SELECT op,digest FROM effect WHERE scope=%s ORDER BY op")
         fees = rows("SELECT arrival_id,units FROM charge WHERE scope=%s ORDER BY arrival_id")
@@ -52,7 +53,7 @@ def snapshot(scope):
         ledger = conn.execute("SELECT receipt_id,units FROM fee WHERE scope=%s ORDER BY receipt_id", (scope,)).fetchall()
     return dict(counts=list(map(len, (arrivals,effects,fees,deliveries))), arrivals=arrivals, effects=effects,
                 fees=fees, deliveries=deliveries, lookups=lookups, state=state, held=held, spent=spent,
-                authority=authority, digest=digest, product_fees=ledger)
+                authority=authority, digest=digest, product_fees=ledger, receipt_published=published)
 
 
 async def history(handle, scope, label):
@@ -73,7 +74,7 @@ async def notice(client, scope, index):
 async def run_case(client, scope, guarded, action, can_lookup, late):
     drop = scope != "normal"
     with witness() as conn:
-        conn.execute("INSERT INTO fixtures VALUES (%s,%s,%s)", (scope, drop, not guarded or not drop))
+        conn.execute("INSERT INTO fixtures VALUES (%s,%s,%s)", (scope, drop, False))
     with db() as conn:
         conn.execute("INSERT INTO job(scope,guarded,can_lookup) VALUES (%s,%s,%s)", (scope, guarded, can_lookup))
     handle = await client.start_workflow(GovernedRequest.run, scope, id=scope, task_queue="rb34")
@@ -88,6 +89,7 @@ async def run_case(client, scope, guarded, action, can_lookup, late):
                 await asyncio.sleep(.10)
         before = snapshot(scope)
         record(scope, "before_control", before)
+        assert not before["receipt_published"]
         assert before["counts"] == [1,1,1,0] and (before["held"],before["spent"],before["authority"]) == (3,0,"active")
         with db() as conn:
             conn.execute("UPDATE job SET authority=%s WHERE scope=%s", (action,scope))
@@ -144,14 +146,18 @@ async def run_case(client, scope, guarded, action, can_lookup, late):
     if late or not drop:
         assert [d["added"] for _,k,d,_ in trace if k == "settle"] == ([1,0] if late else [1,0,0])
     print("RB34_CASE", scope, "PASS", expected, "held", end["held"], "spent", end["spent"], flush=True)
+    return end["arrivals"][0][2]
 
 
 async def main():
     setup()
     client = await Client.connect("temporal:7233", namespace=os.environ["NAMESPACE"])
     record("run", "identity", {"head": os.environ["TEST_HEAD"], "run": os.environ["CI_RUN"], "namespace": os.environ["NAMESPACE"]})
+    input_digests = {}
     for case in CASES:
-        await run_case(client, *case)
+        input_digests[case[0]] = await run_case(client, *case)
+    record("run", "receiver_input_digests", input_digests)
+    assert len(set(input_digests.values())) == 1, input_digests
     print("RB34_RAW_SHA256", hashlib.sha256(RAW.read_bytes()).hexdigest(), flush=True)
 
 
