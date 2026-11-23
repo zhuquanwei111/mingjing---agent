@@ -8,7 +8,7 @@ import sys
 import time
 import uuid
 from pathlib import Path
-from model_gate import ALIAS
+from model_gate import ALIAS, exact_result
 from services import OUT, PRODUCT, RECEIVER, database, http
 
 API = "http://127.0.0.1:8000/api"
@@ -260,6 +260,27 @@ def run_case(tag):
     assert (c["models"],c["paired"],c["delivery"])==((1,0,0) if tag=="cancel" else (2,1,1)),c
     root_state=next(j["status"] for j in final["jobs"] if j["id"]==root)
     assert root_state==("canceled" if tag=="cancel" else "success"),root_state
+    if tag=="cancel":
+        # Independent negative control. Use an otherwise valid paid receipt and real internal ID
+        # after native root cancellation. Distinguish this injected attempt from native timing.
+        old=final["ledger"]["ops"][0]
+        body=json.loads(final["ledger"]["model_attempts"][0]["body"])
+        body["messages"].extend([
+            {"role":"assistant","tool_calls":[{"id":pending,"type":"function",
+             "function":{"name":"async_operation","arguments":"{}"}}]},
+            {"role":"tool","tool_call_id":pending,"content":json.dumps(old["receipt"])}])
+        assert exact_result(body,pending,old["receipt"]) and old["canceled"] and old["reader"]==old["version"]
+        assert all(t["turn"]!=1 for t in final["ledger"]["model_intents"])
+        try:
+            http(PRODUCT+"/v1/chat/completions",body)
+        except RuntimeError as exc:
+            assert "403" in str(exc)
+        else:
+            raise AssertionError("otherwise valid canceled operation reached model")
+        tested=state(op,root,"injected_cancel_denial")["counts"]
+        assert tested["gate_denials"]==c["gate_denials"]+1
+        for key in ["models","model_test_fees","http_post","effect","simulated_charge","delivery"]:
+            assert tested[key]==c[key],tested
     if tag=="known":
         last=final["ledger"]
         inbound=json.loads(last["model_attempts"][-1]["body"])
