@@ -1,0 +1,10 @@
+services:
+  provider:
+    command: [python, -u, /exp/round-gate/gate_receiver.py]
+    environment:
+      PYTHONPATH: /exp
+  controller:
+    command: [python, -u, /exp/round-gate/experiment.py]
+    environment:
+      PYTHONPATH: /exp
+      BUILD_MODULE: release_v2

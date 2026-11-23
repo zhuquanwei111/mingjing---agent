@@ -1,0 +1,29 @@
+name: Whole product - round dispatch and late receipts
+on:
+  pull_request:
+    branches: [lab/architecture-20261123-compare]
+    paths: ['lab/product-review/round-gate/**', '.github/workflows/product-round-gate.yml']
+permissions:
+  contents: read
+jobs:
+  integration:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          persist-credentials: false
+      - run: make check
+      - name: Prove round claims and concurrent receipt recovery
+        env:
+          TEST_HEAD: ${{ github.event.pull_request.head.sha }}
+          CI_RUN: ${{ github.run_id }}
+          LAB_OUT: ${{ runner.temp }}/round-gate
+        run: bash lab/product-review/round-gate/run.sh
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: round-gate-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/round-gate
+          if-no-files-found: error
