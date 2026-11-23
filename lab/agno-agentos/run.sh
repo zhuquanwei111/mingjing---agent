@@ -13,7 +13,7 @@ trap 'docker rm -f "$product_container" "$witness_container" >/dev/null 2>&1 || 
 docker run -d --name "$product_container" -p 127.0.0.1:15432:5432 -e POSTGRES_PASSWORD="$p" "$image"
 docker run -d --name "$witness_container" -p 127.0.0.1:15433:5432 -e POSTGRES_PASSWORD="$w" "$image"
 python3 -m venv "$stage/venv"
-"$stage/venv/bin/pip" -q install --report "$stage/packages.json" 'agno[os,postgres,openai]==3.2.0'
+"$stage/venv/bin/pip" -q install --report "$stage/packages.json" -r lab/agno-agentos/requirements.lock
 "$stage/venv/bin/pip" freeze > "$LAB_OUT/versions.txt"
 "$stage/venv/bin/python" -c 'import json,sys; d=json.load(open(sys.argv[1])); print(json.dumps({r["metadata"]["name"]:r["download_info"]["archive_info"]["hashes"] for r in d["install"]},sort_keys=True,indent=2))' "$stage/packages.json" > "$LAB_OUT/wheel-hashes.json"
 cat "$LAB_OUT/versions.txt"

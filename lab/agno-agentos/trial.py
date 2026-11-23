@@ -10,6 +10,7 @@ import uuid
 from pathlib import Path
 
 import httpx
+import references
 import psycopg
 from psycopg import sql
 from psycopg.rows import dict_row
@@ -120,11 +121,48 @@ def recover(scope, wrong=None):
     return result["status"]
 
 
+def scan(scope, phase):
+    row = current(scope)
+    actual, = witness("SELECT e.receipt FROM effects e WHERE op=%s", (row["operation_id"],))
+    responses = witness("SELECT detail FROM requests WHERE scope=%s AND kind='model' ORDER BY seq", (scope,))
+    original = responses[0]["detail"]["reply"]["tool_calls"][0]["id"]
+    raw_values = [markers[scope], actual["receipt"], original]
+    event = "call-pair" if phase == "completed" else "pending-pair"
+    evidence(event, {"scope": scope, "native": row["call_id"], "external": original, "receipt": actual["receipt"]})
+    assert (original != row["call_id"]) == (scope == references.PROFILE)
+    assert len(agno_table("agno_jobs", "session_id", row["session_id"])) == 1
+    with db() as c:
+        vault = c.execute("SELECT kind,token,value FROM guarded_value WHERE scope=%s ORDER BY kind,token", (scope,)).fetchall()
+    scanned = {"queue": ticket(row), "http_run": read_run(row), "product": row, "vault": vault,
+               "wire": responses, "session_db": agno_table("agno_sessions", "session_id", row["session_id"]),
+               "run_db": agno_table("agno_runs", "run_id", row["run_id"])}
+    assert scanned["run_db"] and scanned["session_db"]
+    if phase == "completed":
+        delivered, = [m for m in responses[1]["detail"]["request"]["messages"] if m["role"] == "tool"]
+        assert delivered["tool_call_id"] == original
+        assert actual["receipt"] == row["receipt"] == delivered["content"]
+        sent, = witness("SELECT detail FROM requests WHERE scope=%s AND kind='arrival'", (scope,))
+        received, = witness("SELECT detail FROM requests WHERE scope=%s AND kind='delivery'", (scope,))
+        assert sent["detail"]["call"] == original and sent["detail"]["ref"] == markers[scope]
+        assert received["detail"]["receipt"] == actual["receipt"]
+    for name, data in scanned.items():
+        raw = json.dumps(data, default=str)
+        hits = [v in raw for v in raw_values]
+        evidence("payload-presence", {"scope": scope, "phase": phase, "where": name,
+                 "argument": hits[0], "receipt": hits[1], "tool_call_id": hits[2]})
+        if scope == references.PROFILE and name in ("queue", "run_db", "session_db", "http_run"):
+            assert not any(hits), (scope, phase, name, hits)
+        if phase == "completed" and (name == "wire" or scope == references.PROFILE and name == "vault"
+                                     or scope == "known" and name in ("queue", "run_db", "http_run")):
+            assert all(hits), (scope, phase, name, hits)
+        encoded = json.dumps(data, ensure_ascii=False, default=str, indent=2)
+        (OUT / f"{scope}-{phase}-{name}.json").write_text(encoded.replace(os.environ["OS_KEY"], "[redacted-service-key]"))
+
 def trial():
     service = start("witness.py")
     alive(WITNESS + "/ready", service)
     with db() as c:
-        c.execute(SCHEMA)
+        c.execute(SCHEMA + references.SCHEMA)
         c.cursor().executemany("INSERT INTO policy VALUES(%s,true)", [(s,) for s in markers])
     for scope, marker in markers.items():
         witness("INSERT INTO scenario(scope,name,marker) VALUES(%s,%s,%s)", (scope, NAME, marker))
@@ -135,20 +173,26 @@ def trial():
     alive(RUNNER + "/openapi.json", server)
     for scope in SCOPES:
         session = "sess_" + uuid.uuid4().hex
-        ack = api("POST", f"/agents/{scope}/runs", data={"message": "Check reference " + markers[scope],
+        with db() as c:
+            prompt = references.hide(c, scope, "prompt", "Check reference " + markers[scope])
+        ack = api("POST", f"/agents/{scope}/runs", data={"message": prompt,
                   "session_id": session, "stream": "false", "background": "true"})
         binding = {"scope": scope, "run_id": ack["run_id"], "session_id": session}
         run = wait_run(binding, "paused")
         wait_ticket(binding, "paused")
         tool = pending(run)
-        assert tool["tool_args"]["ref"] == markers[scope]
-        record(scope, ack["run_id"], session, tool["tool_call_id"], tool["tool_args"]["ref"])
+        with db() as c:
+            assert references.open_value(c, scope, "ref", tool["tool_args"]["ref"]) == markers[scope]
+        record(scope, ack["run_id"], session, tool["tool_call_id"], tool["tool_args"]["ref"],
+               writer_version=2 if scope == "incompatible" else 1)
     worker = start("control.py")
     until(lambda: all(count(s) == (1, 0, 0, 1, 0) for s in SCOPES))
     for scope in SCOPES:
         snapshot(scope, "accepted")
     witness("UPDATE scenario SET enabled=true")
     until(lambda: all(count(s) == (1, 1, 1, 1, 0) for s in SCOPES))
+    for scope in ("known", references.PROFILE):
+        scan(scope, "before-kill")
     for scope in SCOPES:
         row = current(scope)
         assert (row["held"], row["spent"], row["receipt"], row["state"]) == (3, 0, None, "unconfirmed")
@@ -170,10 +214,9 @@ def trial():
         assert (r["held"], r["spent"], count(s)) == (3, 0, (1, 1, 1, 1, 0))
     with db() as c:
         c.execute("UPDATE operation SET active=false WHERE scope='cancel'")
-        c.execute("UPDATE operation SET reader_version=2 WHERE scope='incompatible'")
         c.execute("UPDATE policy SET allowed=false WHERE scope='revoked'")
     cancelled = current("cancel")
-    cancel_reply = api("POST", path(cancelled) + "/cancel", data={"session_id": cancelled["session_id"]})
+    cancel_reply = api("POST", path(cancelled) + "/cancel", params={"session_id": cancelled["session_id"]})
     evidence("cancel-response", cancel_reply)
     # Exercise the actual model gateway after revocation instead of only checking local state.
     denied = httpx.post(GATE + "/revoked/v1/chat/completions", json={"messages": [{"role": "user", "content": markers["revoked"]}]})
@@ -181,38 +224,21 @@ def trial():
     witness("UPDATE scenario SET visible=true WHERE scope!='unknown'")
     wrong_id = "call_" + uuid.uuid4().hex
     assert recover("wrong", wrong_id) == "wrong-call"
-    states = {"known": "delivered", "unknown": "unknown", "cancel": "cancelled-settled",
+    states = {"known": "delivered", references.PROFILE: "delivered", "unknown": "unknown", "cancel": "cancelled-settled",
               "incompatible": "isolated-version", "revoked": "revoked-settled"}
     for scope, expected in states.items():
         assert recover(scope) == expected
         assert recover(scope) == expected
-    wait_ticket(current("known"), "completed")
+    for scope in ("known", references.PROFILE):
+        wait_ticket(current(scope), "completed")
     for scope in SCOPES:
         row = current(scope)
-        expected = (1, 1, 1, 2, 1) if scope == "known" else (1, 1, 1, 1, 0)
+        expected = (1, 1, 1, 2, 1) if scope in ("known", references.PROFILE) else (1, 1, 1, 1, 0)
         assert count(scope) == expected, (scope, count(scope), expected)
         assert (row["held"], row["spent"]) == ((3, 0) if scope in ("wrong", "unknown") else (0, 1))
         snapshot(scope, "final")
-    row = current("known")
-    actual, = witness("SELECT e.receipt FROM effects e WHERE op=%s", (row["operation_id"],))
-    responses = witness("SELECT detail FROM requests WHERE scope='known' AND kind='model' ORDER BY seq")
-    original = responses[0]["detail"]["reply"]["tool_calls"][0]["id"]
-    delivered, = [m for m in responses[1]["detail"]["request"]["messages"] if m["role"] == "tool"]
-    assert delivered["tool_call_id"] == original == row["call_id"]
-    assert actual["receipt"] == row["receipt"] and actual["receipt"] in delivered["content"]
-    assert len(agno_table("agno_jobs", "session_id", row["session_id"])) == 1
-    scanned = {"queue": ticket(row), "http_run": read_run(row), "product": row,
-               "wire": responses, "session_db": agno_table("agno_sessions", "session_id", row["session_id"])}
-    persistent_runs = agno_table("agno_runs", "run_id", row["run_id"])
-    assert persistent_runs, "missing normalized persistent run"
-    scanned["run_db"] = persistent_runs
-    for name, data in scanned.items():
-        raw = json.dumps(data, default=str)
-        evidence("payload-presence", {"where": name, "argument": markers["known"] in raw,
-                 "receipt": row["receipt"] in raw, "tool_call_id": original in raw})
-        (OUT / (name + ".json")).write_text(json.dumps(data, ensure_ascii=False, default=str, indent=2)
-                                            .replace(os.environ["OS_KEY"], "[redacted-service-key]"))
-    assert markers["known"] in json.dumps(responses) and actual["receipt"] in json.dumps(responses)
+    for scope in ("known", references.PROFILE):
+        scan(scope, "completed")
     # Count optional deterministic paths independently; no model interaction on either.
     api("POST", "/fixture/direct", json={"ref": markers["direct"]})
     result = api("POST", "/workflows/fixed/runs", data={"message": markers["workflow"], "stream": "false"})
@@ -220,6 +246,11 @@ def trial():
     for s in EXTRAS:
         until(lambda: count(s) == (1, 1, 1, 0, 0))
         evidence("deterministic-entry", {"scope": s, "counts": count(s), "operation": current(s)})
+    for fee in witness("""SELECT f.*,j.scope,j.call_id,r.detail AS arrival FROM fees f JOIN jobs j USING(op)
+                       JOIN requests r ON r.seq=f.arrival ORDER BY f.arrival"""):
+        evidence("fee", fee)
+    for effect in witness("""SELECT j.scope,j.call_id,e.* FROM effects e JOIN jobs j USING(op) ORDER BY j.scope"""):
+        evidence("effect", effect)
     for record_row in witness("SELECT * FROM requests ORDER BY seq"):
         evidence("receiver", record_row)
     evidence("complete", {"scenarios": list(SCOPES), "extras": list(EXTRAS), "sha": os.environ["TEST_HEAD"]})

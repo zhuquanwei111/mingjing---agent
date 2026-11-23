@@ -9,7 +9,9 @@ import httpx
 import psycopg
 from psycopg.rows import dict_row
 
-SCOPES = ("known", "unknown", "cancel", "incompatible", "wrong", "revoked")
+import references
+
+SCOPES = ("known", "unknown", "cancel", "incompatible", "wrong", "revoked", references.PROFILE)
 EXTRAS = ("direct", "workflow")
 NAME = "request_receipt"
 RUNNER = os.getenv("RUNNER_URL", "http://127.0.0.1:8090")
@@ -19,7 +21,7 @@ SCHEMA = """
 CREATE TABLE policy(scope text PRIMARY KEY, allowed boolean NOT NULL);
 CREATE TABLE operation(scope text PRIMARY KEY REFERENCES policy, operation_id text UNIQUE NOT NULL,
   run_id text NOT NULL, session_id text NOT NULL, call_id text NOT NULL, ref text NOT NULL,
-  active boolean NOT NULL DEFAULT true, reader_version int NOT NULL DEFAULT 1,
+  active boolean NOT NULL DEFAULT true, writer_version int NOT NULL DEFAULT 1,
   state text NOT NULL DEFAULT 'prepared', held int NOT NULL DEFAULT 3,
   spent int NOT NULL DEFAULT 0, receipt text, UNIQUE(run_id,call_id));
 """
@@ -42,16 +44,16 @@ def authorized(scope, path, payload):
         row = c.execute("SELECT allowed FROM policy WHERE scope=%s FOR SHARE", (scope,)).fetchone()
         if not row or not row["allowed"]:
             raise PermissionError(scope)
-        response = httpx.post(f"{WITNESS}/{scope}/{path}", json=payload, timeout=15)
+        response = httpx.post(f"{WITNESS}/{scope}/{path}", json=references.outgoing(c, scope, path, payload), timeout=15)
         response.raise_for_status()
-        return response.status_code, response.json()
+        return response.status_code, references.incoming(c, scope, path, response.json())
 
 
-def record(scope, run, session, call, ref):
+def record(scope, run, session, call, ref, *, writer_version=1):
     with db() as c:
-        c.execute("""INSERT INTO operation(scope,operation_id,run_id,session_id,call_id,ref)
-                  VALUES (%s,%s,%s,%s,%s,%s)""",
-                  (scope, "op_" + uuid.uuid4().hex, run, session, call, ref))
+        c.execute("""INSERT INTO operation(scope,operation_id,run_id,session_id,call_id,ref,writer_version)
+                  VALUES (%s,%s,%s,%s,%s,%s,%s)""",
+                  (scope, "op_" + uuid.uuid4().hex, run, session, call, ref, writer_version))
 
 
 def current(scope):
@@ -110,7 +112,9 @@ def reconcile(scope, notified_call=None):
     proof = lookup.json()
     if not proof["known"]:
         return "unknown"
-    if (proof["op"], proof["call"]) != (row["operation_id"], row["call_id"]):
+    with db() as c:
+        expected_call = references.open_value(c, scope, "call", row["call_id"])
+    if (proof["op"], proof["call"]) != (row["operation_id"], expected_call):
         return "invalid-proof"
     assert 0 <= proof["units"] <= row["held"]
     with db() as c:
@@ -119,22 +123,25 @@ def reconcile(scope, notified_call=None):
             return locked["state"]
         allowed = c.execute("SELECT allowed FROM policy WHERE scope=%s FOR SHARE", (scope,)).fetchone()["allowed"]
         state = ("cancelled-settled" if not locked["active"] else "isolated-version"
-                 if locked["reader_version"] != 1 else "revoked-settled" if not allowed else "continuing")
+                 if locked["writer_version"] != 1 else "revoked-settled" if not allowed else "continuing")
         c.execute("""UPDATE operation SET state=%s,held=0,spent=%s,receipt=%s WHERE scope=%s""",
                   (state, proof["units"], proof["receipt"], scope))
     if state != "continuing":
         return state
+    with db() as c:
+        result = references.hide(c, scope, "receipt", proof["receipt"])
     run = read_run(row)
     tool = pending(run)
-    assert (run["run_id"], run["session_id"], tool["tool_call_id"]) == (row["run_id"], row["session_id"], proof["call"])
-    tool = dict(tool, result=proof["receipt"])
+    assert (run["run_id"], run["session_id"], tool["tool_call_id"]) == (row["run_id"], row["session_id"], row["call_id"])
+    tool = dict(tool, result=result)
     ack = api("POST", path(row) + "/continue", data={"session_id": row["session_id"], "stream": "false", "background": "true",
                                                       "tools": json.dumps([tool])})
     assert ack["run_id"] == row["run_id"], ack
     done = wait_run(row, "completed")
     assert done["run_id"] == row["run_id"] and done["status"].lower() == "completed", done
-    assert proof["receipt"] in str(done["content"])
-    authorized(scope, "deliver", {"op": row["operation_id"], "receipt": proof["receipt"]})
+    if scope != references.PROFILE:
+        assert proof["receipt"] in str(done["content"])
+    authorized(scope, "deliver", {"op": row["operation_id"], "receipt": result, "answer": done["content"]})
     with db() as c:
         c.execute("UPDATE operation SET state='delivered' WHERE scope=%s AND state='continuing'", (scope,))
     return "delivered"
