@@ -21,7 +21,7 @@ CREATE TABLE scenario(scope text PRIMARY KEY, enabled boolean DEFAULT false,
 CREATE TABLE requests(seq bigserial PRIMARY KEY, scope text, kind text, detail jsonb);
 CREATE TABLE jobs(op text PRIMARY KEY, scope text, call_id text, receipt text);
 CREATE TABLE effects(op text PRIMARY KEY, receipt text);
-CREATE TABLE fees(id bigserial PRIMARY KEY, op text, units int);
+CREATE TABLE fees(arrival bigint PRIMARY KEY REFERENCES requests(seq), op text, units int);
 """
 
 
@@ -37,9 +37,12 @@ def tick():
             for op, scope in rows:
                 receipt = "EFFECT_MARK_" + uuid.uuid4().hex
                 c.execute("INSERT INTO effects VALUES(%s,%s)", (op, receipt))
-                c.execute("INSERT INTO fees(op,units) VALUES(%s,1)", (op,))
+
                 c.execute("UPDATE jobs SET receipt=%s WHERE op=%s", (receipt, op))
                 log(c, scope, "effect", {"op": op, "receipt": receipt})
+            c.execute("""INSERT INTO fees(arrival,op,units)
+                       SELECT r.seq,r.detail->>'op',1 FROM requests r JOIN scenario s USING(scope)
+                       WHERE r.kind='arrival' AND s.enabled ON CONFLICT DO NOTHING""")
         time.sleep(.08)
 
 

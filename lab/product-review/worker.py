@@ -1,8 +1,11 @@
 """Reference-only Temporal activity and versioned external-tool checkpoint adapter."""
 import asyncio
+import hashlib
+import importlib
 import json
 import os
 import uuid
+from pathlib import Path
 from urllib.request import Request, urlopen
 
 import psycopg
@@ -18,7 +21,9 @@ from temporalio import activity
 from temporalio.client import Client
 from temporalio.worker import Worker
 
-from flow import Round
+from flow import Notice, Round
+
+RELEASE = importlib.import_module(os.environ["BUILD_MODULE"])
 
 
 def db():
@@ -50,7 +55,11 @@ def agent_for(row):
                             json_schema=desc["input_schema"], takes_ctx=False)
     client = AsyncOpenAI(base_url=f"http://provider:8080/{row['scope']}/v1",
                          api_key="local-test-only",max_retries=0)
-    model = OpenAIChatModel("fixture", provider=OpenAIProvider(openai_client=client))
+    class MeteredModel(OpenAIChatModel):
+        async def request(self,*args,**kwargs):
+            charge_model_slot(row["scope"])
+            return await super().request(*args,**kwargs)
+    model = MeteredModel("fixture", provider=OpenAIProvider(openai_client=client))
     return Agent(model,tools=[tool],output_type=[str, DeferredToolRequests]),client
 
 
@@ -65,7 +74,6 @@ def charge_model_slot(scope):
 async def checkpoint_first(scope):
     row = read(scope)
     agent,client = agent_for(row)
-    charge_model_slot(scope)
     try:
         result = await agent.run("Request the registered asynchronous operation on " + row["marker"],
                                  usage_limits=UsageLimits(request_limit=1))
@@ -76,13 +84,14 @@ async def checkpoint_first(scope):
     assert call.tool_name == row["descriptor"]["name"] and call.args_as_dict() == {"ref":row["marker"]}
     history = json.loads(result.all_messages_json())
     op = str(uuid.uuid4())
+    serialized = RELEASE.encode(row["writer_format"], history, op, call.tool_call_id)
     with db() as c:
-        changed = c.execute("""UPDATE task SET op=%s,call=%s,msg=%s,checkpoint_version=1,
+        changed = c.execute("""UPDATE task SET op=%s,call=%s,msg=%s,checkpoint_version=%s,
                  held=3,state='dispatch_intent' WHERE scope=%s AND op IS NULL AND active RETURNING op""",
-                            (op,call.tool_call_id,Jsonb(history),scope)).fetchone()
+                            (op,call.tool_call_id,Jsonb(serialized),row["writer_format"],scope)).fetchone()
         if not changed:
             raise RuntimeError("conflicting initial intent")
-        log(c,scope,"checkpoint",{"version":1,"op":op,"call":call.tool_call_id,
+        log(c,scope,"checkpoint",{"version":row["writer_format"],"op":op,"call":call.tool_call_id,
                                   "sdk_run":result.run_id,"conversation":result.conversation_id})
     ack = http(scope,"submit",{"op":op,"call":call.tool_call_id,"name":call.tool_name,"input":call.args_as_dict()})
     assert ack == {"accepted":True}
@@ -122,13 +131,12 @@ async def resume(scope, notice=False):
         return status(scope,"cancelled_settled")
     if notice:
         raise ValueError("late notice has no authority to dispatch")
-    if row["checkpoint_version"] not in row["reader_versions"]:
+    decoded = RELEASE.decode(row)
+    if decoded is None:
         return status(scope,"version_quarantine")
-    messages = ModelMessagesTypeAdapter.validate_python(row["msg"])
+    messages = ModelMessagesTypeAdapter.validate_python(decoded)
     call = row["call"] if not row["wrong_pair"] else "invalid_" + uuid.uuid4().hex
     agent,client = agent_for(row)
-    if not row["wrong_pair"]:
-        charge_model_slot(scope)
     try:
         result = await agent.run(message_history=messages,
                                  deferred_tool_results=DeferredToolResults(calls={call:receipt["receipt"]}),
@@ -154,7 +162,7 @@ async def resume(scope, notice=False):
 async def round_step(scope: str) -> str:
     info = activity.info()
     with db() as c:
-        log(c,scope,"attempt",{"attempt":info.attempt,"pid":os.getpid(),"build":os.environ["BUILD"],
+        log(c,scope,"attempt",{"attempt":info.attempt,"pid":os.getpid(),"build":os.environ["BUILD_MODULE"],"release_hash":hashlib.sha256(Path(RELEASE.__file__).read_bytes()).hexdigest(),
                                "wf":info.workflow_id,"run":info.workflow_run_id,"activity":info.activity_id})
     if not read(scope)["op"]:
         await checkpoint_first(scope)
@@ -172,7 +180,6 @@ async def main():
     await worker.run()
 
 
-from flow import Notice
 
 if __name__=="__main__":
     asyncio.run(main())

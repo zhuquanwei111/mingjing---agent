@@ -21,4 +21,3 @@ class Notice:
     async def run(self, scope: str) -> str:
         return await workflow.execute_activity("late_notice", scope, start_to_close_timeout=timedelta(seconds=15),
                                               retry_policy=RetryPolicy(maximum_attempts=1))
-

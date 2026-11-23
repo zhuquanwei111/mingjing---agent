@@ -20,7 +20,7 @@ OUT = Path("/out")
 CASES = ["known","unknown","cancel","incompatible","wrong_pair"]
 SCHEMA = """
 CREATE TABLE task(scope text PRIMARY KEY, descriptor jsonb NOT NULL, marker text NOT NULL,
-  reader_versions int[] NOT NULL, wrong_pair boolean NOT NULL, active boolean DEFAULT true,
+  writer_format int NOT NULL, wrong_pair boolean NOT NULL, active boolean DEFAULT true,
   op text UNIQUE, call text, msg jsonb, checkpoint_version int, held int DEFAULT 0,
   spent int DEFAULT 0, settled text, state text DEFAULT 'new', model_slots int DEFAULT 0);
 CREATE TABLE events(id bigserial PRIMARY KEY, scope text, kind text, detail jsonb);
@@ -42,7 +42,7 @@ def record(case,stage,data):
 
 def source_hashes():
     return {p:hashlib.sha256(Path("/exp",p).read_bytes()).hexdigest()
-            for p in ("worker.py","flow.py")}
+            for p in ("worker.py","flow.py","release_v1.py","release_v2.py")}
 
 
 def snapshot(scope):
@@ -53,7 +53,7 @@ def snapshot(scope):
         observed = subset(c,"SELECT seq,kind,detail FROM requests WHERE scope=%s ORDER BY seq",(scope,))
         jobs = subset(c,"SELECT * FROM jobs WHERE scope=%s",(scope,))
         effects = subset(c,"SELECT e.* FROM effects e JOIN jobs USING(op) WHERE scope=%s",(scope,))
-        fees = subset(c,"SELECT f.* FROM fees f JOIN jobs USING(op) WHERE scope=%s ORDER BY f.id",(scope,))
+        fees = subset(c,"SELECT f.* FROM fees f JOIN jobs USING(op) WHERE scope=%s ORDER BY f.arrival",(scope,))
     return {"task":task,"product":product,"observed":observed,"jobs":jobs,"effects":effects,"fees":fees}
 
 
@@ -67,7 +67,7 @@ def counts(s):
 
 def start_worker(build):
     env = {k:v for k,v in os.environ.items() if k not in ("WITNESS_DSN","CI_RUN","TEST_HEAD")}
-    env["BUILD"]=build
+    env["BUILD_MODULE"]=build
     return subprocess.Popen([sys.executable,"-u","/exp/worker.py"],env=env)
 
 
@@ -115,14 +115,14 @@ async def main():
         product.execute(SCHEMA)
         for scope in CASES:
             marker="REQUEST_MARK_"+uuid.uuid4().hex
-            product.execute("INSERT INTO task(scope,descriptor,marker,reader_versions,wrong_pair) VALUES(%s,%s,%s,%s,%s)",
-                            (scope,Jsonb(desc),marker,[2] if scope=="incompatible" else [1,2],scope=="wrong_pair"))
+            product.execute("INSERT INTO task(scope,descriptor,marker,writer_format,wrong_pair) VALUES(%s,%s,%s,%s,%s)",
+                            (scope,Jsonb(desc),marker,0 if scope=="incompatible" else 1,scope=="wrong_pair"))
             witness.execute("INSERT INTO scenario(scope,name,marker) VALUES(%s,%s,%s)",(scope,name,marker))
     assert before_hash==source_hashes()
     record("run","identity",{"commit":os.environ["TEST_HEAD"],"run":os.environ["CI_RUN"],"namespace":os.environ["NAMESPACE"],
                              "before":before_hash,"registered":name,"after":source_hashes()})
     client=await Client.connect("temporal:7233", namespace=os.environ["NAMESPACE"])
-    first=start_worker("writer-v1")
+    first=start_worker("release_v1")
     second=None
     try:
         handles={s:await client.start_workflow(Round.run,s,id="round-"+s,task_queue="product-lab") for s in CASES}
@@ -145,7 +145,7 @@ async def main():
         with connection("PRODUCT_DSN") as p, connection("WITNESS_DSN") as w:
             p.execute("UPDATE task SET active=false WHERE scope='cancel'")
             w.execute("UPDATE scenario SET visible=true WHERE scope IN ('known','wrong_pair','incompatible')")
-        second=start_worker("reader-v2")
+        second=start_worker("release_v2")
         expected={"known":"delivered","unknown":"unknown","cancel":"unknown",
                   "incompatible":"version_quarantine","wrong_pair":"rejected_pair"}
         for s in CASES:
@@ -161,7 +161,9 @@ async def main():
                 assert (snap["task"]["held"],snap["task"]["spent"])==(0,1)
             old,new=events(snap,"attempt")
             assert old["pid"]==first.pid and new["pid"]==second.pid and old["pid"]!=new["pid"]
-            assert [old["attempt"],new["attempt"]]==[1,2] and [old["build"],new["build"]]==["writer-v1","reader-v2"]
+            assert [old["attempt"],new["attempt"]]==[1,2] and [old["build"],new["build"]]==["release_v1","release_v2"]
+            assert old["release_hash"]==before_hash["release_v1.py"] and new["release_hash"]==before_hash["release_v2.py"]
+            assert old["release_hash"]!=new["release_hash"] and snap["task"]["model_slots"]==len(events(snap,"model"))
             assert all(old[k]==new[k] for k in ("activity","run","wf"))
             attrs=await history(handles[s],s,snap)
             assert any(int(a.get("attempt",1))==2 for a in attrs)
