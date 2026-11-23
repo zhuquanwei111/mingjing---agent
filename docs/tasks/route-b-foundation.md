@@ -19,9 +19,21 @@
 python3 engineering-standard/adapters/codex-cli/start_implementation.py docs/requirements/route-b-foundation.md docs/tasks/route-b-foundation.md -- mkdir -p app/src/mingjing_agent app/tests
 ```
 
+### 证据身份与判定规则
+
+可信适配器先核验来源、访问权限和当前事实，再为每条逐项证明分配一个不透明引用。库只接受形如 `ev_` 加 32 个小写 ASCII 十六进制字符的引用字符串，完整匹配，不裁切或转换。它标识一条逐项证明，同一份底层资料支持两个要求时，适配器分别生成两条逐项证明。库不生成或解析引用，不查询资料，也不以格式合格推断真实性。结果只回显适配器提供且通过检查的引用，按字典序去重；坏引用、原始资料、URL、文件路径均不返回。用合成引用正控，并断言空串、大小写错误、尾随换行、URL 和原文形式被阻断且不泄露。
+
+契约的任务、规则和必需项标识使用无首尾空白的非空单行字符串。可信调用方传入固定有序的必需项和本次证据记录，可用性必须为布尔值。错误的字段类型显式报错。验证不可用、记录的任务或规则错配、引用格式无效、同一引用绑定不同要求项、出现契约以外的要求项，任一情况使整批待核，逐项不返回引用。多种批次错误并存时按上述顺序选稳定原因，与输入顺序无关。
+
+其余记录逐项汇总。完全相同的记录重复使用等价；同一要求项的有效记录若结论不同（含同一引用改报结论）则待核并标记冲突，不能用后写覆盖。无记录为缺项；只有否定为不满足；待核或未知字符串保留待核；只有肯定才满足。所有必需项都满足才返回就绪。测试覆盖正逆输入顺序、多个引用、跨项重放、合法引用与异常记录混合、增加一个缺证据的要求项。正式交付的实时核权和副作用仍在下一批实现。
+
 ## 进展与接续
 
 1. 已交付 [v2.0 冻结开发包](https://github.com/zhuquanwei111/mingjing---agent/tree/501de2e63834f2d8dcbece246bb34c85ad292193/mingjing-codex-engineering-v2)，提交 `501de2e63834f2d8dcbece246bb34c85ad292193`。新开发入口与旧资产处置已列入[同一草稿 PR #6](https://github.com/zhuquanwei111/mingjing---agent/pull/6)。旧包、原执行代码、迁移与测试均可回查。单独提供给用户的 ZIP 经解压字节比对，SHA-256 为 `156950f6b6b668b704ff7f588efdc569c94b080aa3a9e6875a20c7bb101b4fef`。
 2. 本地包内 4 份文档、仓库文档链接与差异检查通过。Mac 受管沙盒拒绝既有测试使用 `ps`，本地整套 `make check` 有 4 个子用例报错。[开发包提交的 GitHub 运行](https://github.com/zhuquanwei111/mingjing---agent/actions/runs/45135933312)的三个作业均通过。原生 [ARM64 完整日志](https://github.com/zhuquanwei111/mingjing---agent/actions/runs/45135933312/job/137562077265)检出合并测试提交 `c5b0845b8f0e03f04aaf4e7a27db8765be8faafc`，工程检查 41 项、P1 两批 16 和 2 项、P2 32 项均通过。两个 amd64 作业为辅助回归。结果覆盖旧资产与开发入口。
 3. 已从干净隔离副本调用上文的正式方案评审入口。该次本地提交为 `35f1397750ce85c543d1fef93e0f4eff04eb2da7`，与公开开发包提交使用同一父提交和 Git tree `654679dbd0494e739db813004f600bde2d1abe2d`。当时冻结需求摘要为 `cc57f61163a10073348862e2f86012ea26ba1bdc904be191a2d287ddc061b73b`，方案为 `2378463dbcb8dce26cb21ce3958747d145f8a18f352750452d806b77c7ca91bd`，首个命令为 `b61fa5d9a49a674746326a28eb782924d58d8d3c41c4d476d3797d25fb2dd123`。Codex CLI 0.167.0 检出已有 ChatGPT 登录。评审进程退出 1，入口退出 2；同一只读启动方式实查返回 `failed to initialize in-process app-server client: Operation not permitted (os error 1)`。首次实现命令没有执行，未创建 `app/`。对开发包提交另行发起的原生独立审查也在同一初始化阶段失败，尚无独立审查结论。
 4. 现有 Daytona 的实例列表在当前会话因域名解析失败而无法读取，Instabox 客户端在会话内无法设置其本机配置目录权限。未创建新实例。当前缺少可运行的独立只读评审会话，首批实现不依赖云沙盒、数据库或工作流服务。项目曾在已登录的 Mac Codex CLI 上[验证只读评审路径](../engineering-standard-execution.md)。恢复时在隔离 checkout 核对 PR 最新 head、工作区和本任务账，再执行上文原命令。评审会按当时实际候选重新生成摘要。原实施者接收意见、处理修订或在通过后开始实现，并在同一 PR 跟进测试和独立代码审查。无需重新决定选型、迁移旧项目或开通云服务。
+
+5. 接手核对草稿 PR #6 的提交仍为 `c9c292417aa2366217984ee1acb27135ba95b7bd`。Instabox 首轮回执无法核对任务原文；随后原版入口的独立会话 `01a207fa-0820-7010-b7bc-f95dbe76c559` 在同一提交返回有效的 `revise`。两项必改涉及引用有效性、同一证明跨项重放。上节给出对应修订、输出规则和可观察反例，提交新评审后按有效结论推进。
+6. 修订方案 SHA-256 为 `e5d4bee13bee138e660ee61e0e340bdbfa12de8e0d0785b54f1de2e916cd973b`。Instabox 新会话 `01a207fb-38ea-79a0-bee3-10cbceb95265` 返回 `pass`，冻结需求和实施命令摘要与第 3 项一致。原入口复核后执行建目录命令，退出 0；两个目录均已核实。
+7. 首项库入口为 [evaluate_quality](../../app/src/mingjing_agent/quality.py)，[合成回归](../../app/tests/test_quality.py)覆盖上述判定、重放、类型错误和判定期间的文件、进程与网络访问。Mac Python 3.12.16 运行 `make agent-test` 15 项、`make check` 41 项工程用例均通过。隔离副本运行 `make smoke` 的既有 Darwin/ARM64 Temporal 用例通过。服务端当前候选的独立代码审查和 CI 证据随[草稿 PR #6](https://github.com/zhuquanwei111/mingjing---agent/pull/6)更新。下一批从 v2 的宿主受理与受控直接调用进入，须先明确可信适配器、实际授权和零次误交付的端到端验收。

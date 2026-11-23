@@ -38,7 +38,7 @@ flowchart LR
 
 - **任务与审查。** 明镜沿用 [原生独立审查及反馈回流](development.md)。实质技术取舍先选择能验证完整投递、无旧历史和只读能力的评审环境。本轮用于进入实现的 [Codex CLI 入口](../engineering-standard/adapters/codex-cli/README.md)先启动独立只读方案评审。原始需求与候选的材料和版本在任务记录给出。原设计 Agent 根据回流结果修订，再提交同一入口复验。接续时在工作区使用 `$engineering-handoff`，读取已有任务账与只读状态入口。原实施者负责接收、修复、复验、提交和更新 Draft PR，用户验收并决定合并。
 - **本机检查。** 用 Python 3.10 或以上运行 `make check`，架构检查使用 `sys.stdlib_module_names`。若系统默认 Python 较旧，可用 `make check PYTHON=/path/to/python3` 指定已核验的解释器。`make smoke` 需要 [macOS 冒烟环境](../p1-walking-skeleton/README.md)，运行在独立目录和本机回环端口。
-- **正式验收。** [实际规则集](https://github.com/zhuquanwei111/mingjing---agent/rules/27699996)要求默认分支通过 GitHub Actions 的 `P1 acceptance`。[当前接入基线的工作流](../.github/workflows/verify.yml)在原生 Linux ARM64 上跑 P1、重建恢复与 P2。amd64 作业提供辅助反馈。堆叠草稿的运行证明其现有目标及候选，切换至默认分支后需核对最新差异与该目标的合并门禁。
+- **正式验收。** [实际规则集](https://github.com/zhuquanwei111/mingjing---agent/rules/27699996)要求默认分支通过 GitHub Actions 的 `P1 acceptance`。[当前接入基线的工作流](../.github/workflows/verify.yml)在原生 Linux ARM64 上运行路线 B 质量测试、P1、重建恢复与 P2。amd64 作业提供辅助反馈。堆叠草稿的运行证明其现有目标及候选，切换至默认分支后需核对最新差异与该目标的合并门禁。
 - **环境和恢复。** Mac M4 为主要工作区；Instabox x64 作为服务联调与复现环境，先确认在线和 `/data` 挂载、可用空间、项目位置与运行占用。Daytona 仅在任务选择隔离试验时使用，验证实例架构、Docker/Compose、网络权限、生命周期及清理。正式验收用已有 GitHub runner。Git 提交与任务账用于恢复，合成数据和临时运行资源各自归属于当前任务。
 - **Codex 配置。** [项目默认](../.codex/config.toml)、Mac 用户层和当前会话权限分别核对。见任务记录的 C09，本轮读取 CLI 在原工作区与新工作区的实际层。会话继续按其当时生效的授权工作。
 - **Space。** 当前连接可列出和搜索可访问 Pages，按“明镜”查询读取到相关个人页面的元数据。页面可用于讨论、链接、评论和呈现进展，项目的规则、ADR、源码和正式证据由 Git 提交与 PR 管理。需要把讨论结论纳入规范时，在有授权的 PR 中写入内容，之后按许可更新页面摘要及版本链接。当前采用流程使用明确的链接与更新动作。页面内容、访问权限和共享由页面维护者决定。[Space 官方说明](https://learn.chatgpt.com/docs/space/pages)

@@ -6,6 +6,8 @@
 
 新任务从[路线 B 开发包](mingjing-codex-engineering-v2/README.md)进入。[选型 ADR](docs/adr/0002-route-b-foundation.md)记录技术决定，[切换任务账](docs/tasks/route-b-foundation.md)记录当前开发与验收状态。旧包和已交付代码按[旧资产表](mingjing-codex-engineering-v2/legacy.md)维护。
 
+首项实现是[交付前质量判定库](app/src/mingjing_agent/quality.py)。宿主和 Worker 将 `app/src` 放入 Python 模块搜索路径，从 `mingjing_agent.quality` 导入 `TaskContract`、`Evidence`、`evaluate_quality`。调用 `evaluate_quality(contract, evidence, verifier_available=True)` 得到就绪状态、稳定原因和按契约顺序排列的逐项结果。调用方提供可信证据快照，并在真正交付前重新核验权限。[契约与反例](docs/tasks/route-b-foundation.md#证据身份与判定规则)
+
 历史 P2 最小公共层已由 [PR #2](https://github.com/zhuquanwei111/mingjing---agent/pull/2)
 合并交付，其兼容维护与操作入口在 [core/README.md](core/README.md)。
 后续新阶段交付时同步更新本入口。新任务先核对实际分支、HEAD 和该提交的检查结果，
@@ -31,12 +33,13 @@ Agent 可用 `python3 scripts/check_development_docs.py --status --task docs/tas
 
 ```bash
 make check       # 实际检查范围见 Makefile，包含开发入口引用检查
+make agent-test  # 路线 B 交付前质量判定，Python 标准库
 make smoke       # 已准备好的 macOS ARM64 环境冒烟
 make acceptance  # 专用 Linux ARM64/x86_64 Docker 环境：全量 P1 + 恢复与重建
 make p2-acceptance  # 专用 Linux ARM64/x86_64 Docker 环境：P2 公共层
 ```
 
-`P1 acceptance` 保留已有必需检查名称，正式 ARM64 作业执行 P1 和 P2 验收；
+`P1 acceptance` 保留已有必需检查名称，正式 ARM64 作业执行路线 B 质量测试、P1 和 P2 验收；
 x86_64 作业只提供辅助反馈。是否已经通过，须查看候选提交的实际运行，不能由
 工作流配置推定。服务器合并保护以[当前生效规则](https://github.com/zhuquanwei111/mingjing---agent/rules/27699996)
 为准；[仓库规则 JSON](.github/rulesets/main.json)用于复现配置，提交文件本身不启用保护。

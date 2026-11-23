@@ -14,11 +14,12 @@ PYTHON ?= python3
 EXPECTED_RUN_ID ?=
 export EXPECTED_RUN_ID
 
-.PHONY: help check smoke acceptance cleanup p2-acceptance
+.PHONY: help check agent-test smoke acceptance cleanup p2-acceptance
 
 help:
 	@printf '%s\n' \
 	  'make check       Check syntax, whitespace, architecture imports, and development docs.' \
+	  'make agent-test  Run the route B delivery quality tests (standard library only).' \
 	  'make smoke       Run the existing macOS smoke test (prepared local environment).' \
 	  'make acceptance  Run isolated Linux ARM64/AMD64 acceptance and recovery, then clean up.' \
 	  'make cleanup     Remove only the current isolated P1 project and its credentials.' \
@@ -47,6 +48,9 @@ check:
 	$(PYTHON) -m unittest discover -s scripts/tests -p 'test_*.py'
 	$(PYTHON) scripts/check_development_docs.py
 	@printf '%s\n' 'Source, architecture import boundaries, and development links passed. No general lint or type-check gate is configured.'
+
+agent-test:
+	PYTHONPATH=app/src $(PYTHON) -m unittest discover -s app/tests -p 'test_*.py' -v
 
 smoke:
 	@test -x "$(P1_DIR)/.venv/bin/python" -a -x "$(P1_DIR)/.p1/bin/temporal" || { \

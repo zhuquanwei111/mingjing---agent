@@ -17,7 +17,7 @@ concurrency:
 
 jobs:
   p1-acceptance:
-    # Keep this existing server-required context stable. It now covers BOTH
+    # Keep this existing server-required context stable. It covers route B quality,
     # P1 recovery and P2 public-layer acceptance on native ARM64.
     name: P1 acceptance
     # ARM64 is the required acceptance platform; AMD64 feedback is independent.
@@ -38,6 +38,9 @@ jobs:
 
       - name: Check source, architecture boundaries, and development docs
         run: make check
+
+      - name: Test route B delivery quality
+        run: make agent-test
 
       - name: Run isolated P1 acceptance and recovery
         run: make acceptance
@@ -91,6 +94,9 @@ jobs:
 
       - name: Check source, architecture boundaries, and development docs
         run: make check
+
+      - name: Test route B delivery quality
+        run: make agent-test
 
       - name: Run isolated P2 tests
         run: make p2-acceptance

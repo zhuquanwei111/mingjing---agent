@@ -47,7 +47,7 @@
   选择，不照搬 ARM64 wheel 到 x86_64。各任务使用独立 checkout 和 Compose
   project，不清理其他任务的资源；环境分工见 `docs/development.md`。
 - 正式合并验收使用 GitHub ARM64 的 `P1 acceptance`；名称保持稳定，工作流覆盖
-  P1 与 P2。x86_64 仅作辅助回归，不以其通过代替 ARM64 结果。交付提供本次
+  路线 B 的 `make agent-test`、P1 与 P2。x86_64 仅作辅助回归，不以其通过代替 ARM64 结果。交付提供本次
   head 对应的 CI run 链接与完整日志入口，独立审查不替代实际运行。
 - 实现者发起一次独立代码审查，收取结果并核实成立的问题。可使用原生
   `codex review`；已安装且兼容时可使用文档中固定版本的 Peter autoreview。

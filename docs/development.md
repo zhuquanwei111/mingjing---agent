@@ -30,13 +30,14 @@
 | 命令 | 实际验证范围 | 前置条件 |
 | --- | --- | --- |
 | `make check` | Python/Shell 语法、代码空白、核心静态依赖边界及其用例、开发入口和任务记录的行内相对文件链接；不等于类型、业务或完整安全验收 | Python 3.10+、Git、sh/bash；服务运行仍用锁定的 Python 3.12 |
+| `make agent-test` | 路线 B 交付前质量判定和失败反例 | Python 3.10+ 标准库 |
 | `make smoke` | 现有 macOS Temporal CLI 冒烟脚本 | 按 [P1 README](../p1-walking-skeleton/README.md)准备 `p1-walking-skeleton/.venv` 和已校验的 `.p1/bin/temporal` |
 | `make acceptance` | 既有全验收、备份恢复、Temporal 重启、独立重建；失败即停 | 隔离的 Linux ARM64 或 x86_64 环境与 Docker Compose |
 | `make p2-acceptance` | P2 迁移和公共层测试，包含真实 PostgreSQL、Temporal 及 LangGraph | 独立 Linux ARM64/x86_64 checkout 与 Docker Compose |
 
-GitHub CI 的 **`P1 acceptance`** 保留既有 required check 名称，在官方 Linux ARM64 runner 上执行 P1 全验收及 P2 公共层验收。任一步失败都不能把该必需检查报为通过。服务器规则需实际启用，不能仅由仓库 JSON 推定；结果以当前候选提交的实际运行与生效规则为准。
+GitHub CI 的 **`P1 acceptance`** 保留既有 required check 名称，在官方 Linux ARM64 runner 上执行路线 B 质量测试、P1 全验收及 P2 公共层验收。任一步失败都不能把该必需检查报为通过。服务器规则需实际启用，不能仅由仓库 JSON 推定；结果以当前候选提交的实际运行与生效规则为准。
 
-x86_64 的 P1 与 P2 检查独立提供辅助反馈，不设为合并必需项，也不代替 ARM64 结果。两个架构分别使用各自的依赖锁，复用对应层的验收入口；P2 测试在独立 Compose project 中执行并清理本次合成卷及凭据。新增当前代码层或改变正式目标时，同步核对工作流、测试范围和服务器 required check，不能让旧层通过代替新层验收。
+x86_64 的 P1 与 P2 检查独立提供辅助反馈，不设为合并必需项，也不代替 ARM64 结果。P2 amd64 作业也运行路线 B 质量测试。两个架构分别使用各自的依赖锁，复用对应层的验收入口；P2 测试在独立 Compose project 中执行并清理本次合成卷及凭据。新增当前代码层或改变正式目标时，同步核对工作流、测试范围和服务器 required check，不能让旧层通过代替新层验收。
 
 验收与重建包含其原有 smoke 测试，但这不等于验证了 Darwin CLI。只改文档时不为凑本地流程启动整套服务；必需 CI 仍运行，避免缺少检查结果而无法合并。修改运行时、基础设施、依赖或验收逻辑时，按影响运行相应验证。历史 `evidence/` 不能作为新提交已通过的证明；保留本次日志、测试结果及对应 commit。PR 明确贴出本次 head 对应的 CI run 链接，并能打开 ARM64 job 的完整日志；独立代码审查和截图不能替代这份运行证据。上传证据只选本次 `.p1/results/` 和验证摘要，不打包含运行凭据、数据库备份的整个 `.p1/`。
 
@@ -47,7 +48,7 @@ x86_64 的 P1 与 P2 检查独立提供辅助反馈，不设为合并必需项�
 | Mac mini | Codex 主会话、查看修改和本地冒烟 | 使用项目配置；`make check`，已准备环境时 `make smoke`。不要求把 PostgreSQL/Temporal 常驻在 Mac 上 |
 | 已有 Instabox | 服务联调、辅助 P1 回归和失败复现 | 历史 `mj-agent` 为 Linux x86_64、4 vCPU/8 GiB、Docker/Compose，已有 16 项用例记录；在专用 checkout 运行 `make acceptance`，新提交须重新验证；不代替 ARM64 合并门禁 |
 | 已有 Daytona 沙盒 | 隔离开发、试验性修改、独立复现 | 先核实当前沙盒；`make check` 不需要 Docker。完整验收还需可用的 Docker daemon、Compose、兼容架构及拉取固定镜像/锁定依赖的网络 |
-| GitHub Actions | 每个 PR 的统一合并前检查 | 正式 ARM64 `P1 acceptance` 覆盖 P1 与 P2，x86_64 独立辅助；以实际启用规则和候选提交结果约束合并 |
+| GitHub Actions | 每个 PR 的统一合并前检查 | 正式 ARM64 `P1 acceptance` 覆盖路线 B 质量测试、P1 与 P2，x86_64 独立辅助；以实际启用规则和候选提交结果约束合并 |
 
 Instabox 的既有证据及平台限制见 [Instabox 验收记录](../p1-walking-skeleton/evidence/instabox/README.md)。`requirements/linux-x86_64.lock` 原样复用该次 amd64 锁；Docker 构建按目标架构选择它或原有的 `linux-aarch64.lock`，无需临时改 Dockerfile。两个锁保持原先各平台的精确版本和 wheel 哈希。
 
