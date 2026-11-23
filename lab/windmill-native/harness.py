@@ -8,6 +8,7 @@ import sys
 import time
 import uuid
 from pathlib import Path
+from model_gate import ALIAS
 from services import OUT, PRODUCT, RECEIVER, database, http
 
 API = "http://127.0.0.1:8000/api"
@@ -148,7 +149,8 @@ def scan_engine(op,call_id,stage):
     db.close()
     assert prompt and details and any(prompt in r[0] for r in models)
     text=cli("docker","exec","wmn-pg","pg_dump","-U","postgres","--data-only","--schema=public","windmill")
-    markers={"product_prompt":prompt,"provider_details":details,"call_id":call_id}
+    internal=logs(op)["ops"][0]["engine_call_id"]
+    markers={"product_prompt":prompt,"provider_details":details,"original_call_id":call_id,"engine_call_reference":internal}
     table=None
     hits={k:{} for k in markers}
     scanned=0
@@ -163,7 +165,8 @@ def scan_engine(op,call_id,stage):
                 if marker in line:
                     hits[k][table]=hits[k].get(table,0)+1
     note("engine_scan",operation=op,point=stage,public_tables=scanned,matching_rows=hits)
-    assert scanned>30 and not hits["product_prompt"] and not hits["provider_details"] and hits["call_id"]
+    assert scanned>30 and not hits["product_prompt"] and not hits["provider_details"] and hits["engine_call_reference"]
+    assert bool(hits["original_call_id"]) == (not ALIAS)
     return hits
 
 
@@ -183,9 +186,10 @@ def run_case(tag):
     cp=wait("native approval checkpoint",checkpoint)
     agent=str(uuid.UUID(cp["job"]))
     actual_id=logs(op)["models"][0]["call_id"]
-    assert cp["data"]["pending"]["call_id"]==actual_id
+    pending=cp["data"]["pending"]["call_id"]
+    assert pending==logs(op)["ops"][0]["engine_call_id"] and ((actual_id!=pending)==ALIAS)
     (OUT/(op+"-parked.json")).write_text(json.dumps(cp,indent=2))
-    call("/jobs_u/flow/resume_suspended/"+agent,{"approved":True,"payload":{"call_id":actual_id}})
+    call("/jobs_u/flow/resume_suspended/"+agent,{"approved":True,"payload":{"call_id":pending}})
     wait("tool POST/202",lambda:counts(op)["http_post"]==1)
     assert counts(op)["effect"]==counts(op)["simulated_charge"]==0
     state(op,root,"accepted")
@@ -256,7 +260,18 @@ def run_case(tag):
     root_state=next(j["status"] for j in final["jobs"] if j["id"]==root)
     assert root_state==("canceled" if tag=="cancel" else "success"),root_state
     if tag=="known":
-        body=final["ledger"]["models"][-1]["body"]
+        last=final["ledger"]
+        inbound=json.loads(last["model_attempts"][-1]["body"])
+        outbound=last["models"][-1]["body"]
+        def ids(request):
+            messages=request["messages"]
+            assistant=[c["id"] for m in messages if m["role"]=="assistant" for c in m.get("tool_calls",[])]
+            tools=[m["tool_call_id"] for m in messages if m["role"]=="tool"]
+            return assistant,tools
+        assert ids(inbound)==([pending],[pending]) and ids(outbound)==([actual_id],[actual_id])
+        note("paired_across_boundary",op=op,agent=agent,internal_ids=ids(inbound),
+             provider_ids=ids(outbound),original_external=actual_id,engine_reference=pending)
+        body=json.loads(final["ledger"]["model_attempts"][-1]["body"])
         bad=json.loads(json.dumps(body))
         next(m for m in bad["messages"] if m["role"]=="tool")["tool_call_id"]="wrong_"+uuid.uuid4().hex
         try:
@@ -266,7 +281,9 @@ def run_case(tag):
         else:
             raise AssertionError("wrong ID forwarded")
         tested=state(op,root,"negative_wrong_id")["counts"]
-        assert tested["models"]==c["models"] and tested["gate_denials"]==c["gate_denials"]+1
+        assert tested["gate_denials"]==c["gate_denials"]+1
+        for key in ["models","http_post","effect","simulated_charge","delivery"]:
+            assert tested[key]==c[key],tested
     if helper:
         cli("docker","stop","--time","1",helper)
     return op
@@ -297,12 +314,26 @@ def main():
         for tag in ["baseline","retrydefault","retryprotected","known","cancel","oldversion"]:
             try:
                 run=retry_probe if tag.startswith("retry") else run_case
-                done[tag]={"operation":run(tag),"status":"pass"}
+                done[tag]={"operation":run(tag),"test_expectation":"observed"}
             except Exception as exc:
                 done[tag]={"status":"error","error":repr(exc)}
                 (OUT/"case-results.json").write_text(json.dumps(done,indent=2))
                 raise
             (OUT/"case-results.json").write_text(json.dumps(done,indent=2))
+        db=database("receiver")
+        unattributed=db.execute("select count(*) from model_http where op is null").fetchone()[0]
+        db.close()
+        note("unattributed_model_http",count=unattributed)
+        assert unattributed==0
+        (OUT/"requirement-outcomes.json").write_text(json.dumps({
+            "native_direct_cancel_no_model":"failed in runs 45190773511 and 45191055874",
+            "guarded_known_unknown_cancel_pairing":"matched in observed cases",
+            "engine_excludes_two_private_markers_observed_public_text_dump":True,
+            "engine_excludes_original_tool_call_id":ALIAS,
+            "real_binary_rolling_upgrade":"unverified",
+            "provider_default_503_after_charge_zero_resend":False,
+            "gated_http_error_headers_real_transport_loss":"unverified"
+        },indent=2))
     finally:
         for proc in subs:
             proc.terminate()

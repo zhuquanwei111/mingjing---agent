@@ -22,7 +22,7 @@ def http(url, body=None, token=None):
         with urlopen(req, timeout=20) as res:
             data = res.read().decode().strip()
     except HTTPError as exc:
-        raise RuntimeError(f"{req.method} {url.split('?')[0]} {exc.code} {exc.read().decode()[:1100]}") from exc
+        raise RuntimeError(f"{req.get_method()} {url.split('?')[0]} {exc.code} {exc.read().decode()[:1100]}") from exc
     try:
         return json.loads(data)
     except ValueError:
@@ -41,7 +41,7 @@ def start(name):
     if name == "product":
         db.executescript("""
         create table ops(op text primary key, sent integer default 0, held integer default 3,
-                         spent integer default 0, canceled integer default 0, receipt text, version integer default 1, delivered integer default 0, call_id text, reader integer default 1,
+                         spent integer default 0, canceled integer default 0, receipt text, version integer default 1, delivered integer default 0, call_id text, engine_call_id text, reader integer default 1,
                          quarantine integer default 0, prompt_private text, result_private text);
         create table model_attempts(op text, allowed integer, body text, at text default current_timestamp);
         create table entries(op text, job text, claim integer, at text default current_timestamp);
@@ -174,7 +174,7 @@ def product_action(db, action, op, body):
     if action == "init":
         db.execute("insert into ops(op,prompt_private) values(?,?)", (op,"productprivate"+uuid.uuid4().hex))
     elif action == "enter":
-        claim = db.execute("update ops set sent=1 where op=? and sent=0 and canceled=0 and version=1", (op,)).rowcount
+        claim = db.execute("update ops set sent=1 where op=? and sent=0 and canceled=0 and version=reader and version=1 and quarantine=0", (op,)).rowcount
         db.execute("insert into entries(op,job,claim) values(?,?,?)", (op,body["job"],claim))
         return {"send":bool(claim)}, 200
     elif action == "switch_reader":
@@ -192,7 +192,7 @@ def product_action(db, action, op, body):
         return {"receipt":None if mismatch else receipt}, 200
     elif action == "deliver":
         row = db.execute("select * from ops where op=?", (op,)).fetchone()
-        if (row and row["receipt"] and not row["canceled"] and row["version"] == 1
+        if (row and row["receipt"] and not row["canceled"] and row["version"] == row["reader"] == 1 and not row["quarantine"]
                 and body.get("verdict")=="complete_"+row["receipt"]):
             if db.execute("update ops set delivered=1 where op=? and delivered=0",(op,)).rowcount:
                 return http(RECEIVER+"/deliver/"+op, {"receipt":row["receipt"]}), 200

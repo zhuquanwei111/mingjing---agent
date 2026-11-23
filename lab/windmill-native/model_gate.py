@@ -1,7 +1,29 @@
 """Product-controlled loopback model boundary. Synthetic operation and receipt references only."""
 import json
+import os
+import uuid
 from urllib.error import HTTPError
 from urllib.request import Request, urlopen
+
+
+ALIAS = os.getenv("WMN_ALIAS_CALL_ID","1")=="1"
+
+
+def rewrite_first(data, db, op):
+    lines=data.decode().splitlines(keepends=True)
+    for i,line in enumerate(lines):
+        if not line.startswith("data: {"):
+            continue
+        packet=json.loads(line[6:])
+        delta=packet["choices"][0]["delta"]
+        for call in delta.get("tool_calls",[]):
+            if call.get("id"):
+                external=call["id"]
+                internal="ref_"+uuid.uuid4().hex if ALIAS else external
+                db.execute("update ops set call_id=?,engine_call_id=? where op=?",(external,internal,op))
+                call["id"]=internal
+                lines[i]="data: "+json.dumps(packet)+"\n"
+    return "".join(lines).encode()
 
 
 def exact_result(body, expected_call, receipt):
@@ -30,13 +52,20 @@ def forward(handler,db,body,raw,destination):
     row=db.execute("select * from ops where op=?",(op,)).fetchone()
     followup=any(m["role"]=="tool" for m in body["messages"])
     allowed=bool(row and not row["canceled"] and row["version"]==row["reader"]==1 and
-                 (not followup or exact_result(body,row["call_id"],row["receipt"])))
+                 (not followup or exact_result(body,row["engine_call_id"],row["receipt"])))
     db.execute("insert into model_attempts(op,allowed,body) values(?,?,?)",(op,allowed,raw.decode()))
     if not allowed:
         db.commit()
         return handler.reply({"error":"model outbound refused"},403,prohibit_retry=True)
     # Only the trusted product gateway resolves the opaque prompt reference.
     external=json.loads(raw)
+    if followup:
+        for message in external["messages"]:
+            if message["role"]=="assistant":
+                for call in message.get("tool_calls",[]):
+                    call["id"]=row["call_id"]
+            if message["role"]=="tool":
+                message["tool_call_id"]=row["call_id"]
     external["messages"].insert(0,{"role":"system","content":row["prompt_private"]})
     req=Request(destination+"/v1/chat/completions",data=json.dumps(external).encode(),headers={"Content-Type":"application/json"})
     try:
@@ -46,12 +75,7 @@ def forward(handler,db,body,raw,destination):
     with res:
         data=res.read()
         if res.status==200 and not followup:
-            for line in data.decode().splitlines():
-                if line.startswith("data: {"):
-                    delta=json.loads(line[6:])["choices"][0]["delta"]
-                    for call in delta.get("tool_calls",[]):
-                        if call.get("id"):
-                            db.execute("update ops set call_id=? where op=?",(call["id"],op))
+            data=rewrite_first(data,db,op)
         db.commit()
         handler.send_response(res.status)
         handler.send_header("Content-Type",res.headers["Content-Type"])
