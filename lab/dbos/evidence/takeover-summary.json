@@ -1,0 +1,59 @@
+{
+  "takeover": {
+    "automatic_observed": false,
+    "old_pid": 3995,
+    "standby_pid": 4059,
+    "explicit_at_seconds": 8.079360156999996,
+    "returned_workflows": {
+      "ids": [
+        "run-takeover"
+      ],
+      "error": null
+    },
+    "final_status": "SUCCESS",
+    "final_executor": "standby-takeover",
+    "counts": [
+      1,
+      1,
+      1,
+      2,
+      1
+    ],
+    "final_old_exit": -9,
+    "final_standby_exit": null,
+    "reentry_pids": [
+      3995,
+      4059
+    ],
+    "op": "33ba14b9-6d57-4da9-8367-e93579246f69"
+  },
+  "false_recovery": {
+    "automatic_observed": false,
+    "old_pid": 4299,
+    "standby_pid": 4362,
+    "second_sender": "original",
+    "explicit_at_seconds": 8.10950216400002,
+    "returned_workflows": {
+      "ids": [
+        "run-false_recovery"
+      ],
+      "error": null
+    },
+    "final_status": "PENDING",
+    "final_executor": "round-false_recovery",
+    "counts": [
+      2,
+      1,
+      2,
+      1,
+      0
+    ],
+    "final_old_exit": null,
+    "final_standby_exit": null,
+    "reentry_pids": [
+      4299,
+      4299
+    ],
+    "op": "bd95613a-fd10-4e73-ba82-58cd797b808f"
+  }
+}

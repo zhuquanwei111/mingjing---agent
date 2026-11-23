@@ -1,0 +1,57 @@
+{
+  "count_order": [
+    "tool sends",
+    "effects",
+    "fees",
+    "model calls",
+    "deliveries"
+  ],
+  "counts": {
+    "naked": [
+      2,
+      1,
+      2,
+      1,
+      0
+    ],
+    "known": [
+      1,
+      1,
+      1,
+      2,
+      1
+    ],
+    "unknown": [
+      1,
+      1,
+      1,
+      1,
+      0
+    ],
+    "cancel": [
+      1,
+      1,
+      1,
+      1,
+      0
+    ],
+    "legacy": [
+      1,
+      1,
+      1,
+      1,
+      0
+    ],
+    "wrong": [
+      1,
+      1,
+      1,
+      1,
+      0
+    ]
+  },
+  "protected_tokens": 15,
+  "naked_marker_present": true,
+  "head": "1bd54add02f661d28a002933bfb88b5d26c3b4ec",
+  "ci": "45193721756"
+}
