@@ -1,0 +1,315 @@
+{
+  "events": [
+    {
+      "eventId": "1",
+      "eventTime": "2026-11-23T12:34:39.506163692Z",
+      "eventType": "EVENT_TYPE_WORKFLOW_EXECUTION_STARTED",
+      "taskId": "1048619",
+      "workflowExecutionStartedEventAttributes": {
+        "workflowType": {
+          "name": "GovernedRequest"
+        },
+        "taskQueue": {
+          "name": "rb34",
+          "kind": "TASK_QUEUE_KIND_NORMAL"
+        },
+        "input": {
+          "payloads": [
+            {
+              "metadata": {
+                "encoding": "anNvbi9wbGFpbg=="
+              },
+              "data": "ImxhdGUtcmV2b2tlIg=="
+            }
+          ]
+        },
+        "workflowTaskTimeout": "10s",
+        "originalExecutionRunId": "01a20866-b912-7279-8824-dff3257018d5",
+        "identity": "7@59d369d3074d",
+        "firstExecutionRunId": "01a20866-b912-7279-8824-dff3257018d5",
+        "attempt": 1,
+        "firstWorkflowTaskBackoff": "0s",
+        "workflowId": "late-revoke",
+        "priority": {}
+      }
+    },
+    {
+      "eventId": "2",
+      "eventTime": "2026-11-23T12:34:39.506236669Z",
+      "eventType": "EVENT_TYPE_WORKFLOW_TASK_SCHEDULED",
+      "taskId": "1048620",
+      "workflowTaskScheduledEventAttributes": {
+        "taskQueue": {
+          "name": "rb34",
+          "kind": "TASK_QUEUE_KIND_NORMAL"
+        },
+        "startToCloseTimeout": "10s",
+        "attempt": 1
+      }
+    },
+    {
+      "eventId": "3",
+      "eventTime": "2026-11-23T12:34:39.516927992Z",
+      "eventType": "EVENT_TYPE_WORKFLOW_TASK_STARTED",
+      "taskId": "1048625",
+      "workflowTaskStartedEventAttributes": {
+        "scheduledEventId": "2",
+        "identity": "7@7bc45dd3a33f",
+        "requestId": "4264f5b7-aedf-48ad-8ba8-3655bd6f30a5",
+        "historySizeBytes": "262",
+        "workerVersion": {
+          "buildId": "a1e5fd16e78097bb0222d0aeec379615"
+        }
+      }
+    },
+    {
+      "eventId": "4",
+      "eventTime": "2026-11-23T12:34:39.530802028Z",
+      "eventType": "EVENT_TYPE_WORKFLOW_TASK_COMPLETED",
+      "taskId": "1048630",
+      "workflowTaskCompletedEventAttributes": {
+        "scheduledEventId": "2",
+        "startedEventId": "3",
+        "identity": "7@7bc45dd3a33f",
+        "workerVersion": {
+          "buildId": "a1e5fd16e78097bb0222d0aeec379615"
+        },
+        "sdkMetadata": {
+          "coreUsedFlags": [
+            4,
+            2,
+            3,
+            1
+          ],
+          "sdkName": "temporal-python",
+          "sdkVersion": "1.36.1"
+        },
+        "meteringMetadata": {}
+      }
+    },
+    {
+      "eventId": "5",
+      "eventTime": "2026-11-23T12:34:39.530856961Z",
+      "eventType": "EVENT_TYPE_ACTIVITY_TASK_SCHEDULED",
+      "taskId": "1048631",
+      "activityTaskScheduledEventAttributes": {
+        "activityId": "1",
+        "activityType": {
+          "name": "dispatch"
+        },
+        "taskQueue": {
+          "name": "rb34",
+          "kind": "TASK_QUEUE_KIND_NORMAL"
+        },
+        "header": {},
+        "input": {
+          "payloads": [
+            {
+              "metadata": {
+                "encoding": "anNvbi9wbGFpbg=="
+              },
+              "data": "ImxhdGUtcmV2b2tlIg=="
+            }
+          ]
+        },
+        "scheduleToCloseTimeout": "0s",
+        "scheduleToStartTimeout": "0s",
+        "startToCloseTimeout": "80s",
+        "heartbeatTimeout": "0s",
+        "workflowTaskCompletedEventId": "4",
+        "retryPolicy": {
+          "initialInterval": "1s",
+          "backoffCoefficient": 2.0,
+          "maximumInterval": "100s",
+          "maximumAttempts": 2
+        },
+        "useWorkflowBuildId": true,
+        "priority": {}
+      }
+    },
+    {
+      "eventId": "6",
+      "eventTime": "2026-11-23T12:34:39.680570784Z",
+      "eventType": "EVENT_TYPE_WORKFLOW_EXECUTION_SIGNALED",
+      "taskId": "1048635",
+      "workflowExecutionSignaledEventAttributes": {
+        "signalName": "product_control",
+        "input": {
+          "payloads": [
+            {
+              "metadata": {
+                "encoding": "anNvbi9wbGFpbg=="
+              },
+              "data": "InJldm9rZWQi"
+            }
+          ]
+        },
+        "identity": "7@59d369d3074d",
+        "requestId": "417dbfa5-0226-4f7b-86aa-d3afdfc151f1"
+      }
+    },
+    {
+      "eventId": "7",
+      "eventTime": "2026-11-23T12:34:39.680582375Z",
+      "eventType": "EVENT_TYPE_WORKFLOW_TASK_SCHEDULED",
+      "taskId": "1048636",
+      "workflowTaskScheduledEventAttributes": {
+        "taskQueue": {
+          "name": "7@7bc45dd3a33f-bbf7813c37be4ee495a75f420ef7421f",
+          "kind": "TASK_QUEUE_KIND_STICKY",
+          "normalName": "rb34"
+        },
+        "startToCloseTimeout": "10s",
+        "attempt": 1
+      }
+    },
+    {
+      "eventId": "8",
+      "eventTime": "2026-11-23T12:34:39.685728661Z",
+      "eventType": "EVENT_TYPE_WORKFLOW_TASK_STARTED",
+      "taskId": "1048640",
+      "workflowTaskStartedEventAttributes": {
+        "scheduledEventId": "7",
+        "identity": "7@7bc45dd3a33f",
+        "requestId": "8e9ed6bd-2b30-4737-ae78-c9b4c7bcf220",
+        "historySizeBytes": "863",
+        "workerVersion": {
+          "buildId": "a1e5fd16e78097bb0222d0aeec379615"
+        }
+      }
+    },
+    {
+      "eventId": "9",
+      "eventTime": "2026-11-23T12:34:39.692621259Z",
+      "eventType": "EVENT_TYPE_WORKFLOW_TASK_COMPLETED",
+      "taskId": "1048644",
+      "workflowTaskCompletedEventAttributes": {
+        "scheduledEventId": "7",
+        "startedEventId": "8",
+        "identity": "7@7bc45dd3a33f",
+        "workerVersion": {
+          "buildId": "a1e5fd16e78097bb0222d0aeec379615"
+        },
+        "sdkMetadata": {},
+        "meteringMetadata": {}
+      }
+    },
+    {
+      "eventId": "10",
+      "eventTime": "2026-11-23T12:34:40.748440983Z",
+      "eventType": "EVENT_TYPE_ACTIVITY_TASK_STARTED",
+      "taskId": "1048651",
+      "activityTaskStartedEventAttributes": {
+        "scheduledEventId": "5",
+        "identity": "7@7bc45dd3a33f",
+        "requestId": "d1dcc64a-290e-49db-abec-c8e133fcf51c",
+        "attempt": 2,
+        "lastFailure": {
+          "message": "Failure exceeds size limit.",
+          "cause": {
+            "message": "request receipt unknown",
+            "stackTrace": "  File \"/usr/local/lib/python3.12/site-packages/temporalio/worker/_activity.py\", line 398, in _handle_start_activity_task\n    result = await self._execute_activity(\n             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n\n  File \"/usr/local/lib/python3.12/site-packages/temporalio/worker/_activity.py\", line 739, in _execute_activity\n    return await impl.execute_activity(input)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n\n  File \"/usr/local/lib/python3.12/site-packages/temporalio/worker/_activity.py\", line 948, in execute_activity\n    return await input.fn(*input.args)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^\n\n  File \"/exp/product.py\", line 152, in dispatch\n    raise ApplicationError(\"request receipt unknown\") from exc\n",
+            "cause": {
+              "message": "Connection error.",
+              "stackTrace": "  File \"/exp/product.py\", line 145, in dispatch\n    result = await agent.run(\"Check the synthetic receipt.\")\n             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n\n  File \"/usr/local/lib/python3.12/site-packages/pydantic_ai/agent/abstract.py\", line 705, in run\n    node = await agent_run.next(node)  # pyright: ignore[reportArgumentType]\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^\n\n  File \"/usr/local/lib/python3.12/site-packages/pydantic_ai/run.py\", line 710, in next\n    return await self._run_node_with_hooks(node, self._stream_and_advance)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n\n  File \"/usr/local/lib/python3.12/site-packages/pydantic_ai/run.py\", line 619, in _run_node_with_hooks\n    result = await lifecycle(node)\n             ^^^^^^^^^^^^^^^^^^^^^\n\n  File \"/usr/local/lib/python3.12/site-packages/pydantic_ai/run.py\", line 599, in lifecycle\n    result = await step_fn(lifecycle_node)\n             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n\n  File \"/usr/local/lib/python3.12/site-packages/pydantic_ai/run.py\", line 760, in _stream_and_advance\n    return await self._advance_graph(node)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n\n  File \"/usr/local/lib/python3.12/site-packages/pydantic_ai/run.py\", line 504, in _advance_graph\n    task = await self._graph_run.next(task)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n\n  File \"/usr/local/lib/python3.12/site-packages/pydantic_graph/graph_builder.py\", line 603, in next\n    return await anext(self)\n           ^^^^^^^^^^^^^^^^^\n\n  File \"/usr/local/lib/python3.12/site-packages/pydantic_graph/graph_builder.py\", line 576, in __anext__\n    raise self._next.error\n\n  File \"/usr/local/lib/python3.12/site-packages/pydantic_graph/graph_builder.py\", line 873, in _run_tracked_task\n    result = await self._run_task(t_)\n             ^^^^^^^^^^^^^^^^^^^^^^^^\n\n  File \"/usr/local/lib/python3.12/site-packages/pydantic_graph/graph_builder.py\", line 931, in _run_task\n    output = await node.call(step_context)\n             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n\n  File \"/usr/local/lib/python3.12/site-packages/pydantic_graph/step.py\", line 253, in _call_node\n    return await node.run(GraphRunContext(state=ctx.state, deps=ctx.deps))\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n\n  File \"/usr/local/lib/python3.12/site-packages/pydantic_ai/_agent_graph.py\", line 2646, in run\n    return await self._make_request(ctx)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n\n  File \"/usr/local/lib/python3.12/site-packages/pydantic_ai/_agent_graph.py\", line 3067, in _make_request\n    model_response = await _outside_attempts(model_handler(request_context))\n                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n\n  File \"/usr/local/lib/python3.12/site-packages/pydantic_ai/_agent_graph.py\", line 2525, in _outside_attempts\n    return await awaitable\n           ^^^^^^^^^^^^^^^\n\n  File \"/usr/local/lib/python3.12/site-packages/pydantic_ai/_agent_graph.py\", line 3053, in model_handler\n    return await self._request_attempts(ctx, run_context, req_ctx, state)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n\n  File \"/usr/local/lib/python3.12/site-packages/pydantic_ai/_agent_graph.py\", line 3137, in _request_attempts\n    return await self._request_attempt(ctx,",
+              "applicationFailureInfo": {
+                "type": "ModelConnectionError"
+              }
+            },
+            "applicationFailureInfo": {}
+          },
+          "serverFailureInfo": {}
+        },
+        "workerVersion": {
+          "buildId": "a1e5fd16e78097bb0222d0aeec379615"
+        }
+      }
+    },
+    {
+      "eventId": "11",
+      "eventTime": "2026-11-23T12:34:40.781736601Z",
+      "eventType": "EVENT_TYPE_ACTIVITY_TASK_COMPLETED",
+      "taskId": "1048652",
+      "activityTaskCompletedEventAttributes": {
+        "result": {
+          "payloads": [
+            {
+              "metadata": {
+                "encoding": "anNvbi9wbGFpbg=="
+              },
+              "data": "InVua25vd24i"
+            }
+          ]
+        },
+        "scheduledEventId": "5",
+        "startedEventId": "10",
+        "identity": "7@7bc45dd3a33f"
+      }
+    },
+    {
+      "eventId": "12",
+      "eventTime": "2026-11-23T12:34:40.781751649Z",
+      "eventType": "EVENT_TYPE_WORKFLOW_TASK_SCHEDULED",
+      "taskId": "1048653",
+      "workflowTaskScheduledEventAttributes": {
+        "taskQueue": {
+          "name": "7@7bc45dd3a33f-bbf7813c37be4ee495a75f420ef7421f",
+          "kind": "TASK_QUEUE_KIND_STICKY",
+          "normalName": "rb34"
+        },
+        "startToCloseTimeout": "10s",
+        "attempt": 1
+      }
+    },
+    {
+      "eventId": "13",
+      "eventTime": "2026-11-23T12:34:40.786973577Z",
+      "eventType": "EVENT_TYPE_WORKFLOW_TASK_STARTED",
+      "taskId": "1048657",
+      "workflowTaskStartedEventAttributes": {
+        "scheduledEventId": "12",
+        "identity": "7@7bc45dd3a33f",
+        "requestId": "32b7c707-ac73-49d6-933e-53e2b2f380c4",
+        "historySizeBytes": "5486",
+        "workerVersion": {
+          "buildId": "a1e5fd16e78097bb0222d0aeec379615"
+        }
+      }
+    },
+    {
+      "eventId": "14",
+      "eventTime": "2026-11-23T12:34:40.793455118Z",
+      "eventType": "EVENT_TYPE_WORKFLOW_TASK_COMPLETED",
+      "taskId": "1048661",
+      "workflowTaskCompletedEventAttributes": {
+        "scheduledEventId": "12",
+        "startedEventId": "13",
+        "identity": "7@7bc45dd3a33f",
+        "workerVersion": {
+          "buildId": "a1e5fd16e78097bb0222d0aeec379615"
+        },
+        "sdkMetadata": {},
+        "meteringMetadata": {}
+      }
+    },
+    {
+      "eventId": "15",
+      "eventTime": "2026-11-23T12:34:40.793480746Z",
+      "eventType": "EVENT_TYPE_WORKFLOW_EXECUTION_COMPLETED",
+      "taskId": "1048662",
+      "workflowExecutionCompletedEventAttributes": {
+        "result": {
+          "payloads": [
+            {
+              "metadata": {
+                "encoding": "anNvbi9wbGFpbg=="
+              },
+              "data": "eyJvYnNlcnZlZF9jb250cm9sIjoicmV2b2tlZCIsInJlc3VsdCI6InVua25vd24ifQ=="
+            }
+          ]
+        },
+        "workflowTaskCompletedEventId": "14"
+      }
+    }
+  ]
+}
