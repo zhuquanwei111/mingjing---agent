@@ -75,5 +75,5 @@ bash lab/architecture/run.sh b
 
 最终 `make check` 核对了 49 个 Python 文件。P2 AMD64 为 32 项通过，P1 的 ARM64 验收和 AMD64 辅助回归各为 16 项加 2 项通过。完整日志随实验账本归档。
 
-全部改动位于公开实验分支。草稿 PR 的目标是固定基线的另一个实验分支。本轮以选型报告收束，正式 main 和生产环境未变更。[隔离实验 PR](https://github.com/zhuquanwei111/mingjing---agent/pull/5) · [输入文件指纹](evidence/inputs.json)
+全部改动位于公开实验分支。草稿 PR 的目标是固定基线的另一个实验分支。本轮实验没有写入或合并 main，也没有调用生产环境。交付时本地 main 仍指向指定基线，远端跟踪引用已包含独立的配置 PR #3（fcc5e47）。实验按原 SHA 完成对照。[隔离实验 PR](https://github.com/zhuquanwei111/mingjing---agent/pull/5) · [输入文件指纹](evidence/inputs.json)
 
