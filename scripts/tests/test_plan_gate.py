@@ -105,6 +105,20 @@ class PlanGateTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             gate.read_verdict(self.result, jsonl([*EVENTS[:2], receipt_only, EVENTS[-1]]), INPUTS)
 
+    def test_structured_ack_with_paths_and_hashes_still_needs_read_receipts(self):
+        original = "The approved task includes an observable rollback."
+        proposal = "The implementation first runs the existing test entry."
+        self.requirements.write_text(original, encoding="utf-8")
+        self.plan.write_text(proposal, encoding="utf-8")
+        paths = (self.requirements.relative_to(self.root), self.plan.relative_to(self.root))
+        with self.assertRaisesRegex(ValueError, "no verifiable read receipt"):
+            gate.verify_read_receipts(self.root, paths, [
+                f"{path}: A generic acknowledgement without review evidence" for path in paths
+            ])
+        gate.verify_read_receipts(self.root, paths, [
+            f"{paths[0]}: {original}", f"{paths[1]}: {proposal}",
+        ])
+
     def test_only_optional_findings_are_consistent_with_pass(self):
         optional = dict(PASS, findings=[dict(FINDING, category="optional")])
         result = json.dumps(optional)

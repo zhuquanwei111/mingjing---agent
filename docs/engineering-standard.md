@@ -1,6 +1,6 @@
 # 明镜接入 Codex 通用工程规范
 
-明镜采用 [1.0.0-rc.1 候选包](../engineering-standard/README.md)及 [Python、Make 与 GitHub Actions 适配](../engineering-standard/adapters/python-github.md)。本页说明采用位置和已选择的项目规则，实测和限制见[任务记录](tasks/engineering-standard.md)，技术决定见 [ADR 0001](adr/0001-versioned-engineering-standard.md)。
+明镜采用 [1.0.0-rc.1 候选包](../engineering-standard/README.md)及 [Python、Make 与 GitHub Actions 适配](../engineering-standard/adapters/python-github.md)。本页说明采用位置和已选择的项目规则，实测和限制见[任务记录](tasks/engineering-standard.md)，技术决定见 [ADR 0001](adr/0001-versioned-engineering-standard.md)。[可执行性审查](engineering-standard-execution.md)逐项记录入口、失败处理和验收方式。
 
 ## 当前实现与权威入口
 

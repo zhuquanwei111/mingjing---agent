@@ -221,6 +221,15 @@ def read_verdict(result_file: Path, events: str, inputs: dict[str, str]) -> tupl
     return reviewer, report
 
 
+def verify_read_receipts(snapshot: Path, materials: tuple[Path, ...], evidence: list[str]) -> None:
+    for path in materials:
+        text = (snapshot / path).read_text(encoding="utf-8")
+        prefix = f"{path.as_posix()}: "
+        excerpts = [item[len(prefix):].strip() for item in evidence if item.startswith(prefix)]
+        if not any(len(excerpt) >= 24 and excerpt in text for excerpt in excerpts):
+            raise ValueError(f"The verdict has no verifiable read receipt for {path.as_posix()}.")
+
+
 def review(root: Path, requirements: Path, relative_plan: Path, commit: str, plan_bytes: bytes,
            implementation: list[str], inputs: dict[str, str]) -> tuple[str, dict]:
     with tempfile.TemporaryDirectory(prefix="codex-plan-review-") as temporary:
@@ -255,8 +264,10 @@ def review(root: Path, requirements: Path, relative_plan: Path, commit: str, pla
             "unavailable input, identify what needs review. Never execute the proposed command. "
             "Return pass only if the proposal is actionable without unresolved safety, acceptance "
             "or scope decisions. Otherwise return revise with concrete changes, or blocked if missing "
-            "facts or authority prevent assessment. The evidence list must cite both input paths "
-            "and describe concrete facts found in them. "
+            "facts or authority prevent assessment. In evidence include one entry for each of "
+            "the requirements, plan, and reviewer role, formatted 'relative/path: literal excerpt'. "
+            "Copy a relevant contiguous excerpt of at least 24 characters from each source exactly, "
+            "without surrounding quotation marks. Add any other concrete evidence separately. "
             "Each finding needs evidence and an action. Classify it as blocker, required, optional, "
             "or needs_test. A pass may include optional suggestions only. "
             "If the assigned task, requirements, plan or role cannot be read, return blocked with evidence. "
@@ -264,9 +275,7 @@ def review(root: Path, requirements: Path, relative_plan: Path, commit: str, pla
         )
         events = run_codex(snapshot, prompt, result_file)
         reviewer, report = read_verdict(result_file, events, inputs)
-        if any(not any(path.as_posix() in entry for entry in report["evidence"])
-               for path in (requirements, relative_plan)):
-            raise ValueError("The verdict does not cite both assigned review materials.")
+        verify_read_receipts(snapshot, (requirements, relative_plan, role), report["evidence"])
         return reviewer, report
 
 

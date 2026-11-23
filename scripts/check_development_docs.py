@@ -27,6 +27,7 @@ ENTRY_POINTS = (
     "docs/PLANS.md",
     "docs/configuration.md",
     "docs/engineering-standard.md",
+    "docs/engineering-standard-execution.md",
     "docs/requirements/engineering-standard.md",
     "docs/adr/0001-versioned-engineering-standard.md",
     "core/README.md",
