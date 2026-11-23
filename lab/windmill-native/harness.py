@@ -194,6 +194,7 @@ def run_case(tag):
     assert counts(op)["effect"]==counts(op)["simulated_charge"]==0
     state(op,root,"accepted")
     http(RECEIVER+"/complete/"+op,{})
+    wait("separate provider worker committed effect and fee",lambda:counts(op)["simulated_charge"]==1)
     boundary=state(op,root,"prekill" if tag!="baseline" else "prerelease")
     assert boundary["counts"]["effect"]==boundary["counts"]["simulated_charge"]==1
     assert boundary["counts"]["models"]==1 and boundary["counts"]["delivery"]==0
@@ -311,6 +312,8 @@ def main():
     try:
         time.sleep(.5)
         assert http(PRODUCT+"/health")=="ready" and http(RECEIVER+"/health")=="ready"
+        subs.append(subprocess.Popen([sys.executable,"services.py","completer"]))
+        note("independent_service_pids",product=subs[0].pid,receiver=subs[1].pid,async_worker=subs[2].pid)
         worker()
         register()
         done={}

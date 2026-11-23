@@ -1,5 +1,7 @@
 """Isolated loopback product ledger and independent simulated async provider."""
 import json
+import os
+import time
 import sqlite3
 import sys
 import uuid
@@ -49,7 +51,7 @@ def start(name):
         """)
     else:
         db.executescript("""
-        create table jobs(op text primary key, completed integer default 0, visible integer default 0, receipt text, result_private text);
+        create table jobs(op text primary key, released integer default 0, completed integer default 0, visible integer default 0, receipt text, result_private text);
         create table model_http(raw text, op text, fee integer default 0, at text default current_timestamp);
         create table models(op text, body text, call_id text, paired integer, at text default current_timestamp);
         create table events(op text, kind text, value text, at text default current_timestamp);
@@ -160,11 +162,8 @@ def receiver_action(db, action, op, body):
         db.execute("insert or ignore into jobs(op) values(?)", (op,))
         return {"accepted":True}, 202
     if action == "complete":
-        receipt = "receipt_" + uuid.uuid4().hex
-        private="vendorprivate"+uuid.uuid4().hex
-        assert db.execute("update jobs set completed=1,receipt=?,result_private=? where op=? and completed=0",(receipt,private,op)).rowcount == 1
-        event("effect",receipt)
-        event("simulated_charge",1)
+        assert db.execute("update jobs set released=1 where op=? and released=0",(op,)).rowcount==1
+        event("released")
     elif action == "open":
         db.execute("update jobs set visible=1 where op=?", (op,))
     elif action == "lookup":
@@ -211,5 +210,24 @@ def product_action(db, action, op, body):
     return {"ok":True}, 200
 
 
+def complete_jobs():
+    db=database("receiver")
+    while True:
+        db.execute("begin immediate")
+        candidate=db.execute("select op from jobs where released and not completed order by rowid limit 1").fetchone()
+        if candidate:
+            op=candidate["op"]
+            receipt="receipt_"+uuid.uuid4().hex
+            private="vendorprivate"+uuid.uuid4().hex
+            db.execute("update jobs set completed=1,receipt=?,result_private=? where op=?",(receipt,private,op))
+            db.executemany("insert into events(op,kind,value) values(?,?,?)",[
+                (op,"completion_worker",str(os.getpid())),(op,"effect",receipt),(op,"simulated_charge","1")])
+        db.commit()
+        time.sleep(.1)
+
+
 if __name__ == "__main__":
-    start(sys.argv[1])
+    if sys.argv[1]=="completer":
+        complete_jobs()
+    else:
+        start(sys.argv[1])
