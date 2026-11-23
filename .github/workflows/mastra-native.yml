@@ -1,0 +1,55 @@
+name: Mastra native recovery
+on:
+  pull_request:
+    branches: [lab/architecture-20261123-compare]
+    paths: ['lab/mastra/**', '.github/workflows/mastra-native.yml']
+permissions:
+  contents: read
+jobs:
+  native:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 18
+    services:
+      postgres:
+        image: docker.io/library/postgres@sha256:e80acae3f1109e8e4533618b594918936f2858c63afc7204c4773148a673add8
+        env:
+          POSTGRES_PASSWORD: local-synthetic
+        ports: ['5432:5432']
+        options: --health-cmd pg_isready --health-interval 3s --health-timeout 3s --health-retries 35
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          persist-credentials: false
+      - run: make check
+      - name: Install exact top-level packages and retain resolved lock
+        working-directory: lab/mastra
+        run: |
+          set -euo pipefail
+          export PATH="$(find /opt/hostedtoolcache/node -path '*/24.*/x64/bin' | sort -V | tail -1):$PATH"
+          dirname "$(which node)" >> "$GITHUB_PATH"
+          mkdir -p "$RUNNER_TEMP/mastra"
+          { node --version; npm --version; git rev-parse HEAD; } | tee "$RUNNER_TEMP/mastra/versions.log"
+          npm install --ignore-scripts --no-audit --no-fund
+          cp package-lock.json "$RUNNER_TEMP/mastra/"
+          npm ls --depth=0 | tee "$RUNNER_TEMP/mastra/deps.log"
+      - name: Observe real process crash and recovery
+        working-directory: lab/mastra
+        env:
+          DB_URL: postgresql://postgres:local-synthetic@127.0.0.1:5432/postgres
+          LAB_OUT: ${{ runner.temp }}/mastra
+        run: |
+          set -o pipefail
+          node driver.mjs 2>&1 | tee "$LAB_OUT/driver.log"
+      - name: Print worker evidence
+        if: always()
+        run: |
+          for f in "$RUNNER_TEMP"/mastra/*-{start,recover}.log; do
+            if test -f "$f"; then echo "$f"; tail -c 4200 "$f"; fi
+          done
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: mastra-native-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/mastra
+          if-no-files-found: error
