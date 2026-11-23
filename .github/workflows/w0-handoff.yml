@@ -1,0 +1,25 @@
+name: W0 selection evidence - handoff ordering
+on:
+  pull_request:
+    branches: [lab/architecture-20261123-compare]
+    paths: ['lab/handoff/**', '.github/workflows/w0-handoff.yml']
+permissions:
+  contents: read
+jobs:
+  observe:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          persist-credentials: false
+      - run: make check
+      - name: Observe database contention and first receiver frames
+        run: bash -o pipefail -c 'bash lab/handoff/run.sh | tee "$RUNNER_TEMP/handoff.log"'
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: first-handoff-${{ github.run_id }}
+          path: ${{ runner.temp }}/handoff.log
+          if-no-files-found: error
