@@ -33,9 +33,9 @@
 | 冻结审查任务和版本输入 | 文档已备 | [审查需求](../requirements/route-b-architecture-gate.md) |
 | Walking Skeleton 与 MVP 区分 | 评审草案已备 | [候选纵切与验收](../designs/route-b-walking-skeleton-mvp.md) |
 | 独立架构评审 | **首轮完成，需修订后复审** | [首轮终审](https://github.com/zhuquanwei111/mingjing---agent/pull/7#issuecomment-7099754918)核对了 v0.4.1 原件及七幅图；原件仍标注待评审 |
-| 原设计者处理与复审 | **七项已答复，复审待执行** | [修订协议与 W0 顺序](../designs/route-b-architecture-revisions.md) · [固定版本与复算证据](../designs/route-b-review-evidence.md) |
+| 原设计者处理与复审 | **七项已答复；第二轮要求修订 RB-03、RB-04，两项定向实测已回填** | [修订协议与 W0 顺序](../designs/route-b-architecture-revisions.md) · [固定版本与复算证据](../designs/route-b-review-evidence.md) |
 | 最短端到端实施 | **未授权 / 未开发** | 架构准入后，按新任务分支和分阶段验收执行 |
 | 正式 MVP 业务范围 | **待用户确认** | 根据已评审架构确定第一类用户任务及验收 |
 | PR #6 合并及后续编码 | **继续暂停** | 核对时 #6 为 Open、非 Draft，未合并；本任务保持编码暂停 |
 
-原冻结需求的历史快照保留，关于 #6 的 Draft 状态以本次查询为准。下一步由新的独立上下文核对同一 PR 的最新提交、七项回复及来源，逐条给出已关闭、需补证或阻断的理由。用户确认实质取舍并另行授权后再进入相应阶段。
+原冻结需求的历史快照保留，关于 #6 的 Draft 状态以本次查询为准。[第二轮独立回执](https://github.com/zhuquanwei111/mingjing---agent/pull/7#issuecomment-7100697588)要求收紧 SDK 重发与仅幂等键恢复。按冻结协议完成[隔离实验 #10](https://github.com/zhuquanwei111/mingjing---agent/pull/10)，已将[代码、成功 CI、111 条原始记录及 14 份真实历史](../designs/route-b-review-evidence.md#rb34-lab)回填，并在[两项修订](../designs/route-b-architecture-revisions.md)区分切片实测与剩余产品验收。针对本次固定候选的独立复审回执登记在本 PR 会话，按受审 SHA 对应。W0 及正式 MVP 继续暂停。用户确认实质取舍并另行授权后再进入相应阶段。

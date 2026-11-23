@@ -1,5 +1,24 @@
 # 架构复审证据与同门槛比较
 
+## RB34 Lab
+
+[PR #10](https://github.com/zhuquanwei111/mingjing---agent/pull/10) 从 #5 实验分支的 `bb55c843b8dd2e9ad646e982a38cda350b3df952` 分出，按预先冻结的[八例协议](https://github.com/zhuquanwei111/mingjing---agent/blob/e263e9403097fbee12d2d12da82efd2ea66cd941/lab/rb34/PLAN.md)检验[上轮独立复审的两项必要修改](https://github.com/zhuquanwei111/mingjing---agent/pull/7#issuecomment-7100697588)。本次引用的[测试提交](https://github.com/zhuquanwei111/mingjing---agent/commit/51c47060826cc3cae0347a4f22d22c29f9288a3f)为 `51c47060826cc3cae0347a4f22d22c29f9288a3f`，[目标 CI](https://github.com/zhuquanwei111/mingjing---agent/actions/runs/45175497629)成功。版本与完整历史、原始收端和产品记录在[永久归档](https://github.com/zhuquanwei111/mingjing---agent/tree/9c39c0f624e0736985491c1aaa49fb471df27ca9/lab/rb34/evidence/45175497629)；[Actions 原始制品](https://github.com/zhuquanwei111/mingjing---agent/actions/runs/45175497629/artifacts/14817864455)另含服务日志。
+
+| 场景（撤权、取消各有独立样本） | 供方收到 POST 次数 | 业务效果次数 | 模拟计费笔数 | 下游收到交付次数 | 产品预算（预留 / 已核销） |
+| --- | ---: | ---: | ---: | ---: | --- |
+| 正常确认，重复对账 | 1 | 1 | 1 | 1 | 0 / 1 |
+| 默认 SDK，首次回执丢失后撤权或取消 | 2 | 1 | 2 | 0 | 0 / 2 |
+| 关闭 SDK 重试，同样故障且查询未知 | 1 | 1 | 1 | 0 | Activity 第 2 次进入后仍为 3 / 0 |
+| 关闭重试，随后查得可信迟到终局 | 1 | 1 | 1 | 0 | 两例均先为 3 / 0，随后为 0 / 1；重复通知新增费用为 0 |
+| 只有幂等键、任务仍有效，无查单能力 | 1 | 1 | 1 | 0 | Activity 第 2 次进入后为 3 / 0，无查单、无重提 |
+
+数据来自 [111 条逐笔记录](https://github.com/zhuquanwei111/mingjing---agent/blob/9c39c0f624e0736985491c1aaa49fb471df27ca9/lab/rb34/evidence/45175497629/raw.jsonl) 及 14 份 Temporal 历史。四项计数分别来自 HTTP 供方的到达、按操作号与输入指纹去重的效果、按到达记录形成的费用，以及另一个 HTTP 交付进程的收据。八个样本首个请求的正文摘要相同。供方先提交效果与费用，再断开套接字。各故障样本在控制前均见 1/1/1/0、未公开终局、产品预留 3。控制器等客户端记录真实断连后，单独提交撤权或取消事务，再释放传输异常；默认重试样本的第二次到达带 SDK 重试号 1。真实 Temporal Activity 重入是同一轮操作的第二次尝试。此处取消指产品取消并通知仍在对账的 Workflow；实验没有调用引擎强制终止。
+
+独立代码审查在[首轮 CI](https://github.com/zhuquanwei111/mingjing---agent/actions/runs/45175256225)成功后发现供方收据的可见性取决于 SDK 组别，且只核对组内输入摘要。已在测试提交统一成同一供方规则，并断言八组收端首发摘要完全一致。代码复审确认两项均修复，表中只采用修订后的 CI。实验台将短授权事务与外部响应分离，未复现 #5 原持锁实现。触发后查单验证的是隔离供方的终局记录；对真实账单、外部回调认证、首次交接竞态、父预算并发、断电或备份恢复与生产权限系统仍应分别验证。
+
+复核时在归档目录运行 `sha256sum -c SHA256SUMS`，原始 JSONL 的 SHA-256 为 `f125ac056e380797e358b921b78af9c00cf898b9a1d73b31cad527455a7d7984`。核对 `before_control`、`after_recovery`、`final` 与逐条 `product_event`，再对照同一 Workflow ID 的完整历史。重跑时检出上述测试提交，从仓库根目录在 Linux AMD64、可运行 Docker Compose 的一次性目录执行 `TEST_HEAD=$(git rev-parse HEAD) CI_RUN=local RB34_OUT=$(mktemp -d) bash lab/rb34/run.sh`。构建沿用 #5 的锁文件，产品库、供方账本、Temporal namespace、容器和卷按实验单独创建。[运行入口](https://github.com/zhuquanwei111/mingjing---agent/blob/51c47060826cc3cae0347a4f22d22c29f9288a3f/lab/rb34/run.sh) · [固定版本](https://github.com/zhuquanwei111/mingjing---agent/blob/9c39c0f624e0736985491c1aaa49fb471df27ca9/lab/rb34/evidence/45175497629/versions.txt)
+
+
 **证据日期为 2026-11-23。** 本轮新增原件指纹核对、归档原始日志复算、PR #6 质量库重跑、固定发行源码与许可检查。没有启动新的产品服务，没有 Dify/Windmill 或新路线端到端结果。逐项回复和关闭要求见[修订稿](route-b-architecture-revisions.md)。
 
 ## 1．版本、来源与证据强度
