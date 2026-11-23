@@ -5,7 +5,7 @@
 | 层次 | 内容 | 维护方式 |
 | --- | --- | --- |
 | 通用标准 | [工作流](workflow.md)、[代码质量与交付](quality.md)、[权限、文档与运维](operations.md)、模板和[任务接续技能](skills/engineering-handoff/SKILL.md) | 当跨任务反复出现同类问题时更新，以真实任务复验 |
-| 技术适配 | [Python、Make 与 GitHub Actions](adapters/python-github.md)、[Codex CLI 方案关卡](adapters/codex-cli/README.md) | 依据项目已有技术栈采用，记录命令、支持平台和实现证据 |
+| 技术适配 | [Python、Make 与 GitHub Actions](adapters/python-github.md)、[原生子代理模板](agents/solution-reviewer.toml)、[CLI 备用方案关卡](adapters/codex-cli/README.md) | 依据项目已有技术栈采用，记录命令、支持平台和实现证据 |
 | 项目实例 | 根 `AGENTS.md`、项目文档、真实命令与行为验收 | 由采用仓库维护，业务约束、环境和实验证据留在该仓库的项目层 |
 
 ## 接入已有项目
@@ -21,6 +21,7 @@
    ```
 
    也可把技能目录按同一版本复制到 `.agents/skills/engineering-handoff/`。每次升级一起更新；同一项目只保留一个可发现的定义。由实际 Codex 客户端确认发现并运行一次冷恢复。
-5. 用一个已有的真实任务验证需求、命令、独立审查回流和交付。检查本地文档导航与复制后的完整性。记录遗漏、失败和不适用情形，以及项目实例层应调整的内容。
+5. 需要方案评审时，将 [原生子代理角色](agents/solution-reviewer.toml)安装到 `.codex/agents/solution-reviewer.toml`，并由主 Agent 按[评审模板](templates/review.md)显式发起。**安装角色文件不会自动触发评审。** 子代理不可用时沿用现有 CLI 关卡或人工新会话。
+6. 用一个已有的真实任务验证需求、命令、独立审查回流和交付。检查本地文档导航与复制后的完整性。记录遗漏、失败和不适用情形，以及项目实例层应调整的内容。
 
 从桌面主会话发起任务后，由 Agent 执行已授权的步骤并回报证据。终端可用于独立审查、可重复检查和人工复核。升级时比较来源版本及目标项目的本地规则，修改接入链接和受影响检查，用一个真实任务验证。需要回退时，在任务分支撤销接入的 Git 变更，重新核对现行门禁。
