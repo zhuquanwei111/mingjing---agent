@@ -73,3 +73,5 @@
 | 载荷 | 将两个仅存在于产品消息或提供方业务结果的独有合成标记与原始工具 ID，在已解码的真实 Temporal 全历史 payload 中检查；检查点/有权模型端可找到预期正文，但引擎只携带运行引用、状态。应用日志/目标检索另在 W0 验。 |
 
 记录原能力契约字段在何处遇到边界、实验新增的一次性公共改造、登记新能力后仍需改什么。受控协议模型只验证 Agent 接口。实验既不证明任意未来执行器零公共改造，也不等于生产 IAM、真实供应商或完整 W0。
+
+**同一 B 内的两种恢复适配。** [固定版 TemporalDurability](https://github.com/pydantic/pydantic-ai/blob/v2.71.0/docs/durable_execution/temporal.md)提供 workflow 内 Agent 与独立模型/工具 Activity，可减少自建轮次协调。是否在授权后、I/O 前控制出站以及默认历史是否暴露请求/结果，须由适配器与 payload codec 实证。本实验选[外部延迟工具与历史续跑](https://github.com/pydantic/pydantic-ai/blob/v2.71.0/docs/deferred-tools.md)，因它能在落持久产品意图后对纯引用作 Activity 调度。若主路径的公开恢复、版本或载荷边界失败，针对失败点检验原生插件能否满足，再决定改桥接或换框架；不把另一种设计列作已测。宿主 Task/Run、同一 Temporal Workflow/Run、同一工具调用/会话、新 SDK 推理 run 分开记录。重新进入不能刷新整个任务的步数或预算，产品账保留原预留，SDK 分段用量以调用轨迹对账。若目标宿主不能沿用产品级上限须修改 Agent 桥接。
