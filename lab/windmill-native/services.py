@@ -3,6 +3,7 @@ import json
 import sqlite3
 import sys
 import uuid
+from model_gate import forward
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from urllib.error import HTTPError
@@ -40,12 +41,14 @@ def start(name):
     if name == "product":
         db.executescript("""
         create table ops(op text primary key, sent integer default 0, held integer default 3,
-                         spent integer default 0, canceled integer default 0, receipt text, version integer default 1, delivered integer default 0);
+                         spent integer default 0, canceled integer default 0, receipt text, version integer default 1, delivered integer default 0, call_id text);
+        create table model_attempts(op text, allowed integer, body text, at text default current_timestamp);
         create table entries(op text, job text, claim integer, at text default current_timestamp);
         """)
     else:
         db.executescript("""
         create table jobs(op text primary key, completed integer default 0, visible integer default 0, receipt text);
+        create table model_http(raw text, op text, fee integer default 0, at text default current_timestamp);
         create table models(op text, body text, call_id text, paired integer, at text default current_timestamp);
         create table events(op text, kind text, value text, at text default current_timestamp);
         """)
@@ -55,23 +58,31 @@ def start(name):
         def log_message(self, *_):
             pass
 
-        def reply(self, obj, status=200, stream=False):
+        def reply(self, obj, status=200, stream=False, prohibit_retry=False):
             data = obj.encode() if stream else json.dumps(obj).encode()
             self.send_response(status)
             self.send_header("Content-Type", "text/event-stream" if stream else "application/json")
             self.send_header("Content-Length", str(len(data)))
+            if prohibit_retry:
+                self.send_header("x-should-retry","false")
             self.end_headers()
             self.wfile.write(data)
 
         def process(self):
             path = self.path.strip("/").split("/")
-            body = json.loads(self.rfile.read(int(self.headers.get("Content-Length", 0))) or b"{}")
+            raw = self.rfile.read(int(self.headers.get("Content-Length", 0))) or b"{}"
             db = database(name)
             try:
+                ingress=None
+                if path==["v1","chat","completions"] and name=="receiver":
+                    ingress=db.execute("insert into model_http(raw) values(?)",(raw.decode(errors="replace"),)).lastrowid
+                body=json.loads(raw)
                 if path == ["health"]:
                     return self.reply("ready")
+                if path==["v1","chat","completions"] and name=="product":
+                    return forward(self,db,body,raw,RECEIVER)
                 if path == ["v1", "chat", "completions"] and name == "receiver":
-                    return self.model(db, body)
+                    return self.model(db, body, ingress)
                 action, op = path
                 db.execute("begin immediate")
                 if name == "receiver":
@@ -86,11 +97,16 @@ def start(name):
             finally:
                 db.close()
 
-        def model(self, db, body):
+        def model(self, db, body, ingress):
             messages = body["messages"]
             op = next(m["content"] for m in messages if m["role"] == "user")
             if isinstance(op, list):
                 op = next(item["text"] for item in op if item["type"] == "text")
+            db.execute("update model_http set op=? where rowid=?",(op,ingress))
+            if op.startswith(("retrydefault_","retryprotected_")):
+                db.execute("update model_http set fee=1 where rowid=?",(ingress,))
+                return self.reply({"error":"accepted synthetic charge then HTTP 503"},503,
+                                  prohibit_retry=op.startswith("retryprotected_"))
             tool = next((m for m in messages if m["role"] == "tool"), None)
             call_id = "call_" + uuid.uuid4().hex
             paired = False

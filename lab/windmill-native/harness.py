@@ -82,7 +82,7 @@ def register():
         return {"type":"static","value":value}
     brain = {"type":"aiagent","tools":[{"id":"t","summary":"async_operation","requires_approval":True,
              "value":step("tool")}],"input_transforms":{
-             "provider":fixed({"kind":"customai","model":"fixture","resource":{"base_url":RECEIVER+"/v1"}}),
+             "provider":fixed({"kind":"customai","model":"fixture","resource":{"base_url":PRODUCT+"/v1"}}),
              "max_iterations":fixed(3),"streaming":fixed(False),"user_message":expr}}
     delivery=step("deliver")
     delivery["input_transforms"]["verdict"]={"type":"javascript","expr":"results.agent.output"}
@@ -96,7 +96,7 @@ def register():
 
 def logs(op):
     out={}
-    for name, tables in [("product",("ops","entries")),("receiver",("models","events"))]:
+    for name, tables in [("product",("ops","entries","model_attempts")),("receiver",("models","events","model_http"))]:
         db=database(name)
         for table in tables:
             rows=[dict(x) for x in db.execute(f"select * from {table} where op=? order by rowid",(op,))]
@@ -112,7 +112,8 @@ def counts(op):
     data=logs(op)
     return {**{kind:sum(e["kind"]==kind for e in data["events"]) for kind in
             ["http_post","effect","simulated_charge","delivery"]},
-            "models":len(data["models"]), "held":data["ops"][0]["held"],"spent":data["ops"][0]["spent"],
+            "models":len(data["model_http"]), "model_parsed":len(data["models"]), "held":data["ops"][0]["held"],"spent":data["ops"][0]["spent"],
+            "gate_attempts":len(data["model_attempts"]), "gate_denials":sum(not a["allowed"] for a in data["model_attempts"]),
             "entries":len(data["entries"]), "paired":sum(m["paired"] for m in data["models"])}
 
 
@@ -205,8 +206,34 @@ def run_case(tag):
     assert (c["models"],c["paired"],c["delivery"])==((1,0,0) if tag=="cancel" else (2,1,1)),c
     root_state=next(j["status"] for j in final["jobs"] if j["id"]==root)
     assert root_state==("canceled" if tag=="cancel" else "success"),root_state
+    if tag=="known":
+        body=final["ledger"]["models"][-1]["body"]
+        bad=json.loads(json.dumps(body))
+        next(m for m in bad["messages"] if m["role"]=="tool")["tool_call_id"]="wrong_"+uuid.uuid4().hex
+        try:
+            http(PRODUCT+"/v1/chat/completions",bad)
+        except RuntimeError as exc:
+            assert "403" in str(exc)
+        else:
+            raise AssertionError("wrong ID forwarded")
+        tested=state(op,root,"negative_wrong_id")["counts"]
+        assert tested["models"]==c["models"] and tested["gate_denials"]==c["gate_denials"]+1
     if helper:
         cli("docker","stop","--time","1",helper)
+    return op
+
+
+def retry_probe(tag):
+    op=tag+"_"+uuid.uuid4().hex[:12]
+    http(PRODUCT+"/init/"+op,{})
+    root=str(uuid.UUID(call("/jobs/run/f/"+PREFIX+"flow",{"operation":op})))
+    wait("model retry probe terminal",lambda:any(j["id"]==root and j["status"] for j in lineage(root)),90)
+    outcome=state(op,root,"model_retry")
+    expected=4 if tag=="retrydefault" else 1
+    raw=outcome["ledger"]["model_http"]
+    assert len(raw)==sum(m["fee"] for m in raw)==expected
+    assert outcome["counts"]["http_post"]==outcome["counts"]["delivery"]==0
+    assert next(j["status"] for j in outcome["jobs"] if j["id"]==root)=="failure"
     return op
 
 
@@ -218,9 +245,10 @@ def main():
         worker()
         register()
         done={}
-        for tag in ["baseline","known","cancel"]:
+        for tag in ["baseline","retrydefault","retryprotected","known","cancel"]:
             try:
-                done[tag]={"operation":run_case(tag),"status":"pass"}
+                run=retry_probe if tag.startswith("retry") else run_case
+                done[tag]={"operation":run(tag),"status":"pass"}
             except Exception as exc:
                 done[tag]={"status":"error","error":repr(exc)}
                 (OUT/"case-results.json").write_text(json.dumps(done,indent=2))

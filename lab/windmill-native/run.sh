@@ -17,6 +17,7 @@ export BASE_URL=http://127.0.0.1:8000
 export ALLOW_PRIVATE_AI_BASE_URLS=127.0.0.1
 docker run -d --network host --name wmn-server -e DATABASE_URL -e BASE_URL -e MODE=server -e SERVER_BIND_ADDR=127.0.0.1 -e ZOMBIE_JOB_TIMEOUT=30 -e RESTART_ZOMBIE_JOBS=true -e ALLOW_PRIVATE_AI_BASE_URLS "$ce"
 for i in {1..150}; do curl -fsS "$BASE_URL/api/version" >"$out/version.txt" 2>/dev/null && break; sleep 1; done
+test "$(docker image inspect "$ce" --format '{{index .Config.Labels "org.opencontainers.image.revision"}}')" = 28985a122cc303200bb36c5c67037f5f2157299c
 cat "$out/version.txt"
 grep -F '1.882.0' "$out/version.txt"
 if [[ "${1:-}" == "--preflight" ]]; then exit 0; fi
