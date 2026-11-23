@@ -1,0 +1,23 @@
+name: Windmill CE native comparison
+on:
+  pull_request:
+    branches: ['lab/architecture-20261123-compare']
+    paths: ['lab/windmill-native/**', '.github/workflows/windmill-native.yml']
+permissions:
+  contents: read
+jobs:
+  native:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 24
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          persist-credentials: false
+      - name: Fixed CE, public version API and native jobs
+        run: bash lab/windmill-native/run.sh
+      - name: Archive synthetic records
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: windmill-native-evidence
+          path: /tmp/wmn-evidence/
