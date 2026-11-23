@@ -4,13 +4,15 @@ P2 提供能力目录、版本发布、资源授权、任务与 Run API、审批
 
 ## 日常开发
 
-使用独立的 Linux amd64 checkout。从 Git 根目录执行 `make p2-acceptance` 可创建一次性 Compose project，运行测试并清理。需要保留开发卷时，从根目录执行以下命令。
+使用独立的原生 Linux ARM64 或 AMD64 checkout。从 Git 根目录执行 `make p2-acceptance` 可创建一次性 Compose project，运行测试并清理。需要保留开发卷时，从根目录执行以下命令。
 
     sh core/infra/dev.sh init
     sh core/infra/dev.sh test
     sh core/infra/dev.sh status
 
-init 创建专用项目名称和合成数据库密码，使用 PostgreSQL 17.12、Temporal Server 1.32.2 和 CPython 3.12.16 的固定镜像，执行三库初始化和产品迁移。test 在内部网络运行 API、Temporal Worker 和合成调用场景。手动测试的 JUnit 位于 `core/.runtime/junit.xml`，自动验收写入命令输出指定的独立目录。依赖来自 [P1 已验证的 x86_64 锁](requirements/linux-x86_64.lock)，安装校验每个 wheel 的哈希。服务使用内部网络，API 在容器内绑定回环，Worker 为 UID 10101。生产制品放行仍需处理 [P1 镜像安全发现](../p1-walking-skeleton/evidence/lima/image-scan.json)。
+init 创建专用项目名称和合成数据库密码，使用 PostgreSQL 17.12、Temporal Server 1.32.2 和 CPython 3.12.16 的固定镜像，执行三库初始化和产品迁移。test 在内部网络运行 API、Temporal Worker 和合成调用场景。手动测试的 JUnit 位于 `core/.runtime/junit.xml`，自动验收写入命令输出指定的独立目录。构建按目标架构选择 [ARM64 锁](requirements/linux-aarch64.lock)或 [AMD64 锁](requirements/linux-x86_64.lock)，复用 P1 对应架构的相同版本与已验证 wheel 哈希。固定多架构镜像索引保留原 AMD64 子镜像并选择对应的原生 ARM64 子镜像；这不是镜像版本升级。服务使用内部网络，API 在容器内绑定回环，Worker 为 UID 10101。生产制品放行仍需处理 [P1 镜像安全发现](../p1-walking-skeleton/evidence/lima/image-scan.json)。
+
+GitHub 正式 ARM64 作业沿用 `P1 acceptance` 名称，同时运行 P1 与本公共层验收；`P2 regression (amd64, advisory)` 仅作辅助。候选提交是否通过以其完整 CI 日志为准，配置支持某个架构不等于已完成该候选的实际验收。
 
 从根目录执行 `sh core/infra/dev.sh run`，它在数据库和 Temporal 就绪并执行迁移后启动 API 与 Worker。API 容器内地址为 `127.0.0.1:8080`。`sh core/infra/dev.sh stop` 停止此项目容器，开发卷供下次启动复用。迁移和凭据开通使用专用的 `MINGJING_MIGRATION_DSN`。应用角色通过受限认证函数读取身份，凭据开通和撤销由迁移角色管理。
 
