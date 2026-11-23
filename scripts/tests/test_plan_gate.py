@@ -21,8 +21,16 @@ SPEC = importlib.util.spec_from_file_location("start_implementation", SCRIPT)
 gate = importlib.util.module_from_spec(SPEC)
 SPEC.loader.exec_module(gate)
 
-PASS = {"decision": "pass", "summary": "Feasible", "evidence": ["AGENTS.md"], "findings": []}
-REVISE = dict(PASS, decision="revise", findings=["Specify the rollback"])
+INPUTS = {"requirements_sha256": "requirements", "plan_sha256": "plan", "implementation_sha256": "argv"}
+PASS = {
+    "role": "solution-reviewer", "decision": "pass", "scope": "Development entry",
+    "summary": "Feasible", "inputs": INPUTS, "evidence": ["AGENTS.md"], "findings": [],
+}
+FINDING = {
+    "category": "required", "issue": "Specify the rollback", "evidence": "plan.md:4",
+    "action": "Record the rollback command",
+}
+REVISE = dict(PASS, decision="revise", findings=[FINDING])
 EVENTS = [
     {"type": "thread.started", "thread_id": "new-session"},
     {"type": "turn.started"},
@@ -43,12 +51,15 @@ class PlanGateTests(unittest.TestCase):
         self.plan = self.root / "docs/tasks/plan.md"
         self.plan.parent.mkdir(parents=True)
         self.plan.write_text("# Plan\n", encoding="utf-8")
+        self.requirements = self.root / "docs/requirements/original.md"
+        self.requirements.parent.mkdir(parents=True)
+        self.requirements.write_text("# Requirements\n", encoding="utf-8")
         self.result = self.root / "verdict.json"
         self.state = ("refs/heads/task", "abc", self.plan.read_bytes())
 
     def test_valid_verdict_needs_one_completed_independent_turn(self):
         self.result.write_text(json.dumps(PASS), encoding="utf-8")
-        self.assertEqual(gate.read_verdict(self.result, jsonl(EVENTS)), ("new-session", PASS))
+        self.assertEqual(gate.read_verdict(self.result, jsonl(EVENTS), INPUTS), ("new-session", PASS))
         bad_streams = [
             "", "[]", jsonl(EVENTS + [{"type": "turn.failed"}]),
             jsonl(EVENTS + EVENTS), jsonl(EVENTS[::-1]), jsonl(EVENTS[:-1]),
@@ -56,7 +67,7 @@ class PlanGateTests(unittest.TestCase):
         ]
         for events in bad_streams:
             with self.subTest(events=events), self.assertRaises(ValueError):
-                gate.read_verdict(self.result, events)
+                gate.read_verdict(self.result, events, INPUTS)
 
     def test_partial_or_conflicting_verdict_is_invalid(self):
         cases = [
@@ -64,36 +75,59 @@ class PlanGateTests(unittest.TestCase):
             '{"decision":"pass","decision":"revise"}',
             json.dumps(dict(PASS, decision="approved")),
             json.dumps(dict(PASS, evidence=[])),
-            json.dumps(dict(PASS, findings=["A blocking issue"])),
+            json.dumps(dict(PASS, findings=[FINDING])),
             json.dumps(dict(PASS, decision="blocked")),
+            json.dumps(dict(PASS, role="default")),
+            json.dumps(dict(PASS, inputs=dict(INPUTS, plan_sha256="stale"))),
         ]
         for text in cases:
             self.result.write_text(text, encoding="utf-8")
             matching_event = {"type": "item.completed", "item": {"type": "agent_message", "text": text}}
             with self.subTest(text=text), self.assertRaises(ValueError):
-                gate.read_verdict(self.result, jsonl([*EVENTS[:2], matching_event, EVENTS[-1]]))
+                gate.read_verdict(self.result, jsonl([*EVENTS[:2], matching_event, EVENTS[-1]]), INPUTS)
 
     def test_file_must_match_this_turns_final_message(self):
         self.result.write_text(json.dumps(REVISE), encoding="utf-8")
         with self.assertRaisesRegex(ValueError, "differs from the final message"):
-            gate.read_verdict(self.result, jsonl(EVENTS))
+            gate.read_verdict(self.result, jsonl(EVENTS), INPUTS)
 
     def test_duplicate_event_fields_cannot_hide_a_failure(self):
         self.result.write_text(json.dumps(PASS), encoding="utf-8")
         events = jsonl(EVENTS[:2]) + '{"type":"error","type":"item.updated"}\n' + jsonl(EVENTS[2:])
         with self.assertRaisesRegex(ValueError, "duplicate fields"):
-            gate.read_verdict(self.result, events)
+            gate.read_verdict(self.result, events, INPUTS)
+
+    def test_thread_created_without_a_delivered_task_is_not_a_review(self):
+        receipt_only = {"type": "item.completed", "item": {
+            "type": "agent_message", "text": "No task has come through yet",
+        }}
+        self.result.write_text(receipt_only["item"]["text"], encoding="utf-8")
+        with self.assertRaises(ValueError):
+            gate.read_verdict(self.result, jsonl([*EVENTS[:2], receipt_only, EVENTS[-1]]), INPUTS)
+
+    def test_only_optional_findings_are_consistent_with_pass(self):
+        optional = dict(PASS, findings=[dict(FINDING, category="optional")])
+        result = json.dumps(optional)
+        self.result.write_text(result, encoding="utf-8")
+        event = {"type": "item.completed", "item": {"type": "agent_message", "text": result}}
+        self.assertEqual(
+            gate.read_verdict(self.result, jsonl([*EVENTS[:2], event, EVENTS[-1]]), INPUTS),
+            ("new-session", optional),
+        )
 
     def run_entry(self, verdict, states, code=17, plan="docs/tasks/plan.md"):
         stdout = io.StringIO()
         stderr = io.StringIO()
         with patch.object(gate, "git", return_value=str(self.root)), \
+                patch.object(gate, "committed_digest", return_value=INPUTS["requirements_sha256"]), \
                 patch.object(gate, "candidate", side_effect=states), \
                 patch.object(gate, "review", side_effect=[verdict]), \
                 patch.object(gate.subprocess, "run") as implementation, \
                 contextlib.redirect_stdout(stdout), contextlib.redirect_stderr(stderr):
             implementation.return_value.returncode = code
-            status = gate.main([plan, "--", "implementation", "literal argument"])
+            status = gate.main([
+                "docs/requirements/original.md", plan, "--", "implementation", "literal argument",
+            ])
         return status, implementation, stdout.getvalue() + stderr.getvalue()
 
     def test_review_feedback_reaches_designer_without_starting_command(self):
