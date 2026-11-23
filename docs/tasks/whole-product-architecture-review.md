@@ -21,3 +21,5 @@
 [B 原始记录](https://github.com/zhuquanwei111/mingjing---agent/tree/554367bf8528a9500a88bac4033ad15a5983b4de/lab/product-review/evidence/45190768318) · [Windmill 报告](https://github.com/zhuquanwei111/mingjing---agent/blob/c847da6c10608f33ba0d88277d20400885afc04d/lab/windmill-native/REPORT.md) · [DBOS 报告及失败记录](https://github.com/zhuquanwei111/mingjing---agent/blob/75d6fccf821c5ebcd70cd837f8fa52a3e78cf936/lab/dbos/RESULT.md) · [Mastra 报告与完整锁](https://github.com/zhuquanwei111/mingjing---agent/blob/a9b6570419f6f6877e824a4abcb889e3867e6517/lab/mastra/RESULT.md) · [Agno 报告与原始事件](https://github.com/zhuquanwei111/mingjing---agent/blob/60dc1965c4cea6d4e976ed40875f82403dbb386f/lab/agno-agentos/REPORT.md)
 
 首轮总评独立裁决暂缓，设计者接受并开出两个可隔离复测的窗口。两项均有明确失败去向和复审条件。见[固定受审稿](https://github.com/zhuquanwei111/mingjing---agent/commit/5a3c2c5cf2c00509e503fc4b44280390b0409bf5)。
+
+逐编号填证、23 组候选横向对照、方案判断按[原表验证结果](../requirements/whole-product-acceptance-results.md)回流。计费观测只作为特定硬门槛的证据。首轮暂缓的两个窗按 [#12 事前预注册](https://github.com/zhuquanwei111/mingjing---agent/blob/041c9683df779732b82f3e9c8161e509bac9dcbd/lab/product-review/round-gate/PLAN.md)执行。

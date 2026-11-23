@@ -1,6 +1,6 @@
 # 明镜完整产品架构复审 · 设计者范围分析与事前实验判据
 
-本轮决策是开发全产品时能否依赖 B 的职责分配。沿用 [PR #7 冻结主表](https://github.com/zhuquanwei111/mingjing---agent/blob/9d61564347dbea5ada09678c1aa8b9d16f36a2df/docs/requirements/route-b-w0-acceptance.md)，其判据与 W0 裁决均保留。需求为 v0.4.1，原件摘要 `75ac634a98393b5f99fb28901a6a91bc7431290143b6458bbf1f9a2af5f23062`。覆盖 41 FR、11 NFR、7 TS、17 AC 及相应章节。完整产品设计采纳、W0 实施授权和能力上线分别决定。
+[按原表逐编号查证和横向比较候选](../requirements/whole-product-acceptance-results.md)。本轮决策是开发全产品时能否依赖 B 的职责分配。沿用 [PR #7 冻结主表](https://github.com/zhuquanwei111/mingjing---agent/blob/9d61564347dbea5ada09678c1aa8b9d16f36a2df/docs/requirements/route-b-w0-acceptance.md)，其判据与 W0 裁决均保留。需求为 v0.4.1，原件摘要 `75ac634a98393b5f99fb28901a6a91bc7431290143b6458bbf1f9a2af5f23062`。覆盖 41 FR、11 NFR、7 TS、17 AC 及相应章节。完整产品设计采纳、W0 实施授权和能力上线分别决定。
 
 | 原表组与范围 | 现有证据最大适用范围 | 失败影响及组件去留 | 最迟取得答案 |
 | --- | --- | --- | --- |
