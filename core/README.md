@@ -1,5 +1,7 @@
 # 明镜 P2 最小公共层
 
+> 本目录继续维护已交付的 P2 v1 接口、迁移和回归。路线 B 的新开发使用[新开发包](../mingjing-codex-engineering-v2/README.md)。
+
 P2 提供能力目录、版本发布、资源授权、任务与 Run API、审批、收据、预算和产物读取。业务模板与统一执行路径见 [SDK 示例](src/mingjing/examples.py)。执行版本和迁移规则见 [VERSIONING.md](VERSIONING.md)。
 
 ## 日常开发

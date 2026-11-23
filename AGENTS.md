@@ -7,7 +7,9 @@
 ## 项目地图
 
 - [当前项目状态](README.md#当前项目状态)：已交付阶段、当前实现及历史证据的区别。
-- [方案与阶段计划](mingjing-codex-engineering-v1/README.md)；[P2 接口与操作](core/README.md)。
+- 新开发从[路线 B 开发包](mingjing-codex-engineering-v2/README.md)与[切换任务账](docs/tasks/route-b-foundation.md)进入。
+- 改动旧包或旧实现前，按[资产处置与兼容边界](mingjing-codex-engineering-v2/legacy.md)核对版本、调用方、在途状态、回退和适用回归；沿用同一套工程规范。
+- [历史 v1 开发包](mingjing-codex-engineering-v1/README.md)与[兼容维护中的 P2 接口](core/README.md)。
 - 历史验收：[P1 报告](p1-walking-skeleton/P1_REPORT.md)、[P2 早期报告](core/P2_REPORT.md)；新提交以对应 CI 为准。
 - [开发流程](docs/development.md)、[长任务计划与接续](docs/PLANS.md)、[配置与环境边界](docs/configuration.md)。
 - [明镜采用的工程规范](docs/engineering-standard.md)；[通用规范包](engineering-standard/README.md)可独立复用。

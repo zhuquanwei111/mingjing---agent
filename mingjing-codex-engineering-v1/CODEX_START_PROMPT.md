@@ -1,5 +1,7 @@
 # 交给 Codex 的第一条指令
 
+> 此启动词仅用于复现旧 P0 阶段。当前开发从[仓库根规则](../AGENTS.md)和[新开发包](../mingjing-codex-engineering-v2/README.md)进入。以下为历史原文。
+
 你正在一个全新的 Mingjing 仓库中工作。请首先完整阅读 AGENTS.md 和 README.md，再阅读 01—09 的工程文档。
 
 本次只执行 P0，并准备 P1 的隔离验证计划；不要直接建设完整平台。

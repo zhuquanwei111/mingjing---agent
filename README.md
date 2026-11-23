@@ -1,11 +1,13 @@
 # 明镜业务智能体工程
 
-本仓库保存工程方案、P1 隔离验证和 P2 最小公共层。
+明镜是 App 内面向组织授权用户的智能体应用。新开发采用 Python、PostgreSQL、Temporal 和 Pydantic AI。
 
 ## 当前项目状态
 
-P2 最小公共层已由 [PR #2](https://github.com/zhuquanwei111/mingjing---agent/pull/2)
-合并交付，当前公共层实现及操作入口在 [core/README.md](core/README.md)。
+新任务从[路线 B 开发包](mingjing-codex-engineering-v2/README.md)进入。[选型 ADR](docs/adr/0002-route-b-foundation.md)记录技术决定，[切换任务账](docs/tasks/route-b-foundation.md)记录当前开发与验收状态。旧包和已交付代码按[旧资产表](mingjing-codex-engineering-v2/legacy.md)维护。
+
+历史 P2 最小公共层已由 [PR #2](https://github.com/zhuquanwei111/mingjing---agent/pull/2)
+合并交付，其兼容维护与操作入口在 [core/README.md](core/README.md)。
 后续新阶段交付时同步更新本入口。新任务先核对实际分支、HEAD 和该提交的检查结果，
 不要把这里的阶段记录或旧日志当作当前候选已经通过的证明。
 
@@ -46,7 +48,7 @@ Daytona 跑完整验收前需确认其当前 Docker/Compose 能力。
 
 ## 项目资料
 
-- [方案入口](mingjing-codex-engineering-v1/README.md)
+- [新开发包](mingjing-codex-engineering-v2/README.md) · [旧工程包](mingjing-codex-engineering-v1/README.md)
 - [P1 运行与复现说明](p1-walking-skeleton/README.md)
 - [P2 接口与操作手册](core/README.md)
 - [开发流程的来源与适配说明](docs/development.md#采用依据与核验版本)

@@ -1,5 +1,7 @@
 # Mingjing P1 Walking Skeleton
 
+> 本目录用于既有 P1 验收与恢复回归。路线 B 的新开发使用[新开发包](../mingjing-codex-engineering-v2/README.md)。
+
 这是 [P1 执行计划](../mingjing-codex-engineering-v1/P1_EXECUTION_PLAN.md) 的隔离验证仓库。所有数据、身份、模型输出和外部回执均由测试夹具生成。验收结论和证据索引见 [P1_REPORT.md](P1_REPORT.md)。
 
 `record_marker@1` 通过普通 HTTP API、Temporal Workflow 和受控 LangGraph 工具调用同一个 PostgreSQL 执行边界。API 使用回环地址。Worker 和 API 在独立进程运行。Temporal 主库、可见性库与明镜业务库分库分角色，业务数据库保存任务、审批、预算、收据及审计。Workflow History 保存执行与重放事件。产物字节使用试验目录，版本和读取权限按业务库记录判断。

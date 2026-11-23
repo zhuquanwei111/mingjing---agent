@@ -1,5 +1,7 @@
 # 明镜 Mingjing — Codex 工程交付包 v1.0
 
+> 历史交付包。下列“当前决策”记录 v1 当时的候选。新开发使用[路线 B 开发包](../mingjing-codex-engineering-v2/README.md)，旧资产的维护方式见[处置表](../mingjing-codex-engineering-v2/legacy.md)。
+
 日期：2026-11-19
 工程类型：全新仓库，代码优先，分阶段验证。
 
