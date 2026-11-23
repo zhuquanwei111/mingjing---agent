@@ -1,0 +1,41 @@
+services:
+  witness-db:
+    image: docker.io/library/postgres@sha256:e80acae3f1109e8e4533618b594918936f2858c63afc7204c4773148a673add8
+    environment:
+      POSTGRES_USER: witness
+      POSTGRES_PASSWORD: ${WITNESS_PASS:?}
+    volumes: [witness_round:/var/lib/postgresql/data]
+    healthcheck:
+      test: [CMD, pg_isready, -U, witness]
+      interval: 2s
+      timeout: 3s
+      retries: 60
+  provider:
+    image: ${P2_PROJECT:?}-round
+    volumes:
+      - ${LAB_DIR:?}:/exp:ro
+    command: [python, -u, /exp/witness.py]
+    environment:
+      WITNESS_DSN: postgresql://witness:${WITNESS_PASS:?}@witness-db/witness
+    healthcheck:
+      test: [CMD, python, -c, "import urllib.request; urllib.request.urlopen('http://localhost:8080/ready',timeout=2).close()"]
+      interval: 2s
+      timeout: 3s
+      retries: 35
+  controller:
+    image: ${P2_PROJECT:?}-round
+    init: true
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    volumes:
+      - ${LAB_DIR:?}:/exp:ro
+      - ${LAB_OUT:?}:/out
+    command: [python, -u, /exp/driver.py]
+    environment:
+      PRODUCT_DSN: postgresql://${P2_PROJECT:?}:${PRODUCT_PASS:?}@db/${P2_PROJECT:?}
+      WITNESS_DSN: postgresql://witness:${WITNESS_PASS:?}@witness-db/witness
+      NAMESPACE: ${P2_PROJECT:?}
+      TEST_HEAD: ${TEST_HEAD:?}
+      CI_RUN: ${CI_RUN:?}
+volumes:
+  witness_round:
