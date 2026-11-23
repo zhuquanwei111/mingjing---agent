@@ -23,6 +23,7 @@ def configuration(c, **cfg):
 def gate_fixture(c, name):
     cfg=settings(c)
     if cfg.get("hold")!=name:return
+    if cfg.get("after_first_tool") and not any(k=="tool" for k,_ in events(c)):return
     record(c,"barrier",{"name":name})
     deadline=time.monotonic()+70
     while settings(c).get("hold")==name:
@@ -55,14 +56,26 @@ def model_reply(c, backend, body):
         reply={"id":"chatcmpl-lab","object":"chat.completion","created":int(time.time()),"model":body["model"],"choices":[{"index":0,"message":msg,"finish_reason":"tool_calls" if next_call else "stop"}],"usage":{"prompt_tokens":10,"completion_tokens":5,"total_tokens":15}}
     record(c,"model_reply",{"backend":backend,"message":reply["choices"][0]["message"]})
     return reply
+plugin_handlers={}
+def deploy_plugin(name,handler):
+    if name in plugin_handlers:raise RuntimeError("duplicate external module")
+    plugin_handlers[name]=handler
+
 def receive(c, a, data):
     cfg=settings(c)
     if a=="tool":
         record(c,a,data)
         name=data["name"]; args=data["args"]
         if name=="read_manifest": return {"value":cfg["key"]}
+        if name=="item_state" and "quality" in cfg and args.get("key")==cfg["key"]:
+            return {"value":json.dumps(cfg["quality"])}
         if name=="item_state": return {"value":"ready" if args.get("key")==cfg["key"] else "invalid-key"}
-        return {"value":json.dumps(args,sort_keys=True)}
+        if name not in plugin_handlers:raise KeyError("missing capability implementation")
+        return {"value":plugin_handlers[name](args)}
+    if a=="quality_policy":
+        record(c,a,{"available":cfg.get("validator",True)})
+        if not cfg.get("validator",True):raise RuntimeError("validator unavailable")
+        return {"required":["left","right"],"version":"v1"}
     if a in ("supplier_send","charge"):
         op=data["op"]
         with db() as con:
@@ -73,7 +86,7 @@ def receive(c, a, data):
         record(c,a,data)
         with db() as con:
             exists=con.execute("select 1 from effects where scope=%s and op=%s",(c,data["op"])).fetchone()
-        return {"known":bool(exists) and (a=="charge_lookup" or not cfg.get("unverifiable"))}
+        return {"known":bool(exists) and (a=="charge_lookup" or not cfg.get("unverifiable")),"units":2}
     record(c,a,data)
     return {"value":cfg.get("key","synthetic"),"ok":True}
 class Handler(BaseHTTPRequestHandler):

@@ -1,5 +1,6 @@
 """Identical black-box scenarios, independent receivers and failure injection."""
 import asyncio, hashlib, importlib, json, os, secrets, subprocess, sys, threading, time, traceback, uuid
+from pathlib import Path
 from datetime import timedelta
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from urllib.error import HTTPError
@@ -7,6 +8,7 @@ from temporalio.client import Client
 from ports import request
 from shared_input import BASE, challenge
 import witness as w
+import psycopg
 route=os.environ["LAB_ROUTE"]
 app=importlib.import_module(route+".runtime")
 workers=[]; scopes=[]; handles=[]
@@ -76,8 +78,16 @@ async def v01():
 async def v02():
     spec=challenge(); data={k:"value-"+k for k in spec["fields"]}; name=spec["name"]
     c=scope("new",challenge={"name":name,"args":data})
+    core_files=sorted(Path("/lab",route).glob("*.py"))
+    def hashes():return {f.name:hashlib.sha256(f.read_bytes()).hexdigest() for f in core_files}
+    before=hashes()
+    from plugin_fixture import verify_receipt
+    w.deploy_plugin(name,verify_receipt)
     app.install(spec,True);app.allow_tool(c,name)
-    expected={"value":json.dumps(data,sort_keys=True)}
+    canonical="|".join(data[k][::-1] for k in sorted(data))
+    expected={"value":"receipt-"+hashlib.sha256(canonical.encode()).hexdigest()}
+    check(before==hashes(),"runtime files changed after plugin registration")
+    emit("FROZEN_CORE",{"before":before,"after":hashes(),"business_package_sha":hashlib.sha256(Path("/lab/plugin_fixture.py").read_bytes()).hexdigest()})
     check(direct(c,name,data)==expected,"direct result")
     check(await run(c,"tool",{"name":name,"data":data})==expected,"workflow result")
     check(count(c,"model")==0,"deterministic path invoked model")
@@ -90,11 +100,13 @@ async def v02():
         for channel in ("api","flow","agent"):
             guard={"name":bad,"args":body}
             w.configuration(c,challenge=guard)
+            refused=False
             try:
                 if channel=="api":direct(c,bad,body)
                 elif channel=="flow":await run(c,"tool",{"name":bad,"data":body})
                 else:await run(c,"agent",agent_args(offered=[bad],user="Verify"))
-            except Exception:pass
+            except Exception:refused=True
+            check(refused or channel=="agent","deterministic entry accepted invalid request")
             check(count(c,"tool")==3,"negative reached external tool via "+channel)
     emit("EXTENSION",{"spec":spec,"receiver_calls":count(c,"tool"),"runtime_changes_after_challenge":0})
 async def v03():
@@ -102,22 +114,39 @@ async def v03():
     observed=["read","model","tool","commit","deliver"]
     for mode in ("staged","continuous"):
         good=scope("allow-"+mode)
-        check(await run(good,mode,stages)=="ok" and all(count(good,s)==1 for s in observed),"permissions positive")
+        check(await run(good,mode,{"steps":stages} if mode=="staged" else stages)=="ok" and all(count(good,s)==1 for s in observed),"permissions positive")
         for idx,action in enumerate(stages):
-            c=scope("revoke-"+mode+"-"+action,hold=action)
-            h=await start(c,mode,stages)
-            await wait_for(c,lambda ev:any(k=="barrier" for k,d in ev))
+            c=scope("revoke-"+mode+"-"+action,hold=action if mode=="continuous" else "")
+            h=await start(c,mode,{"steps":stages,"pause":action} if mode=="staged" else stages)
+            if mode=="staged":
+                async with asyncio.timeout(45):
+                    while await h.query("paused")!=action:await asyncio.sleep(.1)
+            else:await wait_for(c,lambda ev:any(k=="barrier" for k,d in ev))
             app.revoke(c,action)
-            w.configuration(c,hold="")
+            if mode=="staged":await h.signal("release")
+            else:w.configuration(c,hold="")
             check(await h.result()=="denied" and app.state(c)["product"]=="denied","missing denial")
             counts=[count(c,s) for s in observed]
             check(counts==[1]*idx+[0]*(5-idx),counts)
             hist=await h.fetch_history()
             check(w.settings(c)["key"].encode() not in b"".join(e.SerializeToString() for e in hist.events),"sensitive marker in history")
+    for action,model_count in (("model",1),("tool_out",2)):
+        c=scope("native-revoke-"+action,hold="agent_"+action,after_first_tool=True)
+        h=await start(c,"agent",agent_args())
+        await wait_for(c,lambda ev:any(k=="barrier" for k,d in ev))
+        app.revoke(c,action);w.configuration(c,hold="")
+        try:await h.result()
+        except Exception:pass
+        check(count(c,"tool")==1 and count(c,"model")==model_count,"cached result escaped via native Agent")
+    c=scope("supplier-revoked",hold="supplier_gate")
+    h=await start(c,"supplier")
+    await wait_for(c,lambda ev:any(k=="barrier" for k,d in ev))
+    app.revoke(c,"commit");w.configuration(c,hold="")
+    check(await h.result()=="denied" and count(c,"supplier_send")==0 and app.state(c)["held"]==0,"supplier released data after revocation")
 async def v04():
     for mode,unverifiable in (("confirm",False),("unknown",True),("cancel",True)):
         c=scope(mode,hold="after_effect",lose=True,unverifiable=unverifiable)
-        h=await start(c,"supplier")
+        h=await start(c,"supervise")
         await wait_for(c,lambda ev:any(k=="barrier" for k,d in ev))
         with w.db() as db:check(db.execute("select count(*) from effects where scope=%s",(c,)).fetchone()[0]==1,"commit-before-kill")
         kill_worker()
@@ -128,7 +157,8 @@ async def v04():
         if mode=="cancel":
             try:await h.result()
             except Exception:pass
-            app.callback(c,True);app.callback(c,True)
+            w.configuration(c,unverifiable=False)
+            app.late_callback(c);app.late_callback(c)
             desc=await h.describe()
             check("CANCEL" in desc.status.name,"engine cancel not terminal")
         else:
@@ -138,17 +168,25 @@ async def v04():
         events=w.events(c);state=app.state(c)
         check(count(c,"supplier_send")==1 and count(c,"downstream")==int(mode=="confirm"),events)
         check(state["op"][1]==int(mode!="unknown"),state)
-        if mode=="cancel":check(state["product"]=="cancelled",state)
+        check((state["held"],state["spent"])==((3,0) if mode=="unknown" else (0,2)),state)
+        if mode=="cancel":
+            check(state["product"]=="cancelled",state)
+            child=client.get_workflow_handle(h.id+"-supplier")
+            child_history=await child.fetch_history()
+            check(any("CANCEL" in e.DESCRIPTOR.fields_by_name["event_type"].enum_type.values_by_number[e.event_type].name or "TERMINATED" in e.DESCRIPTOR.fields_by_name["event_type"].enum_type.values_by_number[e.event_type].name for e in child_history.events),"missing engine cancellation propagation")
         with w.db() as db:check(db.execute("select count(*) from effects where scope=%s",(c,)).fetchone()[0]==1,"duplicate remote effect")
         emit("RECOVERY",{"mode":mode,"account":state,"events":[k for k,d in events]})
 async def v05():
     for items,version,validator,ok in [(["left"],"v1",True,False),(["left","right"],"v0",True,False),(["left","right"],"v1",False,False),(["left","right"],"v1",True,True)]:
-        c=scope("quality");data={"items":items,"version":version,"validator":validator}
+        c=scope("quality",quality={"items":items,"version":version},validator=validator);data={"items":items,"version":version,"validator":validator}
         check(direct(c,"read_manifest",{"resource":"bundle"})=={"value":w.settings(c)["key"]},"tool success")
-        result=await run(c,"quality",data)
+        result=await run(c,"quality",{})
+        check(count(c,"tool")==3,"missing raw quality evidence")
         check(result==app.state(c)["product"]==("succeeded" if ok else "review"),result)
         check(count(c,"commit")==count(c,"deliver")==int(ok),"incorrect delivery")
-        emit("QUALITY",{"input":data,"rule":"v1","state":result})
+        expected="complete" if ok else "unavailable" if not validator else "version" if version!="v1" else "missing"
+        check(app.verdict(c)==(expected,"v1"),app.verdict(c))
+        emit("QUALITY",{"input":data,"rule":"v1","state":result,"reason":expected})
 async def v06():
     c=scope("race",hold="reserved");h=await start(c,"family",["one","two","three"])
     await wait_for(c,lambda ev:sum(k=="budget_denied" for k,d in ev)==2 and any(k=="barrier" for k,d in ev))
@@ -159,6 +197,12 @@ async def v06():
     check(await run(c,"child",winner)=="settled","duplicate")
     check(await run(c,"child","extra")=="settled" and await run(c,"child","over")=="blocked","remaining quota")
     state=app.state(c);check(state["spent"]==4 and state["held"]==0 and count(c,"charge")==2,state)
+    with psycopg.connect(os.environ["LAB_APP_DSN"]) as conn:
+        transitions=conn.execute("select spent,held from snapshots where scope=%s",(c,)).fetchall()
+    check(transitions and all(0<=s+h<=5 for s,h in transitions),transitions)
+    with w.db() as conn:
+        check(conn.execute("select count(*) from effects where scope=%s and kind='charge'",(c,)).fetchone()[0]==2,"independent charge count")
+    emit("BUDGET_TRANSITIONS",transitions)
     for hold in ("reserved","charged"):
         c=scope("late-"+hold,hold=hold);h=await start(c,"family",["only"])
         await wait_for(c,lambda ev:any(k=="barrier" for k,d in ev))
@@ -170,6 +214,10 @@ async def v06():
         check(count(c,"charge")==int(hold=="charged") and state["product"]=="cancelled",state)
         check((state["spent"],state["held"])==((2,0) if hold=="charged" else (0,3)),state)
         check(out==(["settled"] if hold=="charged" else ["unknown"]),out)
+        with psycopg.connect(os.environ["LAB_APP_DSN"]) as conn:
+            snapshots=conn.execute("select spent,held from snapshots where scope=%s",(c,)).fetchall()
+        check(snapshots and all(0<=s+h<=5 for s,h in snapshots),snapshots)
+        emit("BUDGET_TRANSITIONS",snapshots)
         emit("SHARED_BUDGET",{"hold":hold,"state":state,"summary":out})
 async def main():
     global client

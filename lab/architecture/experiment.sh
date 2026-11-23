@@ -12,7 +12,7 @@ REVOKE CONNECT ON DATABASE :"who" FROM PUBLIC;
 SQL
 opts=(-e LAB_ROUTE -e LAB_NS -e LAB_REV -e LAB_APP_DSN -e LAB_WITNESS_DSN -e LAB_TOKEN -e LAB_ADMIN_TOKEN -e PYTHONDONTWRITEBYTECODE=1 -e PYTHONUNBUFFERED=1)
 mounts=()
-for f in ports.py shared_input.py witness.py worker.py suite.py; do mounts+=(-v "$fixture/$f:/lab/$f:ro"); done
+for f in ports.py shared_input.py witness.py worker.py suite.py plugin_fixture.py; do mounts+=(-v "$fixture/$f:/lab/$f:ro"); done
 mounts+=(-v "$fixture/$route:/lab/$route:ro")
 if [[ "$route" = a ]]; then
   dc run --rm -T --no-deps migrate
