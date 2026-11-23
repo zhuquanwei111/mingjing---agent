@@ -1,29 +1,33 @@
 # 工程目录治理与开发交付包迁移
 
-**状态：第一段完成目录职责与文档索引草案；实际目录迁移未开始。独立架构终审结论为“需修订后复审”，业务开发维持暂停。**
+**状态：第一阶段已建立文档索引与长期治理规则；实际 v1/v2 迁移仍待独立审查。PR #14 已确认调整后的路线 B 为开发基线，W0/MVP 尚未完成。**
 本任务依据用户在独立架构评审结束后启动目录整理的授权，处理文档/旧包位置和文档权威问题，**不代表用户授权合并、发布或恢复新开发**。
 
 ## 冻结对象与当前事实
 
-- 本次基线：`main` `3b5b9d2c285de011c523174d794792eb7cafbd97`；独立分支 `docs/directory-governance-20261123`。
+- 初始基线为 `main` `3b5b9d2c285de011c523174d794792eb7cafbd97`；PR #14 合并后主分支为 `ef8bb05c79d02004d66e48e5ee8dc55c5491c723`，当前目录治理分支为 `docs/directory-governance-20261123`。
 - 明镜根规则、通用规范 `engineering-standard/`、旧 v1 包 `mingjing-codex-engineering-v1/`、代码 `core/` 和 `p1-walking-skeleton/` 已存在。
-- 路线 B v2 开发包仍位于 [PR #6](https://github.com/zhuquanwei111/mingjing---agent/pull/6) 的分支；[PR #7](https://github.com/zhuquanwei111/mingjing---agent/pull/7) 是架构审查请求与候选；[PR #8](https://github.com/zhuquanwei111/mingjing---agent/pull/8) 是独立 Reviewer 机制的调整。各 PR 的实际状态以执行时 GitHub 为准。
-- **最新独立评审证据：**[PR #7 的独立架构终审评论](https://github.com/zhuquanwei111/mingjing---agent/pull/7#issuecomment-7099754918) 对固定材料给出的结论为**“需修订后复审；路线 B 仅为条件性 W0 候选”**。RB-01 至 RB-07 涉及准入、状态一致性、撤权、未知结果和预算、质量交付、选型比较与许可、恢复和运营，原设计者需逐项答复、修订并复审。审查已结束，但**没有准入通过或恢复开发授权**。
+- 路线 B v2 开发包仍在 [PR #6](https://github.com/zhuquanwei111/mingjing---agent/pull/6) 未合并；[PR #7](https://github.com/zhuquanwei111/mingjing---agent/pull/7) 和 [PR #8](https://github.com/zhuquanwei111/mingjing---agent/pull/8) 均已合并，[PR #14](https://github.com/zhuquanwei111/mingjing---agent/pull/14) 为最新的完整产品架构终裁。各 PR 实际状态须在任务运行时复核。
+- **当前独立终裁：**[PR #14 完整产品终裁](https://github.com/zhuquanwei111/mingjing---agent/pull/14) 已把调整后的 B 作为开发基线，[终裁正文](../designs/whole-product-decision.md)明确模型出口与 Agent 工具回合恢复两个调整。PR #7 先前的“需修订后复审”属于**历史阶段**；W0/MVP 开发和上线仍要单独授权/验收。
 
 ## 本次已完成的安全准备
 
 1. 新建 [文档索引](../index.md)，以当前代码和工程规范为权威入口，并准确标识 v1 为历史资料、v2 为未合并候选、A/B 为独立实验。
-2. 新建 [目录职责与迁移映射](../repository-layout.md)，保留执行资产在根目录、文档类交付包分类归入 `docs/`，列出保持规则与引用不断裂的迁移验收。
+2. 新建 [目录职责与迁移映射](../repository-layout.md)并纳入 W0/MVP 后续阶段治理规则；在根 `AGENTS.md` 中增加执行要求，用 CI 对索引/规则入口持续检查。
 3. 暂不移动历史交付包或修改运行命令。所有正式开发保持暂停，不对进行中的 PR 进行推送、强制更新、合并或归档。
 
 ## 后续必须完成
 
-- [x] 已读取独立评审**原文**并确认结论为需修订后复审；已将其链接到文档索引。
-- [ ] 原设计者需处理 RB-01–RB-07，取得受影响范围的独立复审及用户重大取舍的确认；**在此之前不得把 v2 候选升级为正式现行架构**。
+- [x] 已核对早期 PR #7 与后续 PR #14 的不同结论，将 PR #14 最新裁决和 W0/MVP 未完成边界接入索引。
+- [ ] PR #6 v2 开发包迁移前核对是否体现 PR #14 的两项设计调整和完整产品验收边界；同步其他在途 PR 的路径差异。
 - [ ] 给出逐文件迁移清单，并让独立 Reviewer 审查其对根规则、CI、Skills、历史引用、并行 PR 的影响。
 - [ ] 在独立迁移分支进行 v1 历史包移动，并在允许后根据实际采纳的架构方案处理 v2。处理所有源文件与 Markdown 的实际引用，禁止丢失仍有效规则。
 - [ ] 运行 `make check`、相对文档链接/技能检测、适用测试与 GitHub 当前 head 的 CI；对不可验证的路径和本地环境如实记录。
 - [ ] 提交目录迁移独立 Draft PR，提供 rename 摘要、对照清单、审查问题处理和完整验证结果，由用户决定是否合并。
+
+## 长期维护与完成条件
+
+W0 最短贯通、正式 MVP 及之后的重要功能/架构/目录变更在每个 PR 中重复执行：从 `docs/index.md` 核对现行状态，评估 README、架构/ADR、任务、运行手册和验收的影响；同步改动或说明不适用。`make check` 在 CI 检查必需入口及本地链接；审查者须检查内容和实际实现一致。迁移 v1/v2 仍是未完成的独立任务，不因本次索引合并而自动判为完成。
 
 ## 原则与恢复
 

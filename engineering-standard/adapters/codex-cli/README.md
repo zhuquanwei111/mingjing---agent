@@ -1,6 +1,6 @@
 # 用 Codex CLI 执行方案评审关卡
 
-适用于项目要求实质技术取舍先独立评审的任务。由原设计 Agent 在进入实现时调用[执行脚本](start_implementation.py)。技术适配使用 Git、Python 3.9+、macOS 或 Linux，以及支持所列选项、已有 ChatGPT 登录的 Codex CLI。
+**此 CLI 关卡现为备用路径，现有代码和强隔离能力不删除。** 方案评审优先由主 Agent 通过项目 [原生子代理角色](../../agents/solution-reviewer.toml)启动新独立上下文，等待真实问题回流；无需证明强制只读权限。子代理当前环境不可用、未收到任务或回流失败时，再由原设计 Agent 在进入实现时调用[执行脚本](start_implementation.py)。技术适配使用 Git、Python 3.9+、macOS 或 Linux，以及支持所列选项、已有 ChatGPT 登录的 Codex CLI。
 
 ```sh
 python3 engineering-standard/adapters/codex-cli/start_implementation.py docs/requirements/example.md docs/tasks/example.md -- make check
@@ -13,6 +13,6 @@ python3 engineering-standard/adapters/codex-cli/start_implementation.py docs/req
 - **通过与复核。** 通过结论需要一项独立已结束的评审、有证据，且仅可保留可选建议。入口复核当前分支、提交、计划字节及工作区，再按显式参数启动后续命令。它传播命令的实际退出状态或 shell 信号码。在属于本任务的单一工作区运行，并行修改需要新评审。
 - **范围。** 这个关卡控制经该入口发起的命令。项目仍决定何时进入该阶段，并使用已有代码审查、服务器 CI 和人工合并。平台权限继续决定后续命令可做的动作。工具调用钩子覆盖及失败行为由客户端决定，不用作此关卡的失败拦截。
 
-首选能证明完整投递、无原历史及实际只读的原生子代理。该 CLI 入口可作为一条可核对的替代执行路径。在 CLI 也受限时，用户可在独立只读会话发起和转交意见。没有完整回执、有效权限或可行动结论时停在方案阶段。
+首选能确认完整任务投递、没有原设计聊天历史并且意见实际返回的原生子代理；不要求证明强制只读。如果原生流程不可用，此 CLI 入口仍是经过显式调用才生效的独立只读备用方案。在 CLI 也受限时允许用户启动全新独立会话并转交意见。缺少有效回执、证据或存在未解决的阻断问题时停在方案阶段。
 
 在真实任务上验证一次失败和修订后成功。保留输入 SHA、两次 reviewer 会话标识、结论和命令实际结果。CLI、认证或环境异常是待修复的阻断，保留状态并核对具体前置条件。[Codex 非交互模式](https://learn.chatgpt.com/docs/non-interactive-mode) · [Hooks 支持范围](https://learn.chatgpt.com/docs/hooks)

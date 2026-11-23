@@ -3,6 +3,7 @@ from pathlib import Path
 import unittest
 
 from scripts.check_development_docs import (
+    ENTRY_POINTS,
     PROJECT_SKILL,
     STANDARD_SKILL,
     check_package,
@@ -17,6 +18,11 @@ class DevelopmentDocsTests(unittest.TestCase):
         self.root = Path(temporary.name).resolve()
         self.package = self.root / "engineering-standard"
         self.package.mkdir()
+
+    def test_current_documentation_entrypoints_cannot_be_silently_dropped(self):
+        required = {"README.md", "AGENTS.md", "docs/index.md", "docs/repository-layout.md",
+                    "docs/designs/whole-product-decision.md"}
+        self.assertTrue(required.issubset(set(ENTRY_POINTS)))
 
     def test_package_can_be_checked_without_project_docs(self):
         (self.package / "README.md").write_text(
