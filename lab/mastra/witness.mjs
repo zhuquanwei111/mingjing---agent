@@ -20,15 +20,21 @@ setInterval(() => {
     db.prepare('UPDATE jobs SET receipt=? WHERE op=?').run(receipt,j.op);
     log(j.scope,'effect',{op:j.op,receipt});
   }
-  db.exec("INSERT OR IGNORE INTO fees SELECT e.seq,e.scope,'tool',1 FROM events e JOIN controls c USING(scope) WHERE e.kind='submit' AND c.enabled");
+  db.exec("INSERT OR IGNORE INTO fees SELECT e.seq,e.scope,'tool',1 FROM events e JOIN controls c USING(scope) WHERE e.kind='submit-http' AND c.enabled");
   db.exec('COMMIT');
 }, 50);
 
 const app = createServer(async (req,res) => {
   try {
     let body = ''; for await (const part of req) body += part;
-    const data = JSON.parse(body || '{}');
     const [,scope,action] = req.url.split('/');
+    if (action === 'v1' || action === 'submit') {
+      db.exec('BEGIN');
+      const seq = log(scope,action==='v1'?'model-http':'submit-http',{method:req.method,path:req.url,body});
+      if (action==='v1') db.prepare("INSERT INTO fees VALUES(?,?,'model',1)").run(seq,scope);
+      db.exec('COMMIT');
+    }
+    const data = JSON.parse(body || '{}');
     const reply = (status,obj) => {res.writeHead(status,{'Content-Type':'application/json'});res.end(JSON.stringify(obj));};
     if (action === 'setup') {
       db.prepare('INSERT INTO controls(scope) VALUES(?)').run(scope);
@@ -56,10 +62,15 @@ const app = createServer(async (req,res) => {
     if (action === 'v1') {
       const tool = data.messages.findLast(m=>m.role==='tool');
       const call = tool ? null : 'call_'+randomUUID().replaceAll('-','');
-      db.exec('BEGIN');
       const seq=log(scope,'model',{request:data,call});
-      db.prepare("INSERT INTO fees VALUES(?,?,'model',1)").run(seq,scope);
-      db.exec('COMMIT');
+      if (tool) {
+        const original=db.prepare('SELECT * FROM jobs WHERE scope=?').get(scope);
+        const paired=data.messages.flatMap(m=>m.tool_calls || []).filter(t=>t.id===tool.tool_call_id);
+        if (!original || paired.length!==1 || paired[0].function.name!=='inspect' ||
+            JSON.parse(tool.content).receipt!==original.receipt || tool.tool_call_id!==original.call_id) {
+          return reply(422,{error:'receipt or call mismatch'});
+        }
+      }
       if (tool) while (!controls(scope).release) await delay(50);
       const delta = tool ? {content:'inspection confirmed'} : {tool_calls:[{index:0,id:call,type:'function',function:{name:'inspect',arguments:'{}'}}]};
       const chunk = (d,reason) => ({id:'cmpl-'+seq,object:'chat.completion.chunk',created:1,model:'fixture',choices:[{index:0,delta:d,finish_reason:reason}]});

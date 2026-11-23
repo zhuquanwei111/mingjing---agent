@@ -47,6 +47,19 @@ jobs:
           for f in "$RUNNER_TEMP"/mastra/*-{start,recover}.log; do
             if test -f "$f"; then echo "$f"; tail -c 4200 "$f"; fi
           done
+      - name: Emit hash-verifiable copies of synthetic evidence
+        if: always()
+        run: |
+          python3 - <<'PYCODE'
+          import base64, gzip, hashlib, pathlib, os
+          for p in sorted((pathlib.Path(os.environ["RUNNER_TEMP"]) / "mastra").glob("*")):
+              if p.suffix in (".json", ".log"):
+                  data = p.read_bytes()
+                  encoded = base64.b64encode(gzip.compress(data,mtime=0)).decode()
+                  parts = [encoded[i:i+6000] for i in range(0,len(encoded),6000)]
+                  for i, part in enumerate(parts):
+                      print("MASTRA_COPY",p.name,hashlib.sha256(data).hexdigest(),i,len(parts),part)
+          PYCODE
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         if: always()
         with:

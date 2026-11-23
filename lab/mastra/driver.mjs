@@ -7,6 +7,7 @@ import { resolve } from 'node:path';
 import { DatabaseSync } from 'node:sqlite';
 import { setTimeout as delay } from 'node:timers/promises';
 import pg from 'pg';
+import { PostgresStore } from '@mastra/pg';
 
 const out=process.env.LAB_OUT;
 mkdirSync(out,{recursive:true});
@@ -43,8 +44,8 @@ async function scenario(scope) {
   const of=kind=>events().filter(e=>e.kind===kind);
   function counts() {
     const fees=read('fees');
-    return {tools:of('submit').length,effects:read('effects').length,toolFees:fees.filter(f=>f.kind==='tool').length,
-      models:of('model').length,modelFees:fees.filter(f=>f.kind==='model').length,deliveries:of('deliver').length};
+    return {tools:of('submit-http').length,effects:read('effects').length,toolFees:fees.filter(f=>f.kind==='tool').length,
+      models:of('model-http').length,modelFees:fees.filter(f=>f.kind==='model').length,deliveries:of('deliver').length};
   }
   async function snapshot(stage) {
     const schema='mastra_'+scope, tables={};
@@ -54,12 +55,22 @@ async function scenario(scope) {
       tables[tablename]=(await db.query('SELECT * FROM "'+schema+'"."'+tablename+'"')).rows;
     }
     save(scope+'-'+stage+'-framework',tables);
-    const snapshots=Object.entries(tables).filter(([t])=>t.includes('snapshot')).flatMap(([,v])=>v);
-    const encoded=JSON.stringify(snapshots);
+    const reader=new PostgresStore({id:'reader',pool:db,schemaName:schema});
+    const workflows=await reader.getStore('workflows');
+    const outer=await workflows.loadWorkflowSnapshot({workflowName:'durable-agentic-loop',runId:run});
+    const nestedRun=outer?.context?.['durable-agentic-execution']?.metadata?.nestedRunId || run;
+    const nested=await workflows.loadWorkflowSnapshot({workflowName:'durable-agentic-execution',runId:nestedRun});
+    save(scope+'-'+stage+'-logical',{run,nestedRun,outer,nested});
+    const encoded=JSON.stringify({outer,nested});
+    const physical=JSON.stringify(tables);
     const firstCall=of('model')[0]?.payload.call;
     const receipt=read('effects')[0]?.receipt;
-    const scan={running:encoded.includes('"running"'),rows:snapshots.length,run:encoded.includes(run),
-      call:!!firstCall&&encoded.includes(firstCall),prompt:encoded.includes(prompt),receipt:!!receipt&&encoded.includes(receipt)};
+    const markerScan=text=>({call:!!firstCall&&text.includes(firstCall),prompt:text.includes(prompt),receipt:!!receipt&&text.includes(receipt)});
+    const owners=Object.entries(tables).filter(([name])=>name.includes('owner')).flatMap(([,rows])=>rows);
+    const owner=owners.find(o=>o.runId===run);
+    const scan={running:outer?.status==='running',rows:Number(!!outer)+Number(!!nested),run:!!outer,
+      outerStatus:outer?.status,nestedStatus:nested?.status,nestedRun,outerSteps:Object.keys(outer?.context||{}),nestedSteps:Object.keys(nested?.context||{}),
+      owner:owner?{id:owner.ownerId,generation:owner.generation}:null,physical:markerScan(physical),...markerScan(encoded)};
     const state={stage,product:await product(),counts:counts(),scan,tables:Object.fromEntries(Object.entries(tables).map(([k,v])=>[k,v.length]))};
     save(scope+'-'+stage,state);console.log(scope,stage,JSON.stringify({counts:state.counts,scan,tables:state.tables}));
     return state;
@@ -82,7 +93,9 @@ async function scenario(scope) {
     await waitLive(first,()=>read('effects').length && counts().toolFees===1,'effect and fee');
     const before=await snapshot('before-kill');
     assert.equal(before.product.receipt,null);assert.equal(before.product.status,'inflight');
-    assert.ok(before.scan.rows>0&&before.scan.run&&before.scan.running);
+    assert.equal(before.scan.rows,2);assert.ok(before.scan.run&&before.scan.running);
+    assert.ok(before.scan.owner&&before.scan.call);
+    assert.deepEqual(before.scan.physical,{call:true,prompt:raw,receipt:false});
     assert.equal(before.scan.receipt,false);assert.equal(before.scan.prompt,raw);
     const originalCall=of('model')[0].payload.call;
     assert.equal(originalCall,before.product.call_id);
@@ -96,10 +109,15 @@ async function scenario(scope) {
       await waitLive(second,()=>of('model').some(e=>e.payload.request.messages.some(m=>m.role==='tool')),'resumed model');
       const after=await snapshot('tool-returned');
       assert.equal(after.scan.prompt,raw);assert.equal(after.scan.receipt,raw);
+      assert.deepEqual(after.scan.physical,{call:true,prompt:raw,receipt:raw});
+      assert.ok(Number(after.scan.owner?.generation)>Number(before.scan.owner.generation));
+      assert.notEqual(after.scan.owner?.id,before.scan.owner.id);
       await request('control',{release:true});assert.deepEqual(await second.exit,{code:0,signal:null});
       const models=of('model'),pair=models.at(-1).payload.request.messages.findLast(m=>m.role==='tool');
       assert.ok(models[0].payload.request.messages.some(m=>typeof m.content==='string'&&m.content.includes(prompt)));
-      assert.ok(pair.content.includes(read('effects')[0].receipt));assert.equal(pair.tool_call_id,originalCall);
+      assert.deepEqual(JSON.parse(pair.content),{receipt:read('effects')[0].receipt});assert.equal(pair.tool_call_id,originalCall);
+      const sentCalls=models.at(-1).payload.request.messages.flatMap(m=>m.tool_calls||[]).filter(t=>t.id===originalCall);
+      assert.equal(sentCalls.length,1);assert.equal(sentCalls[0].function.name,'inspect');
       const c=counts();assert.equal(c.effects,1);assert.equal(c.modelFees,c.models);assert.equal(c.toolFees,c.tools);
       assert.equal(c.deliveries,1);assert.equal(of('deliver')[0].payload.receipt,read('effects')[0].receipt);
       if(raw) assert.ok(c.tools>1||c.models>2,'no native duplicate observed');
