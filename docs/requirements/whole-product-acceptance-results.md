@@ -15,18 +15,18 @@
 | G01 产品边界和事实权威 | P2 产品对象/业务账 | 自有宿主+产品账/引擎 | 应用作业+外账 | PG 产品/引擎分库 | PG 运行快照+外账 | 队列/运行+产品账 |
 | G02 选型和复用 | 改造原执行核，#5 对照 | 组件组合与新公共适配 | 完整应用+治理出口 | 嵌入引擎+PG | Node 原生运行器+PG | 完整宿主+外部执行 |
 | G03 受理、目标与结果可读 | 合成任务 | 合成任务、无真实用户闭环 | 作业 API，未验业务受理 | 执行 ID，未验需求理解 | run ID，未验业务受理 | HTTP 受理，未验需求理解 |
-| G04 按需推理与真实循环 | LangGraph 动态循环 | 受控 0/1/2 工具，真实任务 0/2 条件 | 动态一工具、两轮 | 原生延迟工具一回合 | 原生 durable Agent 一回合 | 暂停、原号回填一回合 |
+| G04 按需推理与真实循环 | 受控 0/1/2 工具，真实任务 0/2 条件，须自建分派/配对 | 受控 0/1/2 工具，真实任务 0/2 条件，SDK 配对 | 动态一工具、两轮 | 原生延迟工具一回合 | 原生 durable Agent 一回合 | 暂停、原号回填一回合 |
 | G05 依赖、异步与协作 | #5 子任务与取消切片 | #5 子工作流，#12 等待 | 原生流程/子作业树 | 待核与取消本地工作流 | 两层挂起快照 | 持久暂停+原生取消 |
-| G06 运行边界与共享预算 | #5 并发父额度 | #5 父额度；#10 迟到 | 单操作预留；模型断连对照 | 单操作预留/核销 | 单操作预留/核销 | 单操作预留/核销 |
-| G07 异构能力和扩展 | 既有契约内扩展 | 同步样本三入口；异步一入口 | 两个脚本+一个 Flow | 一种外部工具适配 | 一种外部工具适配 | 同一异步能力三入口正例 |
+| G06 运行边界与共享预算 | #5 并发父额度 | #5 父额度；#10 迟到；#12 逐轮认领 | 单操作预留；模型断连对照 | 单操作预留/核销 | 单操作预留/核销 | 单操作预留/核销 |
+| G07 异构能力和扩展 | 同步固定契约三入口，核心指纹相同 | 同一同步三入口及指纹；新增异步一入口 | 两个脚本+一个 Flow | 一种外部工具适配 | 一种外部工具适配 | 同一异步能力三入口正例 |
 | G08 发现、发布与调用门禁 | 角色/发布负例 | #5 部分门禁，命令提供候选 | 公开脚本登记，未测发现 | 未比较目录发现 | 未比较目录发现 | 已知工具，未测发现 |
 | G09 模型可换、降级可查 | SDK/模型协议切片 | #5/#10 SDK；完整降级未测 | 流式代理与断回执，未测降级 | 同一 SDK，未测降级 | 单模型协议，未测降级 | 固定 OpenAIChat 映射，未测降级 |
 | G10 上下文、会话及可选长期记忆 | 未测上下文压缩 | 受限正文外置，模型/历史取样 | 默认/受控映射实查 | 产品检查点、引用 | 默认/受控快照实查 | 默认/引用各四个落点 |
 | G11 业务事实、资料及生命周期 | 未测资料撤回链 | 未测资料撤回链 | 未测资料撤回链 | 未测资料撤回链 | 未测资料撤回链 | 未测资料撤回链 |
 | G12 产物、质量与事后评测 | #5 正负交付 | #5 正负交付；#6 为独立库 | 按回执交付，未验 AC-15 | 同左，未验 AC-15 | 同左，未验 AC-15 | 同左，未验 AC-15 |
 | G13 任务、运行与用户状态 | 历史与状态切片 | 账、运行、尝试/待核 | 作业树与产品状态 | 工作流状态与产品账 | 外嵌两层状态与产品账 | session/run/票据与产品账 |
-| G14 持久执行与恢复 | 原机制故障恢复 | 真实 Worker 重入、回合检查点 | 工具脚本重入/原作业 | 嵌入执行器及双进程接管 | 原生租约转移/快照 | 已持久暂停后重启续接 |
-| G15 取消、未知及跨组件对账 | #5 取消/未知切片 | #10/#12 迟到/错配/未知 | 默认/治理模型及工具出口 | 裸步骤重复/治理对照 | 裸步骤重复/治理对照 | 未知、重复继续和产品状态 |
+| G14 持久执行与恢复 | 原机制故障恢复 | 真实 Worker 重入、活跃未知回执后续原回合 | 工具脚本重入/原作业 | 嵌入执行器及双进程接管 | 原生租约转移/快照 | 已持久暂停后重启续接 |
+| G15 取消、未知及跨组件对账 | #5 取消/未知切片 | #10/#12 迟到、错配、未知；撤权仅结算 | 默认/治理模型及工具出口 | 裸步骤重复/治理对照 | 裸步骤重复/治理对照 | 未知、重复继续和产品状态 |
 | G16 身份、隔离与运行中撤权 | 受控域；P2 旧同库终核 | #5/#11 单域，实际业务方未接 | 合成取消与代理；无真实 IAM | 有权/取消，不作全面撤权证据 | 产品取消，未测并发撤权 | 暂停后撤权、网关拒绝 |
 | G17 不可信内容与执行环境 | 越权工具拒绝；无第三方沙盒结论 | 同一类拒绝；恢复后真实沙盒未验 | 未评不可信脚本隔离 | 未评第三方执行器 | 未评第三方执行器 | 未评第三方执行器 |
 | G18 审计与评测计量关联 | 测试轨迹与收端 | 历史载荷/操作关联 | 公共表与协议两端 | 引擎与外部步骤原始账 | PG 快照/独立收端 | 队列/运行/HTTP 与产品/模型阳性 |
@@ -37,6 +37,17 @@
 | G23 按任务类型测性能 | 无目标压测 | 无目标压测 | 无目标压测 | 无目标压测 | 无目标压测 | 无目标压测 |
 
 [B 原始记录](https://github.com/zhuquanwei111/mingjing---agent/tree/554367bf8528a9500a88bac4033ad15a5983b4de/lab/product-review/evidence/45190768318) · [Windmill 报告](https://github.com/zhuquanwei111/mingjing---agent/blob/c847da6c10608f33ba0d88277d20400885afc04d/lab/windmill-native/REPORT.md) · [DBOS 报告及失败记录](https://github.com/zhuquanwei111/mingjing---agent/blob/75d6fccf821c5ebcd70cd837f8fa52a3e78cf936/lab/dbos/RESULT.md) · [Mastra 报告与完整锁](https://github.com/zhuquanwei111/mingjing---agent/blob/a9b6570419f6f6877e824a4abcb889e3867e6517/lab/mastra/RESULT.md) · [Agno 报告与原始事件](https://github.com/zhuquanwei111/mingjing---agent/blob/60dc1965c4cea6d4e976ed40875f82403dbb386f/lab/agno-agentos/REPORT.md) · [A/B 的原始同题报告](https://github.com/zhuquanwei111/mingjing---agent/blob/553114d2114cc77081c415ad1697e74be282c9a8/lab/architecture/DECISION.md)
+
+### 首轮未通过项的修正与复验
+
+首轮独立总评从 FR-06/09/28/29/30/37、NFR-01/03/10、AC-08/14/16 的判据追查了两个相邻窗口。补测只填这两个窗口的证据；AC-16 多个子任务共享预算仍须引用 #5 的并发场景，不能用单个工具的模拟费证明。
+
+| 场景 | 从独立收端与产品账分别确认的结果 |
+| --- | --- |
+| 首轮模型收到请求并收费，原进程未得答复就退出 | 冻结的按任务计数接法实际发送两次、模拟收费两笔。改为按操作与轮次持久认领后，相同首轮只到达和模拟收费一次，保留模型预留 1、已确认 0；无工具效果及交付。 |
+| 外部工具已生效，先查不到，后有可信回执，两进程并发通知 | 活跃且有权的同一任务按原工具号/会话继续，实际工具发送、效果、工具模拟费、模型请求、交付依次为 1/1/1/2/1。先撤权的对应样本为 1/1/1/1/0；两个样本均只结算一次，两次实际查证均参与竞争。 |
+
+审查者从 CI 复算 9 份原件，核对 6 份真实 Temporal 历史的 44 个解码载荷。固定 SDK、单授权域、一个异步工具。目标身份域、正式交付回执丢失、供应商是否有可查终局仍各按本表阶段验收。[预注册](https://github.com/zhuquanwei111/mingjing---agent/blob/041c9683df779732b82f3e9c8161e509bac9dcbd/lab/product-review/round-gate/PLAN.md) · [固定结果与逐笔原件](https://github.com/zhuquanwei111/mingjing---agent/blob/300868efab379fa53ef0c49065b5cb6de36594ac/lab/product-review/round-gate/RESULT.md) · [受审代码的定向集成](https://github.com/zhuquanwei111/mingjing---agent/actions/runs/45195650384/job/137765260328)
 
 ## 原编号逐项填证
 
@@ -64,7 +75,7 @@
 | FR-01 多入口任务受理 | 局部实测 | 实验按任务键追溯请求，尚缺目标 App 的身份绑定和缺身份拒绝。 [#5](https://github.com/zhuquanwei111/mingjing---agent/pull/5) | W0a 受理并以相同主体读回。 |
 | FR-02 任务目标与约束识别 | 未实测 | 质量库可报缺项，尚无多要求、歧义输入生成正确任务结构的实测。 [#7](https://github.com/zhuquanwei111/mingjing---agent/pull/7) | W0a 接口澄清缺输入；对应 MVP 验真实多目标。 |
 | FR-38 用户可理解的过程与结果 | 未实测 | 实验记录能看出失败和未知，尚缺用户可读的进度、部分结果、等待原因和继续入口。 [#7](https://github.com/zhuquanwei111/mingjing---agent/pull/7) | W0a 用用户身份查询同一任务，首个业务 MVP 验可理解性。 |
-| AC-01 完成一次真实端到端任务 | 未实测 | 一次真实模型任务有 2 次请求、1 个工具，两个必需业务条件确认 0 项。无目标 App 受理至正式交付的真实闭环。 [#5](https://github.com/zhuquanwei111/mingjing---agent/pull/5) [#7](https://github.com/zhuquanwei111/mingjing---agent/pull/7) | W0 串通受控端到端；对应 MVP 验真实业务结果。 |
+| AC-01 完成一次真实端到端任务 | 未实测 | A、B 各跑一次真实模型任务，每路 2 次请求、1 个工具，两个必需业务条件均确认 0 项。无目标 App 受理至正式交付的真实闭环。 [#5](https://github.com/zhuquanwei111/mingjing---agent/pull/5) [#7](https://github.com/zhuquanwei111/mingjing---agent/pull/7) | W0 串通受控端到端；对应 MVP 验真实业务结果。 |
 
 ### G04　按需推理与真实循环
 
@@ -99,10 +110,10 @@
 | 原编号与要求 | 本轮证据等级 | 已观察事实与证据范围 | 余项与最迟验证时间 |
 | --- | --- | --- | --- |
 | FR-10 异构能力接入 | 局部实测 | 普通同步与外部异步各有接法。Agno 一个已知工具经三入口使用；其他执行器没有通用通过结论。 [#5](https://github.com/zhuquanwei111/mingjing---agent/pull/5) [#12](https://github.com/zhuquanwei111/mingjing---agent/pull/12) [#17](https://github.com/zhuquanwei111/mingjing---agent/pull/17) | W0 验宿主契约；新执行类型启用之前验其专有语义。 |
-| FR-11 能力契约 | 局部实测 | 已记录同步描述及异步受理、回执/错配和版本语义。未证明接入者只靠契约即可集成任意类型。 [#5](https://github.com/zhuquanwei111/mingjing---agent/pull/5) [#12](https://github.com/zhuquanwei111/mingjing---agent/pull/12) [#17](https://github.com/zhuquanwei111/mingjing---agent/pull/17) | W0 给出可调用契约和失败示例；稳定后盲接。 |
+| FR-11 能力契约 | 局部实测 | 已记录同步描述及异步受理、回执/错配和版本语义。独立接入者只凭契约调用、处理错误仍待验。 [#5](https://github.com/zhuquanwei111/mingjing---agent/pull/5) [#12](https://github.com/zhuquanwei111/mingjing---agent/pull/12) [#17](https://github.com/zhuquanwei111/mingjing---agent/pull/17) | W0 给出可调用契约和失败示例；稳定后盲接。 |
 | FR-15 能力组合 | 机制实测 | 同一同步能力在直接、工作流、Agent 三入口各有实收；Agno 的一个异步能力亦验证三入口正例。 [#5](https://github.com/zhuquanwei111/mingjing---agent/pull/5) [#17](https://github.com/zhuquanwei111/mingjing---agent/pull/17) | W0 验各入口在失权/错误时保持一致规则。 |
-| FR-41 开发接入体验 | 局部实测 | 有受控接入示例、锁与契约。同一已知 schema 的手写转换不能证明开发者可独立接入任意能力。 [#5](https://github.com/zhuquanwei111/mingjing---agent/pull/5) [#12](https://github.com/zhuquanwei111/mingjing---agent/pull/12) [#17](https://github.com/zhuquanwei111/mingjing---agent/pull/17) | W0 验模板/错误契约；基础稳定后由未参与设计者盲接。 |
-| NFR-07 可扩展性 | 局部实测 | 记录过冻结公共文件后接入同步样本和新异步适配；尚无无限类型零侵入的依据。 [#5](https://github.com/zhuquanwei111/mingjing---agent/pull/5) [#12](https://github.com/zhuquanwei111/mingjing---agent/pull/12) [#17](https://github.com/zhuquanwei111/mingjing---agent/pull/17) | 每次新增执行类型记录核心差异，稳定后盲接。 |
+| FR-41 开发接入体验 | 局部实测 | 有受控接入示例、锁与契约。同一已知 schema 的手写转换尚未由独立接入者验证只凭契约调用和处理错误。 [#5](https://github.com/zhuquanwei111/mingjing---agent/pull/5) [#12](https://github.com/zhuquanwei111/mingjing---agent/pull/12) [#17](https://github.com/zhuquanwei111/mingjing---agent/pull/17) | W0 验模板/错误契约；基础稳定后由未参与设计者盲接。 |
+| NFR-07 可扩展性 | 局部实测 | 记录过冻结公共文件后接入同步样本和新异步适配；不同实现类型的公共机制复用范围和改动原因须持续验证。 [#5](https://github.com/zhuquanwei111/mingjing---agent/pull/5) [#12](https://github.com/zhuquanwei111/mingjing---agent/pull/12) [#17](https://github.com/zhuquanwei111/mingjing---agent/pull/17) | 每次新增执行类型记录核心差异，稳定后盲接。 |
 | AC-02 接入一种普通程序能力 | 局部实测 | 普通程序经直接调用和其他入口产生实际结果；新宿主目录、拒绝、实际受理及结果管理待验。 [#5](https://github.com/zhuquanwei111/mingjing---agent/pull/5) [#17](https://github.com/zhuquanwei111/mingjing---agent/pull/17) | W0a 走目标宿主的完整程序入口。 |
 | AC-17 基础链路稳定后接入事先未专门适配的中立新能力 | 未实测 | 已有固定核心后的动态字段样本和预先定义的异步工具，未完成目标基础链路稳定后的真正未知能力盲接。 [#5](https://github.com/zhuquanwei111/mingjing---agent/pull/5) [#12](https://github.com/zhuquanwei111/mingjing---agent/pull/12) [#17](https://github.com/zhuquanwei111/mingjing---agent/pull/17) | 基础链路稳定后冻结核心，由独立接入者选中立能力，核差异与原因。 |
 
@@ -161,7 +172,7 @@
 
 | 原编号与要求 | 本轮证据等级 | 已观察事实与证据范围 | 余项与最迟验证时间 |
 | --- | --- | --- | --- |
-| FR-28 持久化与恢复 | 机制实测 | 各有已生效、回执未记录时的真实中断/查单；五种路径的暂停点与重入方法有差异。 [#5](https://github.com/zhuquanwei111/mingjing---agent/pull/5) [#10](https://github.com/zhuquanwei111/mingjing---agent/pull/10) [#12](https://github.com/zhuquanwei111/mingjing---agent/pull/12) [#13](https://github.com/zhuquanwei111/mingjing---agent/pull/13) [#15](https://github.com/zhuquanwei111/mingjing---agent/pull/15) [#16](https://github.com/zhuquanwei111/mingjing---agent/pull/16) [#17](https://github.com/zhuquanwei111/mingjing---agent/pull/17) | W0b 核目标宿主其余必要中断点、旧版本及交付已发未回执。 |
+| FR-28 持久化与恢复 | 机制实测 | 各有已生效、回执未记录时的真实中断/查单；五种路径的暂停点与重入方法有差异。 [#5](https://github.com/zhuquanwei111/mingjing---agent/pull/5) [#10](https://github.com/zhuquanwei111/mingjing---agent/pull/10) [#12](https://github.com/zhuquanwei111/mingjing---agent/pull/12) [#13](https://github.com/zhuquanwei111/mingjing---agent/pull/13) [#15](https://github.com/zhuquanwei111/mingjing---agent/pull/15) [#16](https://github.com/zhuquanwei111/mingjing---agent/pull/16) [#17](https://github.com/zhuquanwei111/mingjing---agent/pull/17) | W0a 首次正式交付前验交付已发未回执；W0b 核其余必要 Agent 中断点与旧版本。 |
 | NFR-01 可靠性 | 机制实测 | 固定窗口真杀进程，区分安全结束、继续和持有待核，不同接管拓扑分别记账。 [#5](https://github.com/zhuquanwei111/mingjing---agent/pull/5) [#10](https://github.com/zhuquanwei111/mingjing---agent/pull/10) [#12](https://github.com/zhuquanwei111/mingjing---agent/pull/12) [#13](https://github.com/zhuquanwei111/mingjing---agent/pull/13) [#15](https://github.com/zhuquanwei111/mingjing---agent/pull/15) [#16](https://github.com/zhuquanwei111/mingjing---agent/pull/16) [#17](https://github.com/zhuquanwei111/mingjing---agent/pull/17) | W0a/b 核目标宿主所有必需窗口，上线前验灾备。 |
 | AC-08 人为断开服务、重复提交 | 机制实测 | 固定窗口真实中断、重试、查单。模型首轮及活跃回执的两项另按专项记录判定。 [#5](https://github.com/zhuquanwei111/mingjing---agent/pull/5) [#10](https://github.com/zhuquanwei111/mingjing---agent/pull/10) [#12](https://github.com/zhuquanwei111/mingjing---agent/pull/12) [#13](https://github.com/zhuquanwei111/mingjing---agent/pull/13) [#15](https://github.com/zhuquanwei111/mingjing---agent/pull/15) [#16](https://github.com/zhuquanwei111/mingjing---agent/pull/16) [#17](https://github.com/zhuquanwei111/mingjing---agent/pull/17) | W0a/b 目标宿主受理/交付/跨部署故障。 |
 
@@ -182,7 +193,7 @@
 | FR-32 身份与授权 | 局部实测 | 合成单域验读取后撤权、两种时序与首次交接。跨权威业务出口的实际最终拒绝待证。 [#5](https://github.com/zhuquanwei111/mingjing---agent/pull/5) [#10](https://github.com/zhuquanwei111/mingjing---agent/pull/10) [#11](https://github.com/zhuquanwei111/mingjing---agent/pull/11) | W0a/b 按真实身份逐出口验，失权后实际收端零新增。 |
 | FR-33 租户与数据隔离 | 局部实测 | 存在合成身份及跨范围拒绝。跨租户检索、缓存、外部处理和交付全链未验。 [#5](https://github.com/zhuquanwei111/mingjing---agent/pull/5) [#11](https://github.com/zhuquanwei111/mingjing---agent/pull/11) | W0 首个多租户宿主，真实各路径启用前逐口复测。 |
 | NFR-02 安全性 | 局部实测 | 业务动作核权和失权屏障有合成样本。真正业务端服务权限、防不可信输入与凭据隔离均未全验。 [#5](https://github.com/zhuquanwei111/mingjing---agent/pull/5) [#10](https://github.com/zhuquanwei111/mingjing---agent/pull/10) [#11](https://github.com/zhuquanwei111/mingjing---agent/pull/11) [#17](https://github.com/zhuquanwei111/mingjing---agent/pull/17) | W0 验首个真实出口；不可信执行器及每条生产路径启用前。 |
-| AC-13 暂停及持续运行中撤权 | 局部实测 | 合成暂停/持续两类撤权及五屏障，首次交接同一健康域。真实跨服务、缓存及四类实际出口待验。 [#5](https://github.com/zhuquanwei111/mingjing---agent/pull/5) [#10](https://github.com/zhuquanwei111/mingjing---agent/pull/10) [#11](https://github.com/zhuquanwei111/mingjing---agent/pull/11) | W0a/b 首个实际受限出口，其他出口启用前逐个验。 |
+| AC-13 暂停及持续运行中撤权 | 局部实测 | 合成暂停/持续两类撤权及五屏障，首次交接同一健康域。真实跨服务、缓存及五个观察点（读取、模型传输、工具传输、正式提交、受限交付）待验。 [#5](https://github.com/zhuquanwei111/mingjing---agent/pull/5) [#10](https://github.com/zhuquanwei111/mingjing---agent/pull/10) [#11](https://github.com/zhuquanwei111/mingjing---agent/pull/11) | W0a/b 首个实际受限出口，其他出口启用前逐个验。 |
 
 ### G17　不可信内容与执行环境
 

@@ -23,3 +23,5 @@
 首轮总评独立裁决暂缓，设计者接受并开出两个可隔离复测的窗口。两项均有明确失败去向和复审条件。见[固定受审稿](https://github.com/zhuquanwei111/mingjing---agent/commit/5a3c2c5cf2c00509e503fc4b44280390b0409bf5)。
 
 逐编号填证、23 组候选横向对照、方案判断按[原表验证结果](../requirements/whole-product-acceptance-results.md)回流。计费观测只作为特定硬门槛的证据。首轮暂缓的两个窗按 [#12 事前预注册](https://github.com/zhuquanwei111/mingjing---agent/blob/041c9683df779732b82f3e9c8161e509bac9dcbd/lab/product-review/round-gate/PLAN.md)执行。
+
+独立验收审查按原件和冻结主表，要求统一正式交付故障的 W0a 时点、拆出模型/工具两种实际传输、为 A/B 写入对称的真实模型和扩展证据、移除原件未要求的无限类型零改动标准。已按固定记录修正。#12 的两个相邻窗口、旧回归与持久原件已进入逐编号表。
