@@ -1,0 +1,30 @@
+name: Architecture competition
+on:
+  pull_request:
+    branches: [lab/architecture-20261123-base]
+permissions:
+  contents: read
+concurrency:
+  group: architecture-lab-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+jobs:
+  route-a:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          persist-credentials: false
+      - name: Run A in its disposable environment
+        run: bash lab/architecture/run.sh a
+  route-b:
+    needs: route-a
+    if: ${{ !cancelled() }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          persist-credentials: false
+      - name: Run B in its disposable environment
+        run: bash lab/architecture/run.sh b
