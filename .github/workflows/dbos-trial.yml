@@ -15,15 +15,28 @@ jobs:
           ref: ${{ github.event.pull_request.head.sha }}
           persist-credentials: false
       - run: make check
-      - name: Resolve isolated CPython 3.12 comparison dependencies
+      - name: Run real DBOS, two PG instances and independent receiver
+        env:
+          LAB_OUT: ${{ runner.temp }}/dbos-out
+          TEST_HEAD: ${{ github.event.pull_request.head.sha }}
+          CI_RUN: ${{ github.run_id }}
+        run: bash lab/dbos/run.sh
+      - name: Summarize captured evidence
+        if: always()
         run: |
-          python3.12 -m venv /tmp/dbos-env
-          /tmp/dbos-env/bin/pip install --only-binary=:all: --report /tmp/dbos-install.json 'dbos==3.6.0' 'pydantic-ai-slim[openai]==2.71.0' 'psycopg[binary]==3.3.9'
-          python3 - <<'PY'
-          import json
-          d=json.load(open('/tmp/dbos-install.json'))
-          for p in d['install']:
-              m=p['metadata']
-              h=p['download_info']['archive_info']['hashes']['sha256']
-              print('DBOS_LOCK',m['name']+'=='+m['version'],'--hash=sha256:'+h)
-          PY
+          python3 - <<'PY2'
+          import base64,gzip,hashlib,json,os,pathlib
+          p=pathlib.Path(os.environ['RUNNER_TEMP'],'dbos-out')
+          for f in sorted(p.glob('*')):
+              if f.name.endswith('.log'):
+                  print('WORKER_LOG',f.name,'\n'.join(f.read_text().splitlines()[-12:]))
+              if f.suffix in {'.json','.txt'}:
+                  raw=f.read_bytes()
+                  print('DBOS_RAW',f.name,hashlib.sha256(raw).hexdigest(),base64.b64encode(gzip.compress(raw,mtime=0)).decode())
+          PY2
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: dbos-trial-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/dbos-out
+          if-no-files-found: error
