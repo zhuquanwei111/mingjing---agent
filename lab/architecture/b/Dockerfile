@@ -3,4 +3,3 @@ WORKDIR /lab
 COPY linux-amd64.lock /tmp/
 RUN python -m pip install --require-hashes --only-binary=:all: --report /opt/installed.json -r /tmp/linux-amd64.lock && python -m pip check
 USER 10102:10102
-

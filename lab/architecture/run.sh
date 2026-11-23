@@ -33,9 +33,17 @@ dc up --no-deps --force-recreate -d --wait db
 dc up --no-deps --force-recreate -d --wait temporal
 [[ "$old_db" != "$(dc ps -q db)" && "$old_engine" != "$(dc ps -q temporal)" ]]
 probe readback
-if dc run --rm -T --no-deps --entrypoint env db PGPASSWORD="$(openssl rand -hex 20)" psql -h db -U "$P2_PROJECT" -d "$P2_PROJECT" -c 'select 1' >/dev/null 2>&1; then
-  echo "unexpected credential acceptance"; exit 1
-fi
+# Only these two read-only test identities are reproducible on both disposable runners.
+# All application, owner, administrator and workflow credentials are random and route-local.
+export MJLAB_CI_RUN=${GITHUB_RUN_ID:?} MJLAB_ROUTE="$route"
+peer_role="audit_${route}_${MJLAB_CI_RUN}"
+peer_password=$(printf '%s' "$peer_role/$GITHUB_SHA" | sha256sum | cut -d' ' -f1)
+dc exec -T db psql -U postgres -d "$P2_PROJECT" -v ON_ERROR_STOP=1 -v who="$peer_role" -v dbname="$P2_PROJECT" -v pass="$peer_password" <<'SQL'
+CREATE ROLE :"who" LOGIN PASSWORD :'pass';
+GRANT CONNECT ON DATABASE :"dbname" TO :"who";
+GRANT SELECT ON probe_witness TO :"who";
+SQL
+dc run --rm -T --no-deps -e MJLAB_CI_RUN -e MJLAB_ROUTE -e GITHUB_SHA -e LAB_PROBE_DB="$P2_PROJECT" -v "$fixture/peer_probe.py:/probe.py:ro" test python /probe.py
 echo "LIVE_PREFLIGHT route=$route database_and_history_survived_replacement=true"
 if [[ -f "$fixture/experiment.sh" ]]; then
   source "$fixture/experiment.sh"
