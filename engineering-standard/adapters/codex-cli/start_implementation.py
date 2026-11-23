@@ -223,7 +223,7 @@ def read_verdict(result_file: Path, events: str, inputs: dict[str, str]) -> tupl
 
 def verify_read_receipts(snapshot: Path, materials: tuple[Path, ...], evidence: list[str]) -> None:
     for path in materials:
-        text = (snapshot / path).read_text(encoding="utf-8")
+        text = (snapshot / path).read_bytes().decode("utf-8")
         prefix = f"{path.as_posix()}: "
         excerpts = [item[len(prefix):].strip() for item in evidence if item.startswith(prefix)]
         if not any(len(excerpt) >= 24 and excerpt in text for excerpt in excerpts):

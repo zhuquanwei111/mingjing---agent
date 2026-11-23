@@ -119,6 +119,15 @@ class PlanGateTests(unittest.TestCase):
             f"{paths[0]}: {original}", f"{paths[1]}: {proposal}",
         ])
 
+    def test_read_receipt_preserves_original_line_endings(self):
+        source = "The role cites precise evidence.\r\nThe role records the review scope."
+        self.requirements.write_bytes(source.encode("utf-8"))
+        path = self.requirements.relative_to(self.root)
+        gate.verify_read_receipts(self.root, (path,), [f"{path}: {source}"])
+        with self.assertRaisesRegex(ValueError, "no verifiable read receipt"):
+            normalized = source.replace("\r\n", "\n")
+            gate.verify_read_receipts(self.root, (path,), [f"{path}: {normalized}"])
+
     def test_only_optional_findings_are_consistent_with_pass(self):
         optional = dict(PASS, findings=[dict(FINDING, category="optional")])
         result = json.dumps(optional)
