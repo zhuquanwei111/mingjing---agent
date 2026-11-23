@@ -8,3 +8,5 @@
 4. 独有合成正文仅在产品输入和收端结果产生。对照原生快照的解码 JSON、产品库和模型请求；观测恢复时与完成时的正文与调用 ID。受控引用路径如有需要在框架外保存正文并仅在受权模型端解析；分别披露框架新增适配、产品账、调度进程数及可运营性未知。必须保留正文命中阳性对照。关键反例可排除某种直接接法；安装、环境、探针错误先修复。只对确证边界给结论，不推断全部 TypeScript 底座、生产 IAM、商业账单、容量、费用、跨版或 W0。
 
 上游固定包与许可见 [core](https://github.com/mastra-ai/mastra/blob/%40mastra%2Fcore%401.85.0/packages/core/package.json)、[PG](https://github.com/mastra-ai/mastra/blob/%40mastra%2Fcore%401.85.0/stores/pg/package.json)、[许可](https://github.com/mastra-ai/mastra/blob/%40mastra%2Fcore%401.85.0/LICENSE.md)、[恢复契约](https://mastra.ai/docs/harness/durable-agents)。
+
+独立方案评审已核同一 release tag aa82a4a7858c637f654be24391ff306dcb568c00。采纳：显式 shouldPersistSnapshot 包含 running；等待正常租约到期且不用 force；保存 Mastra 全部原生快照及归属表，至少在首次工具未返回与回执进入下一轮模型且其响应未释放两处解码。逐项列原调用号、提示正文、回执，逐项验证阳性对照。补测不兼容版本、错误回执配对：不兼容保持原记录并可独立核费，错误调用号须在发到模型前拒绝。同键待核与取消迟到复用同一运行。
