@@ -1,0 +1,58 @@
+x-fixture: &fixture
+  image: ${P2_PROJECT:?}-rb34
+  volumes:
+    - ${RB34_DIR:?}:/exp:ro
+  init: true
+  cap_drop: [ALL]
+  security_opt: [no-new-privileges:true]
+x-witness: &witness postgresql://witness:${WITNESS_PASS:?}@witness-db/witness
+x-env: &product
+  PRODUCT_DSN: postgresql://${P2_PROJECT:?}:${PRODUCT_PASS:?}@db/${P2_PROJECT:?}
+  NAMESPACE: ${P2_PROJECT:?}
+x-health: &health
+  test: [CMD, python, -c, "import urllib.request; urllib.request.urlopen('http://localhost:8080/ready',timeout=2).close()"]
+  interval: 2s
+  timeout: 3s
+  retries: 30
+services:
+  witness-db:
+    image: docker.io/library/postgres@sha256:e80acae3f1109e8e4533618b594918936f2858c63afc7204c4773148a673add8
+    environment:
+      POSTGRES_USER: witness
+      POSTGRES_PASSWORD: ${WITNESS_PASS:?}
+    volumes: [witness_data:/var/lib/postgresql/data]
+    healthcheck:
+      test: [CMD, pg_isready, -h, 127.0.0.1, -U, witness]
+      interval: 2s
+      timeout: 3s
+      retries: 45
+  provider:
+    <<: *fixture
+    command: [python, /exp/receiver.py, provider]
+    environment:
+      RECEIVER_DSN: *witness
+    healthcheck: *health
+  delivery:
+    <<: *fixture
+    command: [python, /exp/receiver.py, delivery]
+    environment:
+      RECEIVER_DSN: *witness
+    healthcheck: *health
+  experiment-worker:
+    <<: *fixture
+    command: [python, /exp/worker.py]
+    environment: *product
+  controller:
+    <<: *fixture
+    command: [python, -u, /exp/driver.py]
+    environment:
+      <<: *product
+      WITNESS_DSN: *witness
+      OUT: /out
+      CI_RUN: ${CI_RUN:?}
+      TEST_HEAD: ${TEST_HEAD:?}
+    volumes:
+      - ${RB34_DIR:?}:/exp:ro
+      - ${RB34_OUT:?}:/out
+volumes:
+  witness_data:
