@@ -23,6 +23,9 @@ PROJECT_SKILL = Path(".agents/skills/engineering-handoff/SKILL.md")
 ENTRY_POINTS = (
     "AGENTS.md",
     "README.md",
+    "docs/index.md",
+    "docs/repository-layout.md",
+    "docs/designs/whole-product-decision.md",
     "docs/development.md",
     "docs/PLANS.md",
     "docs/configuration.md",
