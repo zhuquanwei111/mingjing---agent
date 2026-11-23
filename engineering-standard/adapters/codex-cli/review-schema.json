@@ -1,0 +1,36 @@
+{
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "role": {"type": "string", "enum": ["solution-reviewer"]},
+    "decision": {"type": "string", "enum": ["pass", "revise", "blocked"]},
+    "scope": {"type": "string"},
+    "summary": {"type": "string"},
+    "inputs": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "requirements_sha256": {"type": "string"},
+        "plan_sha256": {"type": "string"},
+        "implementation_sha256": {"type": "string"}
+      },
+      "required": ["requirements_sha256", "plan_sha256", "implementation_sha256"]
+    },
+    "evidence": {"type": "array", "items": {"type": "string"}},
+    "findings": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "category": {"type": "string", "enum": ["blocker", "required", "optional", "needs_test"]},
+          "issue": {"type": "string"},
+          "evidence": {"type": "string"},
+          "action": {"type": "string"}
+        },
+        "required": ["category", "issue", "evidence", "action"]
+      }
+    }
+  },
+  "required": ["role", "decision", "scope", "summary", "inputs", "evidence", "findings"]
+}

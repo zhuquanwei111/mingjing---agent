@@ -1,0 +1,4 @@
+# 项目示例。经团队审核后，把适用值合并至 .codex/config.toml。
+# 受信项目才加载该层。管理策略与当前会话权限仍适用。
+approval_policy = "on-request"
+sandbox_mode = "workspace-write"
