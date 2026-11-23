@@ -1,0 +1,14 @@
+{
+  "scope": "reference",
+  "operation_id": "op_5214a653fdb24df99c93c7fa177fcc9c",
+  "run_id": "464f11d5-4a3e-47bd-9dcf-5d0b345729ea",
+  "session_id": "sess_bb02890c6b6b46758f055357ab0ba1d4",
+  "call_id": "call_b3ba57d41fda4b3a9090ca4764a20bc3",
+  "ref": "opaque_56d3314edfb04242ab1880698f285f36",
+  "active": true,
+  "writer_version": 1,
+  "state": "delivered",
+  "held": 0,
+  "spent": 1,
+  "receipt": "EFFECT_MARK_38afc768f05a4ca19e2915f989c68875"
+}

@@ -1,0 +1,44 @@
+[
+  {
+    "summary": null,
+    "team_id": null,
+    "user_id": null,
+    "agent_id": "known",
+    "metadata": null,
+    "team_data": null,
+    "agent_data": {
+      "name": "known",
+      "model": {
+        "id": "fixture",
+        "name": "OpenAIChat",
+        "provider": "OpenAI"
+      },
+      "agent_id": "known"
+    },
+    "created_at": 1795443890,
+    "session_id": "sess_fa2f54ae742e4e2286e5af0b814b4f37",
+    "updated_at": 1795443900,
+    "workflow_id": null,
+    "session_data": {
+      "session_state": {},
+      "session_metrics": {
+        "details": {
+          "model": [
+            {
+              "id": "fixture",
+              "provider": "OpenAI Chat",
+              "input_tokens": 20,
+              "total_tokens": 24,
+              "output_tokens": 4
+            }
+          ]
+        },
+        "input_tokens": 20,
+        "total_tokens": 24,
+        "output_tokens": 4
+      }
+    },
+    "session_type": "agent",
+    "workflow_data": null
+  }
+]

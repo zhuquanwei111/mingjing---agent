@@ -1,0 +1,14 @@
+{
+  "scope": "known",
+  "operation_id": "op_2306bc047f33467481e6076f786b3f9d",
+  "run_id": "3bc20329-4c62-40f0-a68b-94eb2c03d303",
+  "session_id": "sess_fa2f54ae742e4e2286e5af0b814b4f37",
+  "call_id": "call_b5a8fe0429684000a5a5f31f41cf8413",
+  "ref": "PROMPT_0a09f6deef554b3b91ec213b8ed6291e",
+  "active": true,
+  "writer_version": 1,
+  "state": "unconfirmed",
+  "held": 3,
+  "spent": 0,
+  "receipt": null
+}

@@ -1,0 +1,150 @@
+[
+  {
+    "run_id": "3bc20329-4c62-40f0-a68b-94eb2c03d303",
+    "status": "PAUSED",
+    "team_id": null,
+    "user_id": null,
+    "agent_id": "known",
+    "run_data": {
+      "input": {
+        "input_content": "Check reference PROMPT_0a09f6deef554b3b91ec213b8ed6291e"
+      },
+      "model": "fixture",
+      "tools": [
+        {
+          "result": null,
+          "metrics": null,
+          "toolkit": null,
+          "answered": null,
+          "confirmed": null,
+          "tool_args": {
+            "ref": "PROMPT_0a09f6deef554b3b91ec213b8ed6291e"
+          },
+          "tool_name": "request_receipt",
+          "created_at": 1795443890,
+          "approval_id": null,
+          "child_run_id": null,
+          "tool_call_id": "call_b5a8fe0429684000a5a5f31f41cf8413",
+          "approval_type": null,
+          "tool_call_error": null,
+          "confirmation_note": null,
+          "user_input_schema": null,
+          "parent_tool_call_id": null,
+          "requires_user_input": null,
+          "stop_after_tool_call": false,
+          "user_feedback_schema": null,
+          "requires_confirmation": null,
+          "external_execution_silent": null,
+          "external_execution_required": true
+        }
+      ],
+      "run_id": "3bc20329-4c62-40f0-a68b-94eb2c03d303",
+      "status": "PAUSED",
+      "content": "I have tools to execute, but it needs external execution.",
+      "metrics": {
+        "details": {
+          "model": [
+            {
+              "id": "fixture",
+              "provider": "OpenAI Chat",
+              "input_tokens": 10,
+              "total_tokens": 12,
+              "output_tokens": 2
+            }
+          ]
+        },
+        "duration": 0.11914133600000554,
+        "input_tokens": 10,
+        "total_tokens": 12,
+        "output_tokens": 2,
+        "time_to_first_token": 0.11696383900000029
+      },
+      "agent_id": "known",
+      "messages": [
+        {
+          "id": "54a6d32b-56f0-4412-a8ab-026833e11011",
+          "role": "user",
+          "content": "Check reference PROMPT_0a09f6deef554b3b91ec213b8ed6291e",
+          "created_at": 1795443890,
+          "from_history": false,
+          "stop_after_tool_call": false
+        },
+        {
+          "id": "9bb10970-8bd4-49c7-84ae-e2e1488b25e5",
+          "role": "assistant",
+          "metrics": {
+            "duration": 0.11570272200000176,
+            "input_tokens": 10,
+            "total_tokens": 12,
+            "output_tokens": 2
+          },
+          "created_at": 1795443890,
+          "tool_calls": [
+            {
+              "id": "call_b5a8fe0429684000a5a5f31f41cf8413",
+              "type": "function",
+              "function": {
+                "name": "request_receipt",
+                "arguments": "{\"ref\": \"PROMPT_0a09f6deef554b3b91ec213b8ed6291e\"}"
+              }
+            }
+          ],
+          "from_history": false,
+          "provider_data": {
+            "id": "3380582e62514171936f93e3188d8eb1"
+          },
+          "stop_after_tool_call": false
+        }
+      ],
+      "agent_name": "known",
+      "created_at": 1795443890,
+      "session_id": "sess_fa2f54ae742e4e2286e5af0b814b4f37",
+      "content_type": "str",
+      "requirements": [
+        {
+          "id": "ebab017b-0e50-4d60-90ea-90330d771ccb",
+          "created_at": "2026-11-23T14:24:50.417113+00:00",
+          "tool_execution": {
+            "result": null,
+            "metrics": null,
+            "toolkit": null,
+            "answered": null,
+            "confirmed": null,
+            "tool_args": {
+              "ref": "PROMPT_0a09f6deef554b3b91ec213b8ed6291e"
+            },
+            "tool_name": "request_receipt",
+            "created_at": 1795443890,
+            "approval_id": null,
+            "child_run_id": null,
+            "tool_call_id": "call_b5a8fe0429684000a5a5f31f41cf8413",
+            "approval_type": null,
+            "tool_call_error": null,
+            "confirmation_note": null,
+            "user_input_schema": null,
+            "parent_tool_call_id": null,
+            "requires_user_input": null,
+            "stop_after_tool_call": false,
+            "user_feedback_schema": null,
+            "requires_confirmation": null,
+            "external_execution_silent": null,
+            "external_execution_required": true
+          }
+        }
+      ],
+      "queue_attempt": 1,
+      "session_state": {},
+      "model_provider": "OpenAI",
+      "model_provider_data": {
+        "id": "3380582e62514171936f93e3188d8eb1"
+      }
+    },
+    "run_type": "agent",
+    "run_index": 0,
+    "created_at": 1795443890,
+    "session_id": "sess_fa2f54ae742e4e2286e5af0b814b4f37",
+    "updated_at": 1795443890,
+    "workflow_id": null,
+    "parent_run_id": null
+  }
+]

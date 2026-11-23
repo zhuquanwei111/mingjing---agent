@@ -1,0 +1,33 @@
+{
+  "id": "464f11d5-4a3e-47bd-9dcf-5d0b345729ea",
+  "error": null,
+  "status": "paused",
+  "attempt": 1,
+  "payload": {
+    "input": "opaque_83c0e3253cc34d27a112a43b80f851bc",
+    "scope": {
+      "pinned": null,
+      "source": "registry",
+      "user_id": null,
+      "version": null
+    },
+    "kwargs": {},
+    "session_seq": 1,
+    "serialize_session": true,
+    "_agno_authorization": null
+  },
+  "user_id": null,
+  "job_type": "run",
+  "locked_at": null,
+  "locked_by": null,
+  "created_at": 1795443892,
+  "session_id": "sess_bb02890c6b6b46758f055357ab0ba1d4",
+  "updated_at": 1795443892,
+  "available_at": 1795443892,
+  "completed_at": 1795443892,
+  "component_id": "reference",
+  "max_attempts": 1,
+  "deployment_id": null,
+  "component_type": "agent",
+  "idempotency_key": null
+}

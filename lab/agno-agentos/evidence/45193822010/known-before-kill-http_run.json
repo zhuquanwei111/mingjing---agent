@@ -1,0 +1,135 @@
+{
+  "run_id": "3bc20329-4c62-40f0-a68b-94eb2c03d303",
+  "agent_id": "known",
+  "agent_name": "known",
+  "session_id": "sess_fa2f54ae742e4e2286e5af0b814b4f37",
+  "content": "I have tools to execute, but it needs external execution.",
+  "content_type": "str",
+  "model_provider_data": {
+    "id": "3380582e62514171936f93e3188d8eb1"
+  },
+  "model": "fixture",
+  "model_provider": "OpenAI",
+  "session_state": {},
+  "created_at": 1795443890,
+  "status": "PAUSED",
+  "queue_attempt": 1,
+  "metrics": {
+    "input_tokens": 10,
+    "output_tokens": 2,
+    "total_tokens": 12,
+    "time_to_first_token": 0.11696383900000029,
+    "duration": 0.11914133600000554,
+    "details": {
+      "model": [
+        {
+          "input_tokens": 10,
+          "output_tokens": 2,
+          "total_tokens": 12,
+          "id": "fixture",
+          "provider": "OpenAI Chat"
+        }
+      ]
+    }
+  },
+  "events": [],
+  "messages": [
+    {
+      "id": "54a6d32b-56f0-4412-a8ab-026833e11011",
+      "content": "Check reference PROMPT_0a09f6deef554b3b91ec213b8ed6291e",
+      "from_history": false,
+      "stop_after_tool_call": false,
+      "role": "user",
+      "created_at": 1795443890
+    },
+    {
+      "id": "9bb10970-8bd4-49c7-84ae-e2e1488b25e5",
+      "from_history": false,
+      "stop_after_tool_call": false,
+      "role": "assistant",
+      "tool_calls": [
+        {
+          "id": "call_b5a8fe0429684000a5a5f31f41cf8413",
+          "type": "function",
+          "function": {
+            "name": "request_receipt",
+            "arguments": "{\"ref\": \"PROMPT_0a09f6deef554b3b91ec213b8ed6291e\"}"
+          }
+        }
+      ],
+      "provider_data": {
+        "id": "3380582e62514171936f93e3188d8eb1"
+      },
+      "metrics": {
+        "input_tokens": 10,
+        "output_tokens": 2,
+        "total_tokens": 12,
+        "duration": 0.11570272200000176
+      },
+      "created_at": 1795443890
+    }
+  ],
+  "tools": [
+    {
+      "tool_call_id": "call_b5a8fe0429684000a5a5f31f41cf8413",
+      "tool_name": "request_receipt",
+      "tool_args": {
+        "ref": "PROMPT_0a09f6deef554b3b91ec213b8ed6291e"
+      },
+      "tool_call_error": null,
+      "result": null,
+      "metrics": null,
+      "toolkit": null,
+      "child_run_id": null,
+      "stop_after_tool_call": false,
+      "created_at": 1795443890,
+      "requires_confirmation": null,
+      "confirmed": null,
+      "confirmation_note": null,
+      "requires_user_input": null,
+      "user_input_schema": null,
+      "user_feedback_schema": null,
+      "answered": null,
+      "external_execution_required": true,
+      "external_execution_silent": null,
+      "approval_type": null,
+      "approval_id": null,
+      "parent_tool_call_id": null
+    }
+  ],
+  "requirements": [
+    {
+      "id": "ebab017b-0e50-4d60-90ea-90330d771ccb",
+      "created_at": "2026-11-23T14:24:50.417113+00:00",
+      "tool_execution": {
+        "tool_call_id": "call_b5a8fe0429684000a5a5f31f41cf8413",
+        "tool_name": "request_receipt",
+        "tool_args": {
+          "ref": "PROMPT_0a09f6deef554b3b91ec213b8ed6291e"
+        },
+        "tool_call_error": null,
+        "result": null,
+        "metrics": null,
+        "toolkit": null,
+        "child_run_id": null,
+        "stop_after_tool_call": false,
+        "created_at": 1795443890,
+        "requires_confirmation": null,
+        "confirmed": null,
+        "confirmation_note": null,
+        "requires_user_input": null,
+        "user_input_schema": null,
+        "user_feedback_schema": null,
+        "answered": null,
+        "external_execution_required": true,
+        "external_execution_silent": null,
+        "approval_type": null,
+        "approval_id": null,
+        "parent_tool_call_id": null
+      }
+    }
+  ],
+  "input": {
+    "input_content": "Check reference PROMPT_0a09f6deef554b3b91ec213b8ed6291e"
+  }
+}

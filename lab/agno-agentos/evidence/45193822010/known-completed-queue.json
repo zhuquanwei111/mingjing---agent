@@ -1,0 +1,67 @@
+{
+  "id": "3bc20329-4c62-40f0-a68b-94eb2c03d303",
+  "error": null,
+  "status": "completed",
+  "attempt": 2,
+  "payload": {
+    "input": "Check reference PROMPT_0a09f6deef554b3b91ec213b8ed6291e",
+    "scope": {
+      "pinned": null,
+      "source": "registry",
+      "user_id": null,
+      "version": null
+    },
+    "kwargs": {},
+    "continue": {
+      "input": null,
+      "kwargs": {},
+      "continue_from": "end",
+      "updated_tools": [
+        {
+          "result": "EFFECT_MARK_ccaa1b57429048b6bb552a2d58fff4f7",
+          "metrics": null,
+          "toolkit": null,
+          "answered": null,
+          "confirmed": null,
+          "tool_args": {
+            "ref": "PROMPT_0a09f6deef554b3b91ec213b8ed6291e"
+          },
+          "tool_name": "request_receipt",
+          "created_at": 1795443890,
+          "approval_id": null,
+          "child_run_id": null,
+          "tool_call_id": "call_b5a8fe0429684000a5a5f31f41cf8413",
+          "approval_type": null,
+          "tool_call_error": null,
+          "confirmation_note": null,
+          "user_input_schema": null,
+          "parent_tool_call_id": null,
+          "requires_user_input": null,
+          "stop_after_tool_call": false,
+          "user_feedback_schema": null,
+          "requires_confirmation": null,
+          "external_execution_silent": null,
+          "external_execution_required": true
+        }
+      ],
+      "_agno_authorization": null
+    },
+    "session_seq": 1,
+    "serialize_session": true,
+    "_agno_authorization": null
+  },
+  "user_id": null,
+  "job_type": "run",
+  "locked_at": null,
+  "locked_by": null,
+  "created_at": 1795443890,
+  "session_id": "sess_fa2f54ae742e4e2286e5af0b814b4f37",
+  "updated_at": 1795443900,
+  "available_at": 1795443900,
+  "completed_at": 1795443900,
+  "component_id": "known",
+  "max_attempts": 2,
+  "deployment_id": null,
+  "component_type": "agent",
+  "idempotency_key": null
+}

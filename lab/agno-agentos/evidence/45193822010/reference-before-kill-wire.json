@@ -1,0 +1,51 @@
+[
+  {
+    "detail": {
+      "reply": {
+        "role": "assistant",
+        "content": null,
+        "tool_calls": [
+          {
+            "id": "call_e9d975eef98549d3b7885b561ddc7ca4",
+            "type": "function",
+            "function": {
+              "name": "request_receipt",
+              "arguments": "{\"ref\": \"PROMPT_2f7897a003154822a7a2fbc63320ef88\"}"
+            }
+          }
+        ]
+      },
+      "request": {
+        "model": "fixture",
+        "tools": [
+          {
+            "type": "function",
+            "function": {
+              "name": "request_receipt",
+              "parameters": {
+                "type": "object",
+                "required": [
+                  "ref"
+                ],
+                "properties": {
+                  "ref": {
+                    "type": "string"
+                  }
+                },
+                "additionalProperties": false
+              },
+              "description": "Submit a record reference and obtain an independent receipt.",
+              "external_execution": true
+            }
+          }
+        ],
+        "messages": [
+          {
+            "role": "user",
+            "content": "Check reference PROMPT_2f7897a003154822a7a2fbc63320ef88"
+          }
+        ]
+      }
+    }
+  }
+]

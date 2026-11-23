@@ -1,0 +1,27 @@
+[
+  {
+    "kind": "answer",
+    "token": "opaque_6bd6e21dc8bf4ce1a91121cfd99a5588",
+    "value": "recorded EFFECT_MARK_38afc768f05a4ca19e2915f989c68875"
+  },
+  {
+    "kind": "call",
+    "token": "call_b3ba57d41fda4b3a9090ca4764a20bc3",
+    "value": "call_e9d975eef98549d3b7885b561ddc7ca4"
+  },
+  {
+    "kind": "prompt",
+    "token": "opaque_83c0e3253cc34d27a112a43b80f851bc",
+    "value": "Check reference PROMPT_2f7897a003154822a7a2fbc63320ef88"
+  },
+  {
+    "kind": "receipt",
+    "token": "opaque_f66e168889584caab641eeb4e07fd339",
+    "value": "EFFECT_MARK_38afc768f05a4ca19e2915f989c68875"
+  },
+  {
+    "kind": "ref",
+    "token": "opaque_56d3314edfb04242ab1880698f285f36",
+    "value": "PROMPT_2f7897a003154822a7a2fbc63320ef88"
+  }
+]

@@ -1,0 +1,182 @@
+[
+  {
+    "run_id": "464f11d5-4a3e-47bd-9dcf-5d0b345729ea",
+    "status": "COMPLETED",
+    "team_id": null,
+    "user_id": null,
+    "agent_id": "reference",
+    "run_data": {
+      "input": {
+        "input_content": "opaque_83c0e3253cc34d27a112a43b80f851bc"
+      },
+      "model": "fixture",
+      "tools": [
+        {
+          "result": "opaque_f66e168889584caab641eeb4e07fd339",
+          "metrics": null,
+          "toolkit": null,
+          "answered": null,
+          "confirmed": null,
+          "tool_args": {
+            "ref": "opaque_56d3314edfb04242ab1880698f285f36"
+          },
+          "tool_name": "request_receipt",
+          "created_at": 1795443892,
+          "approval_id": null,
+          "child_run_id": null,
+          "tool_call_id": "call_b3ba57d41fda4b3a9090ca4764a20bc3",
+          "approval_type": null,
+          "tool_call_error": null,
+          "confirmation_note": null,
+          "user_input_schema": null,
+          "parent_tool_call_id": null,
+          "requires_user_input": null,
+          "stop_after_tool_call": false,
+          "user_feedback_schema": null,
+          "requires_confirmation": null,
+          "external_execution_silent": null,
+          "external_execution_required": false
+        }
+      ],
+      "events": [],
+      "run_id": "464f11d5-4a3e-47bd-9dcf-5d0b345729ea",
+      "status": "COMPLETED",
+      "content": "opaque_6bd6e21dc8bf4ce1a91121cfd99a5588",
+      "metrics": {
+        "details": {
+          "model": [
+            {
+              "id": "fixture",
+              "provider": "OpenAI Chat",
+              "input_tokens": 20,
+              "total_tokens": 24,
+              "output_tokens": 4
+            }
+          ]
+        },
+        "duration": 9.052110249572635,
+        "input_tokens": 20,
+        "total_tokens": 24,
+        "output_tokens": 4,
+        "time_to_first_token": 0.05078682599999951
+      },
+      "agent_id": "reference",
+      "messages": [
+        {
+          "id": "6d5c4555-8ae1-49d3-a13f-2a9821a26d89",
+          "role": "user",
+          "content": "opaque_83c0e3253cc34d27a112a43b80f851bc",
+          "created_at": 1795443892,
+          "from_history": false,
+          "stop_after_tool_call": false
+        },
+        {
+          "id": "3bc09169-e254-49fc-b599-9e05dc69aec1",
+          "role": "assistant",
+          "metrics": {
+            "duration": 0.050321681999996315,
+            "input_tokens": 10,
+            "total_tokens": 12,
+            "output_tokens": 2
+          },
+          "created_at": 1795443892,
+          "tool_calls": [
+            {
+              "id": "call_b3ba57d41fda4b3a9090ca4764a20bc3",
+              "type": "function",
+              "function": {
+                "name": "request_receipt",
+                "arguments": "{\"ref\": \"opaque_56d3314edfb04242ab1880698f285f36\"}"
+              }
+            }
+          ],
+          "from_history": false,
+          "provider_data": {
+            "id": "3ae13d7eaa0a4b858a7c39fedf50ff2d"
+          },
+          "stop_after_tool_call": false
+        },
+        {
+          "id": "063e5ca9-b883-4411-8948-91f5fceafe85",
+          "role": "tool",
+          "content": "opaque_f66e168889584caab641eeb4e07fd339",
+          "tool_args": {
+            "ref": "opaque_56d3314edfb04242ab1880698f285f36"
+          },
+          "tool_name": "request_receipt",
+          "created_at": 1795443900,
+          "from_history": false,
+          "tool_call_id": "call_b3ba57d41fda4b3a9090ca4764a20bc3",
+          "stop_after_tool_call": false
+        },
+        {
+          "id": "af672075-0be7-4a2c-9040-5f021f9b1d84",
+          "role": "assistant",
+          "content": "opaque_6bd6e21dc8bf4ce1a91121cfd99a5588",
+          "metrics": {
+            "duration": 0.05928766899999971,
+            "input_tokens": 10,
+            "total_tokens": 12,
+            "output_tokens": 2,
+            "time_to_first_token": 0.05928766899999971
+          },
+          "created_at": 1795443900,
+          "from_history": false,
+          "provider_data": {
+            "id": "10f40d6a077f49e9b474e14a793f4d97"
+          },
+          "stop_after_tool_call": false
+        }
+      ],
+      "agent_name": "reference",
+      "created_at": 1795443900,
+      "session_id": "sess_bb02890c6b6b46758f055357ab0ba1d4",
+      "content_type": "str",
+      "requirements": [
+        {
+          "id": "959ade68-8780-4a11-a4c0-2a9b8b6f0ba1",
+          "created_at": "2026-11-23T14:25:00.987892+00:00",
+          "tool_execution": {
+            "result": "opaque_f66e168889584caab641eeb4e07fd339",
+            "metrics": null,
+            "toolkit": null,
+            "answered": null,
+            "confirmed": null,
+            "tool_args": {
+              "ref": "opaque_56d3314edfb04242ab1880698f285f36"
+            },
+            "tool_name": "request_receipt",
+            "created_at": 1795443892,
+            "approval_id": null,
+            "child_run_id": null,
+            "tool_call_id": "call_b3ba57d41fda4b3a9090ca4764a20bc3",
+            "approval_type": null,
+            "tool_call_error": null,
+            "confirmation_note": null,
+            "user_input_schema": null,
+            "parent_tool_call_id": null,
+            "requires_user_input": null,
+            "stop_after_tool_call": false,
+            "user_feedback_schema": null,
+            "requires_confirmation": null,
+            "external_execution_silent": null,
+            "external_execution_required": false
+          }
+        }
+      ],
+      "queue_attempt": 2,
+      "session_state": {},
+      "model_provider": "OpenAI",
+      "model_provider_data": {
+        "id": "10f40d6a077f49e9b474e14a793f4d97"
+      }
+    },
+    "run_type": "agent",
+    "run_index": 0,
+    "created_at": 1795443892,
+    "session_id": "sess_bb02890c6b6b46758f055357ab0ba1d4",
+    "updated_at": 1795443901,
+    "workflow_id": null,
+    "parent_run_id": null
+  }
+]
