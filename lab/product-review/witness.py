@@ -81,9 +81,14 @@ class Handler(BaseHTTPRequestHandler):
                     body = {"role": "assistant", "content": "recorded " + returned[-1]["content"]}
                     reason = "stop"
                 else:
+                    advertised, = [t["function"] for t in data["tools"] if t["type"]=="function" and t["function"]["name"]==name]
+                    assert advertised["parameters"]["properties"]["ref"]["type"]=="string"
+                    prompt, = [m["content"] for m in messages if m["role"]=="user"]
+                    assert isinstance(prompt,str) and prompt.endswith(marker)
+                    wire_input = {"ref":prompt.split()[-1]}
                     call = "call_" + uuid.uuid4().hex
                     body = {"role": "assistant", "content": None, "tool_calls": [
-                        {"id":call, "type":"function", "function":{"name":name,"arguments":json.dumps({"ref":marker})}}]}
+                        {"id":call, "type":"function", "function":{"name":advertised["name"],"arguments":json.dumps(wire_input)}}]}
                     reason = "tool_calls"
                 log(c,scope,"model",{"request":data,"reply":body})
                 result = {"id":uuid.uuid4().hex,"object":"chat.completion","created":int(time.time()),"model":"fixture",

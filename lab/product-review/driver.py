@@ -42,7 +42,7 @@ def record(case,stage,data):
 
 def source_hashes():
     return {p:hashlib.sha256(Path("/exp",p).read_bytes()).hexdigest()
-            for p in ("worker.py","flow.py","release_v1.py","release_v2.py")}
+            for p in ("worker.py","flow.py","adapters.py","release_v1.py","release_v2.py")}
 
 
 def snapshot(scope):
@@ -57,12 +57,16 @@ def snapshot(scope):
     return {"task":task,"product":product,"observed":observed,"jobs":jobs,"effects":effects,"fees":fees}
 
 
-def events(s, kind):
-    return [e["detail"] for e in s["observed"] + s["product"] if e["kind"]==kind]
+def received(s, kind):
+    return [e["detail"] for e in s["observed"] if e["kind"]==kind]
+
+
+def logged(s, kind):
+    return [e["detail"] for e in s["product"] if e["kind"]==kind]
 
 
 def counts(s):
-    return [len(events(s,"arrival")),len(s["effects"]),len(s["fees"]),len(events(s,"delivery")),len(events(s,"model"))]
+    return [len(received(s,"arrival")),len(s["effects"]),len(s["fees"]),len(received(s,"delivery")),len(received(s,"model"))]
 
 
 def start_worker(build):
@@ -97,6 +101,12 @@ async def history(handle,name,s):
     doc = json.loads(raw)
     payloads = list(decode_payloads(doc))
     assert payloads, name
+    if name in CASES:
+        attempts=logged(s,"attempt")
+        assert all(a["wf"]==handle.id and a["run"]==h.run_id for a in attempts)
+        scheduled=[e["activityTaskScheduledEventAttributes"]["activityId"] for e in doc["events"]
+                   if "activityTaskScheduledEventAttributes" in e]
+        assert scheduled == [attempts[0]["activity"]]
     forbidden = [s["task"]["marker"], s["task"]["call"], s["effects"][0]["receipt"]]
     for token in forbidden:
         assert token not in raw and all(token not in x for x in payloads)
@@ -109,7 +119,7 @@ async def main():
     before_hash=source_hashes()
     name="inspect_"+uuid.uuid4().hex[:10]
     desc={"name":name,"description":"Submit a referenced item for independent verification",
-          "mode":"asynchronous","side_effect":"submit","status_source":"lookup","input_schema":{
+          "adapter":"external_receipt_v1","mode":"asynchronous","side_effect":"submit","status_source":"lookup","input_schema":{
               "type":"object","properties":{"ref":{"type":"string"}},"required":["ref"],"additionalProperties":False}}
     with connection("PRODUCT_DSN") as product, connection("WITNESS_DSN") as witness:
         product.execute(SCHEMA)
@@ -134,11 +144,21 @@ async def main():
         with connection("WITNESS_DSN") as w:
             w.execute("UPDATE scenario SET enabled=true")
         await wait_for(lambda:all(len(snapshot(s)["effects"])==1 for s in CASES),first)
+        frozen={}
         for s in CASES:
             snap=snapshot(s)
+            frozen[s]=snap["task"]["msg"]
             assert counts(snap)==[1,1,1,0,1] and snap["task"]["settled"] is None
             assert snap["task"]["spent"]==0 and snap["task"]["held"]==3
-            assert "tool-return" not in json.dumps(snap["task"]["msg"])
+            msg=json.dumps(snap["task"]["msg"])
+            assert snap["task"]["call"] in msg and snap["task"]["marker"] in msg
+            assert snap["effects"][0]["receipt"] not in msg
+            assert snap["task"]["marker"] in json.dumps(received(snap,"model")[0]["request"]["messages"])
+            arrival,=received(snap,"arrival")
+            assert arrival["op"]==snap["task"]["op"]==snap["effects"][0]["op"]==snap["fees"][0]["op"]
+            assert arrival["call"]==snap["task"]["call"] and arrival["input"]=={"ref":snap["task"]["marker"]}
+            arrival_seq,=[e["seq"] for e in snap["observed"] if e["kind"]=="arrival"]
+            assert snap["fees"][0]["arrival"]==arrival_seq and snap["fees"][0]["units"]==1
             record(s,"effect_before_kill",snap)
         first.kill()
         assert first.wait(timeout=8)==-9
@@ -153,29 +173,31 @@ async def main():
             snap=snapshot(s)
             record(s,"reentered",snap)
             assert snap["task"]["state"]==outcome==expected[s],(s,outcome)
+            assert snap["task"]["msg"]==frozen[s]
+            assert received(snap,"lookup")==[{"op":snap["task"]["op"],"found":s not in ("unknown","cancel")}]
             known=s=="known"
             assert counts(snap)==[1,1,1,int(known),1+int(known)],(s,counts(snap))
             if s in ("unknown","cancel"):
                 assert (snap["task"]["held"],snap["task"]["spent"])==(3,0)
             else:
                 assert (snap["task"]["held"],snap["task"]["spent"])==(0,1)
-            old,new=events(snap,"attempt")
+            old,new=logged(snap,"attempt")
             assert old["pid"]==first.pid and new["pid"]==second.pid and old["pid"]!=new["pid"]
             assert [old["attempt"],new["attempt"]]==[1,2] and [old["build"],new["build"]]==["release_v1","release_v2"]
             assert old["release_hash"]==before_hash["release_v1.py"] and new["release_hash"]==before_hash["release_v2.py"]
-            assert old["release_hash"]!=new["release_hash"] and snap["task"]["model_slots"]==len(events(snap,"model"))
+            assert old["release_hash"]!=new["release_hash"] and snap["task"]["model_slots"]==len(received(snap,"model"))
             assert all(old[k]==new[k] for k in ("activity","run","wf"))
             attrs=await history(handles[s],s,snap)
             assert any(int(a.get("attempt",1))==2 for a in attrs)
             if known:
-                first_call,second_call=events(snap,"model")
+                first_call,second_call=received(snap,"model")
                 original=first_call["reply"]["tool_calls"][0]["id"]
                 tool,=[m for m in second_call["request"]["messages"] if m["role"]=="tool"]
                 receipt=snap["effects"][0]["receipt"]
                 assert tool["tool_call_id"]==original==snap["task"]["call"] and receipt in tool["content"]
-                assert events(snap,"delivery")[0]["receipt"]==receipt
-                checkpoint,=events(snap,"checkpoint")
-                resumed,=events(snap,"resumed")
+                assert received(snap,"delivery")[0]["receipt"]==receipt
+                checkpoint,=logged(snap,"checkpoint")
+                resumed,=logged(snap,"resumed")
                 assert checkpoint["sdk_run"]!=resumed["sdk_run"]
                 assert checkpoint["conversation"]==resumed["conversation"]
         with connection("WITNESS_DSN") as w:
@@ -184,10 +206,12 @@ async def main():
             h=await client.start_workflow(Notice.run,"cancel",id=f"notice-{n}",task_queue="product-lab")
             assert await asyncio.wait_for(h.result(),25)=="cancelled_settled"
             snap=snapshot("cancel")
+            assert [x["found"] for x in received(snap,"lookup")]==[False]+[True]*n
+            assert all(x["op"]==snap["task"]["op"] for x in received(snap,"lookup"))
             record("cancel",f"late_{n}",snap)
             await history(h,f"late-{n}",snap)
             assert counts(snap)==[1,1,1,0,1] and (snap["task"]["held"],snap["task"]["spent"])==(0,1)
-        assert [x["new"] for x in events(snap,"settle")]==[True,False]
+        assert [x["new"] for x in logged(snap,"settle")]==[True,False]
         print("OBSERVED",len(CASES),"cases; 5 interrupted activities on one killed worker; 2 notices",
               flush=True)
     finally:

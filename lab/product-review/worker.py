@@ -1,5 +1,6 @@
 """Reference-only Temporal activity and versioned external-tool checkpoint adapter."""
 import asyncio
+from functools import partial
 import hashlib
 import importlib
 import json
@@ -21,6 +22,7 @@ from temporalio import activity
 from temporalio.client import Client
 from temporalio.worker import Worker
 
+from adapters import adapter_for
 from flow import Notice, Round
 
 RELEASE = importlib.import_module(os.environ["BUILD_MODULE"])
@@ -81,7 +83,8 @@ async def checkpoint_first(scope):
         await client.close()
     assert isinstance(result.output,DeferredToolRequests) and len(result.output.calls)==1
     call, = result.output.calls
-    assert call.tool_name == row["descriptor"]["name"] and call.args_as_dict() == {"ref":row["marker"]}
+    assert call.tool_name == row["descriptor"]["name"]
+    adapter = adapter_for(row["descriptor"])
     history = json.loads(result.all_messages_json())
     op = str(uuid.uuid4())
     serialized = RELEASE.encode(row["writer_format"], history, op, call.tool_call_id)
@@ -93,7 +96,7 @@ async def checkpoint_first(scope):
             raise RuntimeError("conflicting initial intent")
         log(c,scope,"checkpoint",{"version":row["writer_format"],"op":op,"call":call.tool_call_id,
                                   "sdk_run":result.run_id,"conversation":result.conversation_id})
-    ack = http(scope,"submit",{"op":op,"call":call.tool_call_id,"name":call.tool_name,"input":call.args_as_dict()})
+    ack = adapter.dispatch(partial(http,scope),op,call)
     assert ack == {"accepted":True}
     with db() as c:
         c.execute("UPDATE task SET state='accepted' WHERE scope=%s",(scope,))
@@ -123,7 +126,7 @@ def status(scope, name):
 
 async def resume(scope, notice=False):
     row = read(scope)
-    receipt = http(scope,"lookup/"+row["op"])
+    receipt = adapter_for(row["descriptor"]).lookup(partial(http,scope), row["op"])
     if not receipt["known"]:
         return status(scope,"unknown")
     settle(scope,receipt)
@@ -142,7 +145,8 @@ async def resume(scope, notice=False):
                                  deferred_tool_results=DeferredToolResults(calls={call:receipt["receipt"]}),
                                  usage_limits=UsageLimits(request_limit=1))
     except UserError as exc:
-        if not row["wrong_pair"]:
+        if (not row["wrong_pair"] or "Tool call results need to be provided for all deferred tool calls" not in str(exc)
+                or call not in str(exc) or row["call"] not in str(exc)):
             raise
         with db() as c:
             log(c,scope,"rejected_pair",{"exception":type(exc).__name__,"reason":str(exc)})
