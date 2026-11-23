@@ -29,13 +29,16 @@ def forward(handler,db,body,raw,destination):
     db.execute("begin immediate")
     row=db.execute("select * from ops where op=?",(op,)).fetchone()
     followup=any(m["role"]=="tool" for m in body["messages"])
-    allowed=bool(row and not row["canceled"] and row["version"]==1 and
+    allowed=bool(row and not row["canceled"] and row["version"]==row["reader"]==1 and
                  (not followup or exact_result(body,row["call_id"],row["receipt"])))
     db.execute("insert into model_attempts(op,allowed,body) values(?,?,?)",(op,allowed,raw.decode()))
     if not allowed:
         db.commit()
         return handler.reply({"error":"model outbound refused"},403,prohibit_retry=True)
-    req=Request(destination+"/v1/chat/completions",data=raw,headers={"Content-Type":"application/json"})
+    # Only the trusted product gateway resolves the opaque prompt reference.
+    external=json.loads(raw)
+    external["messages"].insert(0,{"role":"system","content":row["prompt_private"]})
+    req=Request(destination+"/v1/chat/completions",data=json.dumps(external).encode(),headers={"Content-Type":"application/json"})
     try:
         res=urlopen(req,timeout=20)
     except HTTPError as exc:

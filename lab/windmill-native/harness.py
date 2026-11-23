@@ -1,5 +1,6 @@
 """Real Windmill public APIs, independent ledgers, and process fault controller."""
 import json
+import hashlib
 import os
 import re
 import subprocess
@@ -135,6 +136,37 @@ def state(op,root,stage):
     return doc
 
 
+def scan_engine(op,call_id,stage):
+    # Alphanumeric markers survive PostgreSQL COPY text escaping unchanged.
+    # Read all public data without publishing unrelated rows, settings or bearer tokens.
+    db=database("product")
+    prompt=db.execute("select prompt_private from ops where op=?",(op,)).fetchone()[0]
+    db.close()
+    db=database("receiver")
+    details=db.execute("select result_private from jobs where op=?",(op,)).fetchone()[0]
+    models=db.execute("select raw from model_http where op=?",(op,)).fetchall()
+    db.close()
+    assert prompt and details and any(prompt in r[0] for r in models)
+    text=cli("docker","exec","wmn-pg","pg_dump","-U","postgres","--data-only","--schema=public","windmill")
+    markers={"product_prompt":prompt,"provider_details":details,"call_id":call_id}
+    table=None
+    hits={k:{} for k in markers}
+    scanned=0
+    for line in text.splitlines():
+        if line.startswith("COPY "):
+            table=line.split()[1]
+            scanned+=1
+        elif line==chr(92)+".":
+            table=None
+        elif table:
+            for k,marker in markers.items():
+                if marker in line:
+                    hits[k][table]=hits[k].get(table,0)+1
+    note("engine_scan",operation=op,point=stage,public_tables=scanned,matching_rows=hits)
+    assert scanned>30 and not hits["product_prompt"] and not hits["provider_details"] and hits["call_id"]
+    return hits
+
+
 def run_case(tag):
     op=tag+"_"+uuid.uuid4().hex[:12]
     http(PRODUCT+"/init/"+op,{})
@@ -162,6 +194,7 @@ def run_case(tag):
     assert boundary["counts"]["effect"]==boundary["counts"]["simulated_charge"]==1
     assert boundary["counts"]["models"]==1 and boundary["counts"]["delivery"]==0
     assert boundary["ledger"]["ops"][0]["receipt"] is None
+    scan_engine(op,actual_id,"effect_before_result")
     tooljob=boundary["ledger"]["entries"][0]["job"]
     jobrows={j["id"]:j for j in boundary["jobs"]}
     for ident in (agent,tooljob):
@@ -176,6 +209,8 @@ def run_case(tag):
         cli("docker","kill","--signal","KILL",old)
         note("killed",pid=original_pid,container=old,agent=agent,tool=tooljob,
              worker=jobrows[agent]["worker"],exit=cli("docker","inspect","-f","{{.State.ExitCode}}",old))
+        if tag=="oldversion":
+            http(PRODUCT+"/switch_reader/"+op,{})
         worker()
         helper=worker(helper=True)
         recovered=wait("new native job attempt or terminal status",
@@ -194,6 +229,19 @@ def run_case(tag):
             call("/jobs_u/queue/cancel/"+root,{"reason":"synthetic cancel"})
             wait("canceled native root",lambda:any(j["id"]==root and j["status"]=="canceled" for j in lineage(root)),90)
     http(RECEIVER+"/open/"+op,{})
+    if tag=="oldversion":
+        wait("quarantined old run after trusted reconciliation",lambda:counts(op)["spent"]==1)
+        doc=state(op,root,"quarantined")
+        old=doc["ledger"]["ops"][0]
+        assert (old["version"],old["reader"],old["quarantine"])==(1,2,1)
+        c=doc["counts"]
+        assert (c["held"],c["spent"],c["models"],c["delivery"],c["http_post"],c["effect"],c["simulated_charge"])==(0,1,1,0,1,1,1)
+        saved=checkpoint()
+        assert saved["data"]==cp["data"] and saved["job"]==agent
+        note("older_checkpoint_preserved",op=op,agent=agent,sha256=hashlib.sha256(json.dumps(saved,sort_keys=True).encode()).hexdigest())
+        assert old["result_private"] and old["result_private"] not in json.dumps(doc["ledger"]["model_http"])
+        scan_engine(op,actual_id,"quarantine")
+        return op
     if tag=="cancel":
         for _ in range(2):
             http(PRODUCT+"/reconcile/"+op,{})
@@ -202,6 +250,7 @@ def run_case(tag):
         wait("real native flow terminal",lambda:any(j["id"]==root and j["status"] for j in lineage(root)),120)
     final=state(op,root,"final")
     c=final["counts"]
+    scan_engine(op,actual_id,"terminal")
     assert (c["http_post"],c["effect"],c["simulated_charge"],c["held"],c["spent"])==(1,1,1,0,1),c
     assert (c["models"],c["paired"],c["delivery"])==((1,0,0) if tag=="cancel" else (2,1,1)),c
     root_state=next(j["status"] for j in final["jobs"] if j["id"]==root)
@@ -245,7 +294,7 @@ def main():
         worker()
         register()
         done={}
-        for tag in ["baseline","retrydefault","retryprotected","known","cancel"]:
+        for tag in ["baseline","retrydefault","retryprotected","known","cancel","oldversion"]:
             try:
                 run=retry_probe if tag.startswith("retry") else run_case
                 done[tag]={"operation":run(tag),"status":"pass"}
