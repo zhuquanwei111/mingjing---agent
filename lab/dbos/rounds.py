@@ -19,7 +19,7 @@ from pydantic_ai.models.openai import OpenAIChatModel
 from pydantic_ai.providers.openai import OpenAIProvider
 
 SCHEMA = """
-CREATE TABLE task(scope text PRIMARY KEY, name text NOT NULL, marker text NOT NULL, version int NOT NULL,
+CREATE TABLE task(scope text PRIMARY KEY, name text NOT NULL, marker text NOT NULL, version int,
  active bool NOT NULL DEFAULT true, op text UNIQUE, call text, history jsonb, first_run text, conversation text,
  sent bool DEFAULT false, held int DEFAULT 0, spent int DEFAULT 0, receipt text, state text DEFAULT 'new',
  resumed_run text, resumed_conversation text, model_slots int NOT NULL DEFAULT 0);
@@ -76,10 +76,16 @@ def prepare(scope):
     assert isinstance(result.output, DeferredToolRequests)
     call, = result.output.calls
     assert call.tool_name == row['name'] and call.args_as_dict() == {'ref':row['marker']}
+    version=int(os.environ['WRITER_FORMAT'])
+    messages=json.loads(result.all_messages_json())
+    operation=str(uuid4())
+    payload=(['v0',messages] if version==0 else
+             {'version':version,'operation':operation,'call':call.tool_call_id,'messages':messages})
     with product() as c:
-        c.execute("""UPDATE task SET op=%s,call=%s,history=%s,first_run=%s,conversation=%s,held=3,
+        trace(c,scope,'write_checkpoint',{'written_format':version,'worker_release':os.environ['GENERATION']})
+        c.execute("""UPDATE task SET op=%s,call=%s,history=%s,version=%s,first_run=%s,conversation=%s,held=3,
                   state='reserved' WHERE scope=%s AND active AND op IS NULL""",
-                  (str(uuid4()),call.tool_call_id,Jsonb({'version':row['version'],'messages':json.loads(result.all_messages_json())}),
+                  (operation,call.tool_call_id,Jsonb(payload),version,
                    str(result.run_id),str(result.conversation_id),scope))
 
 @DBOS.step()
@@ -117,7 +123,13 @@ def reconcile(scope, settlement_only=False):
         active=locked['active']
     if settlement_only or not active:
         return 'settled'
-    if row['version'] != int(os.environ['READER_VERSION']) or row['history']['version'] != row['version']:
+    accepted=[int(v) for v in os.environ['READER_FORMATS'].split(',')]
+    checkpoint=row['history']
+    with product() as c:
+        trace(c,scope,'read_checkpoint',{'supported':accepted,'seen':row['version'],'worker_release':os.environ['GENERATION']})
+    if (row['version'] not in accepted or not isinstance(checkpoint,dict) or
+            (checkpoint.get('version'),checkpoint.get('operation'),checkpoint.get('call')) !=
+            (row['version'],row['op'],row['call'])):
         state='quarantine'
     else:
         call_id = 'incorrect-'+row['call'] if scope=='wrong' else row['call']
