@@ -65,7 +65,7 @@ try {
   await storage.init();
   const op=await row();
   console.log('worker',mode,process.pid,runId);
-  const result=mode==='start'?await durable.stream(raw?op.prompt:'prompt-ref:'+op.op,{runId}):await durable.recover(runId);
+  const result=mode==='start'?await durable.stream(raw?op.prompt:'prompt-ref:'+op.op,{runId}):await durable.recover(runId,{closeOnSuspend:true});
   console.log('framework run',result.runId); assert.equal(result.runId,runId);
   let answer='';
   for await (const item of result.output.fullStream) {
