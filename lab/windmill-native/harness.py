@@ -98,7 +98,7 @@ def register():
 
 def logs(op):
     out={}
-    for name, tables in [("product",("ops","entries","model_attempts")),("receiver",("models","events","model_http"))]:
+    for name, tables in [("product",("ops","entries","model_attempts","model_intents")),("receiver",("models","events","model_http"))]:
         db=database(name)
         for table in tables:
             rows=[dict(x) for x in db.execute(f"select * from {table} where op=? order by rowid",(op,))]
@@ -114,7 +114,7 @@ def counts(op):
     data=logs(op)
     return {**{kind:sum(e["kind"]==kind for e in data["events"]) for kind in
             ["http_post","effect","simulated_charge","delivery"]},
-            "models":len(data["model_http"]), "model_parsed":len(data["models"]), "held":data["ops"][0]["held"],"spent":data["ops"][0]["spent"],
+            "models":len(data["model_http"]), "model_test_fees":sum(m["fee"] for m in data["model_http"]), "model_parsed":len(data["models"]), "held":data["ops"][0]["held"],"spent":data["ops"][0]["spent"],
             "gate_attempts":len(data["model_attempts"]), "gate_denials":sum(not a["allowed"] for a in data["model_attempts"]),
             "entries":len(data["entries"]), "paired":sum(m["paired"] for m in data["models"])}
 
@@ -295,9 +295,12 @@ def retry_probe(tag):
     root=str(uuid.UUID(call("/jobs/run/f/"+PREFIX+"flow",{"operation":op})))
     wait("model retry probe terminal",lambda:any(j["id"]==root and j["status"] for j in lineage(root)),90)
     outcome=state(op,root,"model_retry")
-    expected=4 if tag=="retrydefault" else 1
+    expected=4 if tag in ("retrydefault","lossraw") else 1
     raw=outcome["ledger"]["model_http"]
     assert len(raw)==sum(m["fee"] for m in raw)==expected
+    if tag=="lossguarded":
+        assert outcome["counts"]["gate_attempts"]==2 and outcome["counts"]["gate_denials"]==1
+        assert [t["state"] for t in outcome["ledger"]["model_intents"]]==["unknown"]
     assert outcome["counts"]["http_post"]==outcome["counts"]["delivery"]==0
     assert next(j["status"] for j in outcome["jobs"] if j["id"]==root)=="failure"
     return op
@@ -311,9 +314,9 @@ def main():
         worker()
         register()
         done={}
-        for tag in ["baseline","retrydefault","retryprotected","known","cancel","oldversion"]:
+        for tag in ["baseline","retrydefault","retryprotected","lossraw","lossguarded","known","cancel","oldversion"]:
             try:
-                run=retry_probe if tag.startswith("retry") else run_case
+                run=retry_probe if tag.startswith(("retry","loss")) else run_case
                 done[tag]={"operation":run(tag),"test_expectation":"observed"}
             except Exception as exc:
                 done[tag]={"status":"error","error":repr(exc)}
@@ -332,7 +335,7 @@ def main():
             "engine_excludes_original_tool_call_id":ALIAS,
             "real_binary_rolling_upgrade":"unverified",
             "provider_default_503_after_charge_zero_resend":False,
-            "gated_http_error_headers_real_transport_loss":"unverified"
+            "provider_tcp_closed_after_charge_durable_claim":"verified for this two-turn protocol"
         },indent=2))
     finally:
         for proc in subs:

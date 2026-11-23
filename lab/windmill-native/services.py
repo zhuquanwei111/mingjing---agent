@@ -44,6 +44,7 @@ def start(name):
                          spent integer default 0, canceled integer default 0, receipt text, version integer default 1, delivered integer default 0, call_id text, engine_call_id text, reader integer default 1,
                          quarantine integer default 0, prompt_private text, result_private text);
         create table model_attempts(op text, allowed integer, body text, at text default current_timestamp);
+        create table model_intents(op text, turn integer, state text, primary key(op,turn));
         create table entries(op text, job text, claim integer, at text default current_timestamp);
         """)
     else:
@@ -104,6 +105,13 @@ def start(name):
             if isinstance(op, list):
                 op = next(item["text"] for item in op if item["type"] == "text")
             db.execute("update model_http set op=? where rowid=?",(op,ingress))
+            if op.startswith(("lossraw_","lossguarded_")):
+                # A real TCP close after committing a simulated bill, before any reply bytes.
+                db.execute("update model_http set fee=1 where rowid=?",(ingress,))
+                self.close_connection=True
+                self.connection.shutdown(2)
+                self.connection.close()
+                return
             if op.startswith(("retrydefault_","retryprotected_")):
                 db.execute("update model_http set fee=1 where rowid=?",(ingress,))
                 return self.reply({"error":"accepted synthetic charge then HTTP 503"},503,

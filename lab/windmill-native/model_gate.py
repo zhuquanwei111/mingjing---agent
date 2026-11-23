@@ -42,17 +42,37 @@ def exact_result(body, expected_call, receipt):
             and calls[0]["function"]["name"]=="async_operation")
 
 
+def authorized(row,body,followup):
+    return bool(row and not row["canceled"] and row["version"]==row["reader"]==1 and
+                (not followup or exact_result(body,row["engine_call_id"],row["receipt"])))
+
+
 def forward(handler,db,body,raw,destination):
     # In this synthetic trust domain authorized infrastructure can handle internal references.
     # The same product transaction orders revocation vs the external POST. No cross-domain IAM claim.
     op=next(m["content"] for m in body["messages"] if m["role"]=="user")
     if isinstance(op,list):
         op=next(p["text"] for p in op if p["type"]=="text")
+    followup=any(m["role"]=="tool" for m in body["messages"])
+    # The direct retry controls deliberately omit the dispatch claim. All business cases use it.
+    guarded=not op.startswith(("retrydefault_","retryprotected_","lossraw_"))
+    turn=int(followup)
+    if guarded:
+        db.execute("begin immediate")
+        checks=db.execute("select * from ops where op=?",(op,)).fetchone()
+        if not authorized(checks,body,followup):
+            db.execute("insert into model_attempts(op,allowed,body) values(?,0,?)",(op,raw.decode()))
+            db.commit()
+            return handler.reply({"error":"model outbound refused"},403,prohibit_retry=True)
+        inserted=db.execute("insert or ignore into model_intents values(?,?,'unknown')",(op,turn)).rowcount
+        if not inserted:
+            db.execute("insert into model_attempts(op,allowed,body) values(?,0,?)",(op,raw.decode()))
+            db.commit()
+            return handler.reply({"error":"existing model dispatch; outcome not authorized for resend"},409,prohibit_retry=True)
+        db.commit()
     db.execute("begin immediate")
     row=db.execute("select * from ops where op=?",(op,)).fetchone()
-    followup=any(m["role"]=="tool" for m in body["messages"])
-    allowed=bool(row and not row["canceled"] and row["version"]==row["reader"]==1 and
-                 (not followup or exact_result(body,row["engine_call_id"],row["receipt"])))
+    allowed=authorized(row,body,followup)
     db.execute("insert into model_attempts(op,allowed,body) values(?,?,?)",(op,allowed,raw.decode()))
     if not allowed:
         db.commit()
@@ -72,8 +92,15 @@ def forward(handler,db,body,raw,destination):
         res=urlopen(req,timeout=20)
     except HTTPError as exc:
         res=exc
+    except (OSError, EOFError):
+        # The attempt and durable claim survive losing the provider response.
+        db.commit()
+        return handler.reply({"error":"upstream response lost before any bytes"},503)
+
     with res:
         data=res.read()
+        if guarded and res.status==200:
+            db.execute("update model_intents set state='answered' where op=? and turn=?",(op,turn))
         if res.status==200 and not followup:
             data=rewrite_first(data,db,op)
         db.commit()
