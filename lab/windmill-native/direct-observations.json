@@ -1,0 +1,741 @@
+{
+  "commit": "f246ea90f3dcbab1d7bfc8e83f47ec59f6e9c708",
+  "run_id": 45190773511,
+  "job_id": 137748198935,
+  "artifact_id": 14826061631,
+  "artifact_sha256": "f8584b41ecb288704b10f4cc152c88fe014aceb91eec6ed80285b78f97c5a226",
+  "actual_observations": [
+    {
+      "stage": "worker_started",
+      "time": 1795442909.7842035,
+      "container": "wmn-worker",
+      "pid": "3022"
+    },
+    {
+      "stage": "registered_script",
+      "time": 1795442909.9151967,
+      "name": "tool",
+      "hash": "d4c619a42c1d177a"
+    },
+    {
+      "stage": "registered_script",
+      "time": 1795442909.986864,
+      "name": "deliver",
+      "hash": "865142c4a720447a"
+    },
+    {
+      "stage": "registered_flow",
+      "time": 1795442910.0402737,
+      "response": "u/admin/wmn_flow"
+    },
+    {
+      "stage": "submitted",
+      "time": 1795442910.8380437,
+      "op": "baseline_87ad40876a1b",
+      "root": "01a208bc-a667-3b28-4b66-aa4ba5ccd293"
+    },
+    {
+      "stage": "accepted",
+      "time": 1795442915.341597,
+      "op": "baseline_87ad40876a1b",
+      "root": "01a208bc-a667-3b28-4b66-aa4ba5ccd293",
+      "counts": {
+        "http_post": 1,
+        "effect": 0,
+        "simulated_charge": 0,
+        "delivery": 0,
+        "models": 1,
+        "held": 3,
+        "spent": 0,
+        "entries": 1,
+        "paired": 0
+      },
+      "jobs": [
+        {
+          "id": "01a208bc-a6d3-4c32-268f-d85e50dd6f02",
+          "kind": "aiagent",
+          "status": null,
+          "worker": "wk-default-worker-Up0kR",
+          "counter": null,
+          "running": true,
+          "suspend": 0,
+          "parent_job": "01a208bc-a667-3b28-4b66-aa4ba5ccd293"
+        },
+        {
+          "id": "01a208bc-a667-3b28-4b66-aa4ba5ccd293",
+          "kind": "flow",
+          "status": null,
+          "worker": "wk-default-worker-Up0kR",
+          "counter": null,
+          "running": true,
+          "suspend": 0,
+          "parent_job": null
+        },
+        {
+          "id": "01a208bc-b702-ed2f-2f63-2a2665337562",
+          "kind": "script",
+          "status": null,
+          "worker": "wk-default-worker-Up0kR",
+          "counter": null,
+          "running": true,
+          "suspend": 0,
+          "parent_job": "01a208bc-a6d3-4c32-268f-d85e50dd6f02"
+        }
+      ]
+    },
+    {
+      "stage": "prerelease",
+      "time": 1795442915.4171917,
+      "op": "baseline_87ad40876a1b",
+      "root": "01a208bc-a667-3b28-4b66-aa4ba5ccd293",
+      "counts": {
+        "http_post": 1,
+        "effect": 1,
+        "simulated_charge": 1,
+        "delivery": 0,
+        "models": 1,
+        "held": 3,
+        "spent": 0,
+        "entries": 1,
+        "paired": 0
+      },
+      "jobs": [
+        {
+          "id": "01a208bc-a6d3-4c32-268f-d85e50dd6f02",
+          "kind": "aiagent",
+          "status": null,
+          "worker": "wk-default-worker-Up0kR",
+          "counter": null,
+          "running": true,
+          "suspend": 0,
+          "parent_job": "01a208bc-a667-3b28-4b66-aa4ba5ccd293"
+        },
+        {
+          "id": "01a208bc-a667-3b28-4b66-aa4ba5ccd293",
+          "kind": "flow",
+          "status": null,
+          "worker": "wk-default-worker-Up0kR",
+          "counter": null,
+          "running": true,
+          "suspend": 0,
+          "parent_job": null
+        },
+        {
+          "id": "01a208bc-b702-ed2f-2f63-2a2665337562",
+          "kind": "script",
+          "status": null,
+          "worker": "wk-default-worker-Up0kR",
+          "counter": null,
+          "running": true,
+          "suspend": 0,
+          "parent_job": "01a208bc-a6d3-4c32-268f-d85e50dd6f02"
+        }
+      ]
+    },
+    {
+      "stage": "final",
+      "time": 1795442916.2341413,
+      "op": "baseline_87ad40876a1b",
+      "root": "01a208bc-a667-3b28-4b66-aa4ba5ccd293",
+      "counts": {
+        "http_post": 1,
+        "effect": 1,
+        "simulated_charge": 1,
+        "delivery": 1,
+        "models": 2,
+        "held": 0,
+        "spent": 1,
+        "entries": 1,
+        "paired": 1
+      },
+      "jobs": [
+        {
+          "id": "01a208bc-a6d3-4c32-268f-d85e50dd6f02",
+          "kind": "aiagent",
+          "status": "success",
+          "worker": null,
+          "counter": null,
+          "running": null,
+          "suspend": null,
+          "parent_job": "01a208bc-a667-3b28-4b66-aa4ba5ccd293"
+        },
+        {
+          "id": "01a208bc-a667-3b28-4b66-aa4ba5ccd293",
+          "kind": "flow",
+          "status": "success",
+          "worker": null,
+          "counter": null,
+          "running": null,
+          "suspend": null,
+          "parent_job": null
+        },
+        {
+          "id": "01a208bc-b702-ed2f-2f63-2a2665337562",
+          "kind": "script",
+          "status": "success",
+          "worker": null,
+          "counter": null,
+          "running": null,
+          "suspend": null,
+          "parent_job": "01a208bc-a6d3-4c32-268f-d85e50dd6f02"
+        },
+        {
+          "id": "01a208bc-b90f-6230-079a-49ddf97744cd",
+          "kind": "script",
+          "status": "success",
+          "worker": null,
+          "counter": null,
+          "running": null,
+          "suspend": null,
+          "parent_job": "01a208bc-a667-3b28-4b66-aa4ba5ccd293"
+        }
+      ]
+    },
+    {
+      "stage": "submitted",
+      "time": 1795442916.2557511,
+      "op": "known_f651547f3a6c",
+      "root": "01a208bc-bb90-e497-e824-08c6102841ef"
+    },
+    {
+      "stage": "accepted",
+      "time": 1795442921.3574116,
+      "op": "known_f651547f3a6c",
+      "root": "01a208bc-bb90-e497-e824-08c6102841ef",
+      "counts": {
+        "http_post": 1,
+        "effect": 0,
+        "simulated_charge": 0,
+        "delivery": 0,
+        "models": 1,
+        "held": 3,
+        "spent": 0,
+        "entries": 1,
+        "paired": 0
+      },
+      "jobs": [
+        {
+          "id": "01a208bc-bb90-e497-e824-08c6102841ef",
+          "kind": "flow",
+          "status": null,
+          "worker": "wk-default-worker-Up0kR",
+          "counter": null,
+          "running": true,
+          "suspend": 0,
+          "parent_job": null
+        },
+        {
+          "id": "01a208bc-bbf6-ba8e-4866-a92a06e2d1ea",
+          "kind": "aiagent",
+          "status": null,
+          "worker": "wk-default-worker-Up0kR",
+          "counter": null,
+          "running": true,
+          "suspend": 0,
+          "parent_job": "01a208bc-bb90-e497-e824-08c6102841ef"
+        },
+        {
+          "id": "01a208bc-cd36-869d-c357-a7957f12e6ac",
+          "kind": "script",
+          "status": null,
+          "worker": "wk-default-worker-Up0kR",
+          "counter": null,
+          "running": true,
+          "suspend": 0,
+          "parent_job": "01a208bc-bbf6-ba8e-4866-a92a06e2d1ea"
+        }
+      ]
+    },
+    {
+      "stage": "prekill",
+      "time": 1795442921.431411,
+      "op": "known_f651547f3a6c",
+      "root": "01a208bc-bb90-e497-e824-08c6102841ef",
+      "counts": {
+        "http_post": 1,
+        "effect": 1,
+        "simulated_charge": 1,
+        "delivery": 0,
+        "models": 1,
+        "held": 3,
+        "spent": 0,
+        "entries": 1,
+        "paired": 0
+      },
+      "jobs": [
+        {
+          "id": "01a208bc-bb90-e497-e824-08c6102841ef",
+          "kind": "flow",
+          "status": null,
+          "worker": "wk-default-worker-Up0kR",
+          "counter": null,
+          "running": true,
+          "suspend": 0,
+          "parent_job": null
+        },
+        {
+          "id": "01a208bc-bbf6-ba8e-4866-a92a06e2d1ea",
+          "kind": "aiagent",
+          "status": null,
+          "worker": "wk-default-worker-Up0kR",
+          "counter": null,
+          "running": true,
+          "suspend": 0,
+          "parent_job": "01a208bc-bb90-e497-e824-08c6102841ef"
+        },
+        {
+          "id": "01a208bc-cd36-869d-c357-a7957f12e6ac",
+          "kind": "script",
+          "status": null,
+          "worker": "wk-default-worker-Up0kR",
+          "counter": null,
+          "running": true,
+          "suspend": 0,
+          "parent_job": "01a208bc-bbf6-ba8e-4866-a92a06e2d1ea"
+        }
+      ]
+    },
+    {
+      "stage": "killed",
+      "time": 1795442921.543,
+      "pid": "3022",
+      "container": "wmn-worker",
+      "agent": "01a208bc-bbf6-ba8e-4866-a92a06e2d1ea",
+      "tool": "01a208bc-cd36-869d-c357-a7957f12e6ac",
+      "worker": "wk-default-worker-Up0kR",
+      "exit": "137"
+    },
+    {
+      "stage": "worker_started",
+      "time": 1795442921.6835961,
+      "container": "wmn-worker-next",
+      "pid": "3751"
+    },
+    {
+      "stage": "replacement",
+      "time": 1795442959.4511127,
+      "op": "known_f651547f3a6c",
+      "root": "01a208bc-bb90-e497-e824-08c6102841ef",
+      "counts": {
+        "http_post": 1,
+        "effect": 1,
+        "simulated_charge": 1,
+        "delivery": 0,
+        "models": 1,
+        "held": 3,
+        "spent": 0,
+        "entries": 2,
+        "paired": 0
+      },
+      "jobs": [
+        {
+          "id": "01a208bc-bbf6-ba8e-4866-a92a06e2d1ea",
+          "kind": "aiagent",
+          "status": null,
+          "worker": "wk-default-next-pPFt6",
+          "counter": 1,
+          "running": true,
+          "suspend": 0,
+          "parent_job": "01a208bc-bb90-e497-e824-08c6102841ef"
+        },
+        {
+          "id": "01a208bc-cd36-869d-c357-a7957f12e6ac",
+          "kind": "script",
+          "status": null,
+          "worker": "wk-default-worker-Up0kR",
+          "counter": 1,
+          "running": false,
+          "suspend": 0,
+          "parent_job": "01a208bc-bbf6-ba8e-4866-a92a06e2d1ea"
+        },
+        {
+          "id": "01a208bc-bb90-e497-e824-08c6102841ef",
+          "kind": "flow",
+          "status": null,
+          "worker": "wk-default-worker-Up0kR",
+          "counter": null,
+          "running": true,
+          "suspend": 0,
+          "parent_job": null
+        },
+        {
+          "id": "01a208bd-629f-828e-7a67-dba581f2c676",
+          "kind": "script",
+          "status": null,
+          "worker": "wk-default-next-pPFt6",
+          "counter": null,
+          "running": true,
+          "suspend": 0,
+          "parent_job": "01a208bc-bbf6-ba8e-4866-a92a06e2d1ea"
+        }
+      ]
+    },
+    {
+      "stage": "final",
+      "time": 1795442960.2676508,
+      "op": "known_f651547f3a6c",
+      "root": "01a208bc-bb90-e497-e824-08c6102841ef",
+      "counts": {
+        "http_post": 1,
+        "effect": 1,
+        "simulated_charge": 1,
+        "delivery": 1,
+        "models": 2,
+        "held": 0,
+        "spent": 1,
+        "entries": 3,
+        "paired": 1
+      },
+      "jobs": [
+        {
+          "id": "01a208bc-bbf6-ba8e-4866-a92a06e2d1ea",
+          "kind": "aiagent",
+          "status": "success",
+          "worker": null,
+          "counter": 1,
+          "running": null,
+          "suspend": null,
+          "parent_job": "01a208bc-bb90-e497-e824-08c6102841ef"
+        },
+        {
+          "id": "01a208bc-cd36-869d-c357-a7957f12e6ac",
+          "kind": "script",
+          "status": "success",
+          "worker": null,
+          "counter": 1,
+          "running": null,
+          "suspend": null,
+          "parent_job": "01a208bc-bbf6-ba8e-4866-a92a06e2d1ea"
+        },
+        {
+          "id": "01a208bc-bb90-e497-e824-08c6102841ef",
+          "kind": "flow",
+          "status": "success",
+          "worker": null,
+          "counter": null,
+          "running": null,
+          "suspend": null,
+          "parent_job": null
+        },
+        {
+          "id": "01a208bd-629f-828e-7a67-dba581f2c676",
+          "kind": "script",
+          "status": "success",
+          "worker": null,
+          "counter": null,
+          "running": null,
+          "suspend": null,
+          "parent_job": "01a208bc-bbf6-ba8e-4866-a92a06e2d1ea"
+        },
+        {
+          "id": "01a208bd-64c6-778c-a689-9213340714dc",
+          "kind": "script",
+          "status": "success",
+          "worker": null,
+          "counter": null,
+          "running": null,
+          "suspend": null,
+          "parent_job": "01a208bc-bb90-e497-e824-08c6102841ef"
+        }
+      ]
+    },
+    {
+      "stage": "submitted",
+      "time": 1795442960.2921581,
+      "op": "cancel_3f399eab6eaa",
+      "root": "01a208bd-6795-d4c7-8846-b2853fce7368"
+    },
+    {
+      "stage": "accepted",
+      "time": 1795442962.8496351,
+      "op": "cancel_3f399eab6eaa",
+      "root": "01a208bd-6795-d4c7-8846-b2853fce7368",
+      "counts": {
+        "http_post": 1,
+        "effect": 0,
+        "simulated_charge": 0,
+        "delivery": 0,
+        "models": 1,
+        "held": 3,
+        "spent": 0,
+        "entries": 1,
+        "paired": 0
+      },
+      "jobs": [
+        {
+          "id": "01a208bd-6f41-0e6b-cb6e-308a97a8adad",
+          "kind": "script",
+          "status": null,
+          "worker": "wk-default-next-pPFt6",
+          "counter": null,
+          "running": true,
+          "suspend": 0,
+          "parent_job": "01a208bd-67cc-58e3-3e5e-7da5fbaf54bc"
+        },
+        {
+          "id": "01a208bd-67cc-58e3-3e5e-7da5fbaf54bc",
+          "kind": "aiagent",
+          "status": null,
+          "worker": "wk-default-next-pPFt6",
+          "counter": null,
+          "running": true,
+          "suspend": 0,
+          "parent_job": "01a208bd-6795-d4c7-8846-b2853fce7368"
+        },
+        {
+          "id": "01a208bd-6795-d4c7-8846-b2853fce7368",
+          "kind": "flow",
+          "status": null,
+          "worker": "wk-default-next-pPFt6",
+          "counter": null,
+          "running": true,
+          "suspend": 0,
+          "parent_job": null
+        }
+      ]
+    },
+    {
+      "stage": "prekill",
+      "time": 1795442962.9238877,
+      "op": "cancel_3f399eab6eaa",
+      "root": "01a208bd-6795-d4c7-8846-b2853fce7368",
+      "counts": {
+        "http_post": 1,
+        "effect": 1,
+        "simulated_charge": 1,
+        "delivery": 0,
+        "models": 1,
+        "held": 3,
+        "spent": 0,
+        "entries": 1,
+        "paired": 0
+      },
+      "jobs": [
+        {
+          "id": "01a208bd-6f41-0e6b-cb6e-308a97a8adad",
+          "kind": "script",
+          "status": null,
+          "worker": "wk-default-next-pPFt6",
+          "counter": null,
+          "running": true,
+          "suspend": 0,
+          "parent_job": "01a208bd-67cc-58e3-3e5e-7da5fbaf54bc"
+        },
+        {
+          "id": "01a208bd-67cc-58e3-3e5e-7da5fbaf54bc",
+          "kind": "aiagent",
+          "status": null,
+          "worker": "wk-default-next-pPFt6",
+          "counter": null,
+          "running": true,
+          "suspend": 0,
+          "parent_job": "01a208bd-6795-d4c7-8846-b2853fce7368"
+        },
+        {
+          "id": "01a208bd-6795-d4c7-8846-b2853fce7368",
+          "kind": "flow",
+          "status": null,
+          "worker": "wk-default-next-pPFt6",
+          "counter": null,
+          "running": true,
+          "suspend": 0,
+          "parent_job": null
+        }
+      ]
+    },
+    {
+      "stage": "killed",
+      "time": 1795442963.0267816,
+      "pid": "3751",
+      "container": "wmn-worker-next",
+      "agent": "01a208bd-67cc-58e3-3e5e-7da5fbaf54bc",
+      "tool": "01a208bd-6f41-0e6b-cb6e-308a97a8adad",
+      "worker": "wk-default-next-pPFt6",
+      "exit": "137"
+    },
+    {
+      "stage": "worker_started",
+      "time": 1795442963.1645224,
+      "container": "wmn-worker-next-next",
+      "pid": "5905"
+    },
+    {
+      "stage": "replacement",
+      "time": 1795442999.5181563,
+      "op": "cancel_3f399eab6eaa",
+      "root": "01a208bd-6795-d4c7-8846-b2853fce7368",
+      "counts": {
+        "http_post": 1,
+        "effect": 1,
+        "simulated_charge": 1,
+        "delivery": 0,
+        "models": 1,
+        "held": 3,
+        "spent": 0,
+        "entries": 2,
+        "paired": 0
+      },
+      "jobs": [
+        {
+          "id": "01a208bd-67cc-58e3-3e5e-7da5fbaf54bc",
+          "kind": "aiagent",
+          "status": null,
+          "worker": "wk-default-next-oPdoX",
+          "counter": 1,
+          "running": true,
+          "suspend": 0,
+          "parent_job": "01a208bd-6795-d4c7-8846-b2853fce7368"
+        },
+        {
+          "id": "01a208bd-6f41-0e6b-cb6e-308a97a8adad",
+          "kind": "script",
+          "status": null,
+          "worker": "wk-default-next-pPFt6",
+          "counter": 1,
+          "running": false,
+          "suspend": 0,
+          "parent_job": "01a208bd-67cc-58e3-3e5e-7da5fbaf54bc"
+        },
+        {
+          "id": "01a208bd-ff81-5748-b70e-c746041dfa14",
+          "kind": "script",
+          "status": null,
+          "worker": "wk-default-next-oPdoX",
+          "counter": null,
+          "running": true,
+          "suspend": 0,
+          "parent_job": "01a208bd-67cc-58e3-3e5e-7da5fbaf54bc"
+        },
+        {
+          "id": "01a208bd-6795-d4c7-8846-b2853fce7368",
+          "kind": "flow",
+          "status": null,
+          "worker": "wk-default-next-pPFt6",
+          "counter": null,
+          "running": true,
+          "suspend": 0,
+          "parent_job": null
+        }
+      ]
+    },
+    {
+      "stage": "unknown",
+      "time": 1795442999.5897934,
+      "op": "cancel_3f399eab6eaa",
+      "root": "01a208bd-6795-d4c7-8846-b2853fce7368",
+      "counts": {
+        "http_post": 1,
+        "effect": 1,
+        "simulated_charge": 1,
+        "delivery": 0,
+        "models": 1,
+        "held": 3,
+        "spent": 0,
+        "entries": 2,
+        "paired": 0
+      },
+      "jobs": [
+        {
+          "id": "01a208bd-67cc-58e3-3e5e-7da5fbaf54bc",
+          "kind": "aiagent",
+          "status": null,
+          "worker": "wk-default-next-oPdoX",
+          "counter": 1,
+          "running": true,
+          "suspend": 0,
+          "parent_job": "01a208bd-6795-d4c7-8846-b2853fce7368"
+        },
+        {
+          "id": "01a208bd-6f41-0e6b-cb6e-308a97a8adad",
+          "kind": "script",
+          "status": null,
+          "worker": "wk-default-next-pPFt6",
+          "counter": 1,
+          "running": false,
+          "suspend": 0,
+          "parent_job": "01a208bd-67cc-58e3-3e5e-7da5fbaf54bc"
+        },
+        {
+          "id": "01a208bd-ff81-5748-b70e-c746041dfa14",
+          "kind": "script",
+          "status": null,
+          "worker": "wk-default-next-oPdoX",
+          "counter": null,
+          "running": true,
+          "suspend": 0,
+          "parent_job": "01a208bd-67cc-58e3-3e5e-7da5fbaf54bc"
+        },
+        {
+          "id": "01a208bd-6795-d4c7-8846-b2853fce7368",
+          "kind": "flow",
+          "status": null,
+          "worker": "wk-default-next-pPFt6",
+          "counter": null,
+          "running": true,
+          "suspend": 0,
+          "parent_job": null
+        }
+      ]
+    },
+    {
+      "stage": "final",
+      "time": 1795443003.4191434,
+      "op": "cancel_3f399eab6eaa",
+      "root": "01a208bd-6795-d4c7-8846-b2853fce7368",
+      "counts": {
+        "http_post": 1,
+        "effect": 1,
+        "simulated_charge": 1,
+        "delivery": 0,
+        "models": 2,
+        "held": 0,
+        "spent": 1,
+        "entries": 2,
+        "paired": 0
+      },
+      "jobs": [
+        {
+          "id": "01a208bd-67cc-58e3-3e5e-7da5fbaf54bc",
+          "kind": "aiagent",
+          "status": "canceled",
+          "worker": null,
+          "counter": 1,
+          "running": null,
+          "suspend": null,
+          "parent_job": "01a208bd-6795-d4c7-8846-b2853fce7368"
+        },
+        {
+          "id": "01a208bd-6f41-0e6b-cb6e-308a97a8adad",
+          "kind": "script",
+          "status": "canceled",
+          "worker": null,
+          "counter": 1,
+          "running": null,
+          "suspend": null,
+          "parent_job": "01a208bd-67cc-58e3-3e5e-7da5fbaf54bc"
+        },
+        {
+          "id": "01a208bd-ff81-5748-b70e-c746041dfa14",
+          "kind": "script",
+          "status": "canceled",
+          "worker": null,
+          "counter": null,
+          "running": null,
+          "suspend": null,
+          "parent_job": "01a208bd-67cc-58e3-3e5e-7da5fbaf54bc"
+        },
+        {
+          "id": "01a208bd-6795-d4c7-8846-b2853fce7368",
+          "kind": "flow",
+          "status": "canceled",
+          "worker": null,
+          "counter": null,
+          "running": null,
+          "suspend": null,
+          "parent_job": null
+        }
+      ]
+    }
+  ],
+  "completed_canceled_agent_log": "2026-11-23T14:10:03.4955640Z aiagent|u/admin/wmn_flow/agent|||canceled|{\"output\": \"unpaired\", \"messages\": [{\"role\": \"user\", \"content\": \"cancel_3f399eab6eaa\"}, {\"role\": \"assistant\", \"tool_calls\": [{\"id\": \"call_9a3c211c4f1a4c39b8aefe33121d1bd9\", \"type\": \"function\", \"function\": {\"name\": \"async_operation\", \"arguments\": \"{}\"}}]}, {\"role\": \"tool\", \"content\": \"{\\\"error\\\": {\\\"name\\\": \\\"ExecutionErr\\\", \\\"message\\\": \\\"execution error:\\\\njob process terminated due to cancelled by admin (reason: synthetic cancel)\\\"}}\", \"agent_action\": {\"type\": \"tool_call\", \"job_id\": \"01a208bd-ff81-5748-b70e-c746041dfa14\", \"module_id\": \"t\", \"function_name\": \"async_operation\"}, \"tool_call_id\": \"call_9a3c211c4f1a4c39b8aefe33121d1bd9\"}, {\"role\": \"assistant\", \"content\": \"unpaired\", \"agent_action\": {\"type\": \"message\"}}]}"
+}
