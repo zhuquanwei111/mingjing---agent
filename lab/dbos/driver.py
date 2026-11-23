@@ -192,8 +192,8 @@ def run_case(scope,client):
                 job_switch(scope,'visible')
                 for _ in range(2):
                     client.send('run-'+scope,'available','receipt',idempotency_key='trigger-'+scope)
-                end=wait(scope,p,lambda s: engine(client,scope)['status']=='SUCCESS')
                 expected={'known':'delivered','legacy':'quarantine','wrong':'rejected'}[scope]
+                end=wait(scope,p,lambda s: s['task']['state']==expected and engine(client,scope)['status']=='SUCCESS')
                 writer,=[t for t in end['trace'] if t['kind']=='write_checkpoint']
                 reader,=[t for t in end['trace'] if t['kind']=='read_checkpoint']
                 assert writer['pid']==old_pid and reader['pid']==p.pid

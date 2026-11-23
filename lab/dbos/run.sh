@@ -76,3 +76,4 @@ for lock in pathlib.Path('lab/dbos/linux-cp312.lock').read_text().splitlines():
 pathlib.Path(os.environ['LAB_OUT'],'licenses.json').write_text(json.dumps(out,indent=2))
 PY
 python -u "$LAB_DIR/driver.py"
+python -u "$LAB_DIR/takeover.py"

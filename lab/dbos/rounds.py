@@ -4,6 +4,7 @@ import json
 import os
 import signal
 import sys
+import threading
 import time
 from urllib.request import Request, urlopen
 from uuid import uuid4
@@ -175,13 +176,13 @@ def late_receipt(scope):
 
 def main():
     action,scope = sys.argv[1:3]
-    executor=('receipt-' if action=='late' else 'round-')+scope
+    executor={'late':'receipt-','standby':'standby-'}.get(action,'round-')+scope
     DBOS(config={'name':'round-lab','system_database_url':os.environ['ENGINE_DSN'],
                  'executor_id':executor,'application_version':'fixed-lab-v1','enable_otlp':False})
     DBOS.launch()
     if action == 'start':
         with SetWorkflowID('run-'+scope):
-            if scope=='naked':
+            if scope in ('naked','false_recovery'):
                 DBOS.start_workflow(naked_control,scope,'NAKED_INPUT_MARK_'+scope)
             else:
                 DBOS.start_workflow(controlled,scope)
@@ -189,6 +190,15 @@ def main():
         for i in range(2):
             with SetWorkflowID('notice-'+scope+'-'+str(i)):
                 assert late_receipt(scope)=='settled'
+    elif action=='standby':
+        requested=threading.Event()
+        signal.signal(signal.SIGUSR1,lambda *_: requested.set())
+        print('WORKER_READY',action,scope,os.getpid(),flush=True)
+        requested.wait()
+        recovered=DBOS.recover_workflows(['round-'+scope])
+        print('EXPLICIT_RECOVER',json.dumps([h.get_workflow_id() for h in recovered]),flush=True)
+        signal.pause()
+        return
     elif action != 'recover':
         raise ValueError(action)
     print('WORKER_READY',action,scope,os.getpid(),flush=True)
