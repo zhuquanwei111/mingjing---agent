@@ -1,0 +1,41 @@
+[
+  {
+    "scope": "native",
+    "ok": true,
+    "counts": {
+      "tools": 2,
+      "effects": 1,
+      "toolFees": 2,
+      "models": 2,
+      "modelFees": 2,
+      "deliveries": 1
+    }
+  },
+  {
+    "scope": "known",
+    "ok": true,
+    "counts": {
+      "tools": 1,
+      "effects": 1,
+      "toolFees": 1,
+      "models": 2,
+      "modelFees": 2,
+      "deliveries": 1
+    }
+  },
+  {
+    "scope": "unknown",
+    "ok": false,
+    "error": "AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:\n+ actual - expected\n\n  {\n+   code: 13,\n-   code: 0,\n    signal: null\n  }\n"
+  },
+  {
+    "scope": "incompatible",
+    "ok": false,
+    "error": "AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:\n+ actual - expected\n\n  {\n+   code: 13,\n-   code: 0,\n    signal: null\n  }\n"
+  },
+  {
+    "scope": "mismatch",
+    "ok": false,
+    "error": "AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:\n+ actual - expected\n\n  {\n+   code: 13,\n-   code: 0,\n    signal: null\n  }\n"
+  }
+]

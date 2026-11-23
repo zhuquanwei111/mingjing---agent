@@ -1,0 +1,62 @@
+[
+  {
+    "scope": "native",
+    "ok": true,
+    "counts": {
+      "tools": 2,
+      "effects": 1,
+      "toolFees": 2,
+      "models": 2,
+      "modelFees": 2,
+      "deliveries": 1
+    }
+  },
+  {
+    "scope": "known",
+    "ok": true,
+    "counts": {
+      "tools": 1,
+      "effects": 1,
+      "toolFees": 1,
+      "models": 2,
+      "modelFees": 2,
+      "deliveries": 1
+    }
+  },
+  {
+    "scope": "unknown",
+    "ok": true,
+    "counts": {
+      "tools": 1,
+      "effects": 1,
+      "toolFees": 1,
+      "models": 1,
+      "modelFees": 1,
+      "deliveries": 0
+    }
+  },
+  {
+    "scope": "incompatible",
+    "ok": true,
+    "counts": {
+      "tools": 1,
+      "effects": 1,
+      "toolFees": 1,
+      "models": 1,
+      "modelFees": 1,
+      "deliveries": 0
+    }
+  },
+  {
+    "scope": "mismatch",
+    "ok": true,
+    "counts": {
+      "tools": 1,
+      "effects": 1,
+      "toolFees": 1,
+      "models": 1,
+      "modelFees": 1,
+      "deliveries": 0
+    }
+  }
+]

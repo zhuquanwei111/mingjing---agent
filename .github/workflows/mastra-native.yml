@@ -22,15 +22,17 @@ jobs:
           ref: ${{ github.event.pull_request.head.sha }}
           persist-credentials: false
       - run: make check
-      - name: Install exact top-level packages and retain resolved lock
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38
+        with:
+          node-version: '24.22.3'
+          package-manager-cache: false
+      - name: Install and attest the frozen package lock
         working-directory: lab/mastra
         run: |
           set -euo pipefail
-          export PATH="$(find /opt/hostedtoolcache/node -path '*/24.*/x64/bin' | sort -V | tail -1):$PATH"
-          dirname "$(which node)" >> "$GITHUB_PATH"
           mkdir -p "$RUNNER_TEMP/mastra"
           { node --version; npm --version; git rev-parse HEAD; } | tee "$RUNNER_TEMP/mastra/versions.log"
-          npm install --ignore-scripts --no-audit --no-fund
+          npm ci --ignore-scripts --no-audit --no-fund
           cp package-lock.json "$RUNNER_TEMP/mastra/"
           npm ls --depth=0 | tee "$RUNNER_TEMP/mastra/deps.log"
       - name: Observe real process crash and recovery
