@@ -42,6 +42,6 @@
 
 ## 本次治理与正式架构关系
 
-[PR #6 路线 B 开发包](https://github.com/zhuquanwei111/mingjing---agent/pull/6) 和 [PR #7 架构评审草案](https://github.com/zhuquanwei111/mingjing---agent/pull/7) 尚未合并。**是否已经完成总体架构独立评审及其准入结论，必须另有可定位的报告和审查处置，不能由用户的“评审结束”四字推定为通过。** 因此，本次目录治理先确定索引、职责和迁移顺序，不提前把路线 B 提升为正式当前架构。
+[PR #6 路线 B 开发包](https://github.com/zhuquanwei111/mingjing---agent/pull/6) 和 [PR #7 架构评审草案](https://github.com/zhuquanwei111/mingjing---agent/pull/7) 尚未合并。**独立整体架构评审已回传，但结论为“需修订后复审”，并非准入通过。** [PR #7 原始评审](https://github.com/zhuquanwei111/mingjing---agent/pull/7#issuecomment-7099754918) 的 RB-01–RB-07 仍待设计者逐项处置及复审。因此，本次目录治理先确定索引、职责和迁移顺序，不把路线 B 提升为正式当前架构；已获批准的有效规则与历史资产继续保留。
 
 未来每个新项目应保留同类**目录职责和文档权威**原则，不要求照搬明镜具体路径、旧项目结构或 ARM64 门禁。
