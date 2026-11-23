@@ -176,7 +176,13 @@ def run_case(scope,client):
                 job_switch(scope,'visible')
                 late=worker(scope,'late','two')
                 try:
-                    end=wait(scope,late,lambda s: len([t for t in s['trace'] if t['kind']=='settled'])==2)
+                    notice_ids=['notice-'+scope+'-'+str(i) for i in range(2)]
+                    def complete_notices(s):
+                        if len([t for t in s['trace'] if t['kind']=='settled'])!=2:
+                            return False
+                        statuses=client.list_workflows(workflow_ids=notice_ids)
+                        return len(statuses)==2 and all(st.status=='SUCCESS' and st.executor_id=='receipt-'+scope for st in statuses)
+                    end=wait(scope,late,complete_notices)
                     assert sorted(t['detail']['new'] for t in end['trace'] if t['kind']=='settled')==[False,True]
                 finally:
                     kill(late)

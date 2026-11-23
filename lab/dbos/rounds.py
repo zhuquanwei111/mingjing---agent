@@ -175,8 +175,9 @@ def late_receipt(scope):
 
 def main():
     action,scope = sys.argv[1:3]
+    executor=('receipt-' if action=='late' else 'round-')+scope
     DBOS(config={'name':'round-lab','system_database_url':os.environ['ENGINE_DSN'],
-                 'executor_id':'round-'+scope,'application_version':'fixed-lab-v1','enable_otlp':False})
+                 'executor_id':executor,'application_version':'fixed-lab-v1','enable_otlp':False})
     DBOS.launch()
     if action == 'start':
         with SetWorkflowID('run-'+scope):
