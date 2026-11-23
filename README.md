@@ -49,7 +49,7 @@ Daytona 跑完整验收前需确认其当前 Docker/Compose 能力。
 - [统一文档索引（含当前方案与历史资料状态）](docs/index.md)
 - [目录职责及交付包迁移规范（草案）](docs/repository-layout.md)
 
-- [方案入口](mingjing-codex-engineering-v1/README.md)
+- [历史 v1 工程交付包（不是当前新路线的批准依据）](mingjing-codex-engineering-v1/README.md)
 - [P1 运行与复现说明](p1-walking-skeleton/README.md)
 - [P2 接口与操作手册](core/README.md)
 - [开发流程的来源与适配说明](docs/development.md#采用依据与核验版本)
