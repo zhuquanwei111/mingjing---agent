@@ -14,3 +14,7 @@
 独立初审固定稿 [63cdb2f](https://github.com/zhuquanwei111/mingjing---agent/commit/63cdb2f875d3ab337ece917244fdaa9960f9b8f2) 的结论为「需修改」。设计者接受四项运行判据和一项业务意见：补齐原调用未落账与已认领未知窗口；用三类动态实收和三入口同权对照；增加父取消传播与迟到冲突；区别撤权后的新交接和此前已合法交接；运营退回计入返工。修订后交原独立评审者复审。
 
 另将合法欠参 Task 与可派发 Run 的创建时点分开，补入 W0-07 的干净复跑、失败非零、资源清理和对应版本回归要求。
+
+## 设计复审结论
+
+独立初审要求修改，整改后对 [8095d6f 的四份文档](https://github.com/zhuquanwei111/mingjing---agent/commit/8095d6f79e2e4e42fbdef03c8fdbfdf6b4785b35) 复审通过。批准对象是正式 W0 接入契约和逐场景设计。当前没有真实宿主，真实集成未运行（0/16）；本轮不授予建宿主、实施 W0 或开发 MVP 的权限。首期运营单场复盘仍是待业务确认的产品范围草案。原始回流及处理详见[PR #18 独立复审收据](https://github.com/zhuquanwei111/mingjing---agent/pull/18#issuecomment-7105222681)。
