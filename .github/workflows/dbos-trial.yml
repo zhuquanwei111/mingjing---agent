@@ -1,0 +1,29 @@
+name: DBOS interrupted tool round
+on:
+  pull_request:
+    branches: [lab/architecture-20261123-compare]
+    paths: ['lab/dbos/**', '.github/workflows/dbos-trial.yml']
+permissions:
+  contents: read
+jobs:
+  comparison:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          persist-credentials: false
+      - run: make check
+      - name: Resolve isolated CPython 3.12 comparison dependencies
+        run: |
+          python3.12 -m venv /tmp/dbos-env
+          /tmp/dbos-env/bin/pip install --only-binary=:all: --report /tmp/dbos-install.json 'dbos==3.6.0' 'pydantic-ai-slim[openai]==2.71.0' 'psycopg[binary]==3.3.9'
+          python3 - <<'PY'
+          import json
+          d=json.load(open('/tmp/dbos-install.json'))
+          for p in d['install']:
+              m=p['metadata']
+              h=p['download_info']['archive_info']['hashes']['sha256']
+              print('DBOS_LOCK',m['name']+'=='+m['version'],'--hash=sha256:'+h)
+          PY
