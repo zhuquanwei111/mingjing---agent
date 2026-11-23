@@ -23,6 +23,7 @@ P2 最小公共层已由 [PR #2](https://github.com/zhuquanwei111/mingjing---age
 
 [开发流程](docs/development.md)包含验证、审查和 Git 交付；
 [计划与接续](docs/PLANS.md)说明完成信号、换会话和恢复方法。
+[Codex 通用规范与明镜接入](docs/engineering-standard.md)提供独立评审、复用、文档治理和验证入口。
 Agent 可用 `python3 scripts/check_development_docs.py --status --task docs/tasks/codex-development-configuration.md`
 读取实际 Git 状态、定位本次任务并检查开发入口引用。它不连接服务或修改工作区。
 

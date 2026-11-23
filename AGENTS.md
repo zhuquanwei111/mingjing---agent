@@ -10,6 +10,8 @@
 - [方案与阶段计划](mingjing-codex-engineering-v1/README.md)；[P2 接口与操作](core/README.md)。
 - 历史验收：[P1 报告](p1-walking-skeleton/P1_REPORT.md)、[P2 早期报告](core/P2_REPORT.md)；新提交以对应 CI 为准。
 - [开发流程](docs/development.md)、[长任务计划与接续](docs/PLANS.md)、[配置与环境边界](docs/configuration.md)。
+- [明镜采用的工程规范](docs/engineering-standard.md)；[通用规范包](engineering-standard/README.md)可独立复用。
+- [规范建设与验证任务](docs/tasks/engineering-standard.md)记录独立方案评审、候选及恢复入口。
 - [本次完整配置任务](docs/tasks/codex-development-configuration.md)：C01–C09 范围和验收进度；不要另建重复总账。
 - [Makefile](Makefile) 是本地与 CI 的检查入口；只读状态与入口检查由 `python3 scripts/check_development_docs.py --status` 提供。
 
@@ -21,6 +23,8 @@
 - 先检查 Git 状态，识别并保留用户或其他任务的改动；不要清空工作区。
 - 小改动直接实施；影响运行行为、API、配置或持久状态时，先在现有计划或简短说明中
   明确必需行为、兼容边界、不支持范围和既有替代路径，再做最小适用修改。
+- 实质技术取舍按[项目接入说明](docs/engineering-standard.md)使用有独立方案评审的实现入口，
+  由原设计者处置返回的意见。已有工作通过任务记录接续。
 - 复杂或跨会话任务按 [计划与接续约定](docs/PLANS.md)维护既有记录；验收写可观察结果。
 - 优先使用项目已有实现、依赖和验证入口。新增依赖先核对官方接口、版本、许可
   与现有架构的适配，不为一个局部需求建设新的通用平台。
