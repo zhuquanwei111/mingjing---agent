@@ -1,0 +1,4 @@
+services:
+  db:
+    environment:
+      POSTGRES_INITDB_ARGS: --auth-host=scram-sha-256

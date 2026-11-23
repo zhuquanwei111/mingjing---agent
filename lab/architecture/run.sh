@@ -11,7 +11,7 @@ export P2_MIGRATION_PASSWORD=$(openssl rand -hex 20)
 export P2_APP_PASSWORD=$(openssl rand -hex 20)
 export P2_TEMPORAL_PASSWORD=$(openssl rand -hex 20)
 export MJLAB_DB_PASSWORD=$(openssl rand -hex 20)
-dc() { docker compose -p "$P2_PROJECT" -f core/infra/compose.yaml "$@"; }
+dc() { docker compose -p "$P2_PROJECT" -f core/infra/compose.yaml -f "$fixture/pg-auth.yml" "$@"; }
 cleanup() { dc down -v --remove-orphans >/dev/null; }
 trap cleanup EXIT
 dc up -d --wait db temporal
@@ -33,10 +33,11 @@ dc up --no-deps --force-recreate -d --wait db
 dc up --no-deps --force-recreate -d --wait temporal
 [[ "$old_db" != "$(dc ps -q db)" && "$old_engine" != "$(dc ps -q temporal)" ]]
 probe readback
-if dc exec -T db env PGPASSWORD="$(openssl rand -hex 20)" psql -h 127.0.0.1 -U "$P2_PROJECT" -d "$P2_PROJECT" -c 'select 1' >/dev/null 2>&1; then
+if dc run --rm -T --no-deps --entrypoint env db PGPASSWORD="$(openssl rand -hex 20)" psql -h db -U "$P2_PROJECT" -d "$P2_PROJECT" -c 'select 1' >/dev/null 2>&1; then
   echo "unexpected credential acceptance"; exit 1
 fi
 echo "LIVE_PREFLIGHT route=$route database_and_history_survived_replacement=true"
 if [[ -f "$fixture/experiment.sh" ]]; then
   source "$fixture/experiment.sh"
 fi
+if [[ ! -f "$fixture/experiment.sh" ]]; then source "$fixture/model.sh"; fi
