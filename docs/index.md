@@ -15,6 +15,8 @@
 | 开发与任务接续 | [开发流程](development.md)、[长任务计划](PLANS.md)、[设置及环境边界](configuration.md) | 任务具体状态以所属任务记录和实际 Git 状态核对 |
 | 需求与验收 | [通用工程规范需求](requirements/engineering-standard.md)、[任务记录目录](tasks/) | 已有项目需求摘要不代替用户持有的完整需求原件 |
 | 正式产品架构与选型 | [PR #14 独立终裁](designs/whole-product-decision.md)、[需求验收与证据](requirements/whole-product-acceptance-results.md) | 经调整的路线 B 已作为开发基线；W0、MVP 和上线各有后续验收 |
+| W0 设计与验收 | [宿主接线](designs/w0-host-design.md)、[16 个验收场景](designs/w0-host-acceptance.md)、[复审与文件指纹](tasks/reviewed-deliverables.md) | W0a/W0b 的设计基线，实际结果待真实宿主验证 |
+| 首期业务与通用基座 | [首期产品范围](requirements/first-mvp-product-scope.md)、[调用图](designs/mvp-operation-call-graph.md)、[组件选型](designs/whole-product-component-selection.md)、[公共架构图](architecture/明镜公共架构.svg) | [HTML 说明](architecture/明镜完整产品公共架构与首期通用基座.html)、[可编辑图](architecture/明镜公共架构.drawio)、[运行与证据表](architecture/明镜公共组件选型_首期运行与证据.csv) |
 | 技术决定 | [ADR 目录](adr/) | 记录拟议、接受、替代与撤回，状态必须与当前事实一致 |
 
 ## 当前架构与历史的区别
@@ -29,7 +31,7 @@
 
 ## 目录治理及资料规则
 
-参见 [目录职责、迁移映射和验收](repository-layout.md)。目前优先完成入口梳理、引用清单及目录规范，**历史包搬迁与候选方案定版另作为后续受审迁移**，避免与进行中的 PR 冲突。`docs/designs/` 已保存完整产品选型与审查正文。`docs/architecture/` 仅在需要独立维护当前架构地图时再建，不为排版创建空目录。正式工程记录留在 Git；Space 可用于讨论和链接，但不自动替代正式提交。
+参见 [目录职责、迁移映射和验收](repository-layout.md)。目前优先完成入口梳理、引用清单及目录规范，**历史包搬迁与候选方案定版另作为后续受审迁移**，避免与进行中的 PR 冲突。`docs/designs/` 已保存完整产品选型与审查正文。`docs/architecture/` 保存首期通用基座的图文说明、可编辑图源及组件表。正式工程记录留在 Git；Space 可用于讨论和链接，但不自动替代正式提交。
 ## W0、MVP 和后续开发如何持续维护
 
 - **已有开发分支**不能假定自动继承本规范；启动 W0/MVP 或接续旧 PR 时要与最新 `main` 比较，安全同步适用规则及文档入口，再以该候选复验。不得为同步而覆盖未提交的他人改动。
