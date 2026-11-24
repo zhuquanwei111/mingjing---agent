@@ -16,6 +16,8 @@ P2 最小公共层已由 [PR #2](https://github.com/zhuquanwei111/mingjing---age
 - 当前改动的验证以同一候选提交的 PR、CI 作业和完整日志为准；生产制品等未放行事项继续适用。
 - [Codex 配置与验收任务历史](docs/tasks/codex-development-configuration.md)记录 C01–C09；具体进度须与现行 PR、代码和测试对照。
 
+首期建设、后续扩展与生产准入的依赖见[完整产品分阶段实施方案](docs/designs/whole-product-phased-implementation.md)。按[需求到阶段索引](docs/requirements/whole-product-phase-index.md)核对各阶段须新增的证据。
+
 ## 用 Codex 开发
 
 在 Codex 图形界面选择仓库根目录，从 [AGENTS.md](AGENTS.md) 进入。

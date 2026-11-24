@@ -16,6 +16,10 @@
 | 正式产品架构与选型 | [PR #14 独立终裁](designs/whole-product-decision.md)、[需求验收与证据](requirements/whole-product-acceptance-results.md) | 经调整的路线 B 已作为开发基线；W0、MVP 和上线各有后续验收 |
 | 技术决定 | [ADR 目录](adr/) | 记录拟议、接受、替代与撤回，状态必须与当前事实一致 |
 
+## 按阶段推进产品
+
+[完整产品分阶段实施方案](designs/whole-product-phased-implementation.md)给出各阶段进入条件、交付物、责任接口、放行与后续工作。[需求到阶段索引](requirements/whole-product-phase-index.md)逐项对应原 23 组、76 个编号。
+
 ## 当前架构与历史的区别
 
 - [v1 历史工程交付包](../mingjing-codex-engineering-v1/README.md) 仍暂存仓库根目录。这是**历史来源**，不应单凭其 `03_TECH_STACK.md` 或启动词确定新开发路线；其中仍被根 AGENTS 引用的安全/阶段约束必须在迁移前识别并保留。
