@@ -8,6 +8,8 @@
 | MVP-SCOPE-COMP-01 | [首期产品范围](../requirements/first-mvp-product-scope.md)、[组件选择](../designs/whole-product-component-selection.md)和[业务调用图](../designs/mvp-operation-call-graph.md)。三份 Markdown 均与独立复审回执记录的完整 SHA-256 相符。 |
 | MJ-COMMON-BOUNDARY-02 R5 | [首期基座说明](../architecture/明镜完整产品公共架构与首期通用基座.html)、[架构图](../architecture/明镜公共架构.svg)、[可编辑源图](../architecture/明镜公共架构.drawio)及[组件运行与取证表](../architecture/明镜公共组件选型_首期运行与证据.csv)。使用说明与评审记录可在 HTML 中阅读，克隆后可本地打开。 |
 
+两份选型材料按评审顺序阅读。MVP-SCOPE-COMP-01 给出业务范围和组件候选，R5 补充首个可运行版本、最迟可用时点、第一条真实链路和验收取证。受控知识库、撤回验证、失败追查和公共评测均已列入首个业务功能开发前的验收。
+
 ## 文件指纹
 
 散列对应本次归档的原始文件。四份基座交付物来自同一份通过完整性校验的 ZIP，源包 SHA-256 为 `1cf2210f717d2deb3af007a0bac47ffab538c23e38c6f03a8e08b4d9a4807e71`。
