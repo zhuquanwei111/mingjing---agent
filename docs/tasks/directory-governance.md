@@ -32,3 +32,29 @@ W0 最短贯通、正式 MVP 及之后的重要功能/架构/目录变更在每�
 ## 原则与恢复
 
 本次工作只属于**工程治理**，不是新功能研发；继续使用仓库 [开发流程](../development.md) 和 [通用工程规范](../../engineering-standard/workflow.md)。后续从本任务、最新 Git 状态和用户提供的评审结论恢复，不依赖原聊天历史，不让旧交付包悄悄成为新权威。
+## v1 实际迁移的评审稿（2026-11-24）
+
+冻结基线 [e759892a](https://github.com/zhuquanwei111/mingjing---agent/commit/e759892afdfae7fe08c51e90b5fed977b053e905)。本节提交迁移方案供独立评审。收到回执并处理阻断后，在同一 PR 移动目录、修订引用、提交实际验证记录。
+
+### 文件映射与原件验证
+
+以下每个文件均从 `mingjing-codex-engineering-v1/` 原名移至 `docs/archive/engineering-v1/`。16 份原件的 Git 树为 `8c8d45fe6fd733e409858db1a31f450b7787cbf3`。基线的包内 Markdown 相对链接已逐条检查，均能在原包内解析。实际移动后，以新目录的完整 Git 树与该值相等验收文件名、模式和字节。
+
+| 内容 | 文件 |
+| --- | --- |
+| 产品与架构 | `01_PROJECT_BRIEF.md`、`02_ARCHITECTURE.md`、`03_TECH_STACK.md`、`04_CAPABILITY_CONTRACT.md` |
+| 安全、数据与计划 | `05_SECURITY_AND_RELIABILITY.md`、`06_DATA_AND_ARTIFACTS.md`、`07_IMPLEMENTATION_PLAN.md`、`08_ACCEPTANCE_TESTS.md`、`09_OPEN_QUESTIONS.md` |
+| 规则与入口 | `AGENTS.md`、`README.md`、`CODEX_START_PROMPT.md` |
+| 版本与历史证据 | `DEPENDENCY_LOCK.md`、`P0_REPORT.md`、`P1_EXECUTION_PLAN.md`、`RISK_REGISTER.md` |
+
+### 实际迁移时要改的入口
+
+- **仍生效的规则。** 根 `AGENTS.md` 继续明确要求从仓库根读取有效工程规则。把旧规则中的业务与授权边界、P0–P3 门禁、修改及停止条件接入当前工程规范，逐条对照存档原文。由独立读者从根入口复述这些约束，并说明与 #14 现行裁决的关系。
+- **现行文档与证据。** 更新根 README、工程索引、开发流程、项目工程规范、完整产品裁决的契约链接，以及 P2 报告、P1 README、Instabox 证据 README 和工程规范任务中的有效链接。目录治理文件保留原路径作为迁移映射，历史记录中提到的本地未跟踪文件保留原叙述。用 Git 的文件清单分辨当前入口、历史事实和固定 SHA 引用。
+- **已审原件。** [交付物归档 PR #21](https://github.com/zhuquanwei111/mingjing---agent/pull/21) 的三份 MVP 文件有已审指纹。其中组件表正文含一个指向旧包技术栈的相对链接。执行前先吸收 #21 的正式归档提交，保留该文件的原字节及可从仓库取回的固定版本。当前阅读版只改这个链接，记录原版与导航修订版的两个指纹和可核对差异；其余原件照原指纹验收。为保证克隆后仍能核对全部七个原件，将这一份原稿逐字节保存在 `docs/archive/MVP-SCOPE-COMP-01/whole-product-component-selection.md.txt`，校验原 SHA-256，以索引区分原始文本与可导航的阅读版。
+- **并行分支。** #20 更改 README 和索引，合入后需保留两套导航。#6 更改旧包的 README 与启动词，后续提取其候选资产时逐文件对照迁移映射，避免恢复根目录旧包。本次只处理 v1。
+- **运行入口。** 保持根工程规范包、现有 Skill 发现路径、工作流和运行命令。执行前后核对根规则、Skill 实际解析位置与 CI 路径，并验证新检出能从入口读取现行规则和历史版本。
+
+### 评审者判据与实施回执
+
+对照上述清单核实原件可找回、有效规则可发现、当前链接可用、并行 PR 有明确处理方式。记录固定评审提交、审查意见、整改及结论。实施后附 Git 重命名摘要、16 文件树相等结果、全仓库旧路径剩余引用分类、新旧规则对应关系、`make check` 及对应 CI。由维护者复核后合并，回退使用本迁移 PR 对应提交。当前归档路径与运行状态仍以实际 Git 树为准。
