@@ -14,6 +14,7 @@
 | 明镜如何采用工程规范 | [项目接入说明](engineering-standard.md)、[执行性审查](engineering-standard-execution.md) | 通用层与项目例外分开 |
 | 开发与任务接续 | [开发流程](development.md)、[长任务计划](PLANS.md)、[设置及环境边界](configuration.md) | 任务具体状态以所属任务记录和实际 Git 状态核对 |
 | 需求与验收 | [通用工程规范需求](requirements/engineering-standard.md)、[任务记录目录](tasks/) | 已有项目需求摘要不代替用户持有的完整需求原件 |
+| 身份、租户与权限（G16） | [全机构身份与权限需求评审稿](requirements/g16-identity-permissions.md) | 从晴禾替岗交件核对授予、使用、撤回和收件，待项目方确认 |
 | 正式产品架构与选型 | [PR #14 独立终裁](designs/whole-product-decision.md)、[需求验收与证据](requirements/whole-product-acceptance-results.md) | 经调整的路线 B 已作为开发基线；W0、MVP 和上线各有后续验收 |
 | 技术决定 | [ADR 目录](adr/) | 记录拟议、接受、替代与撤回，状态必须与当前事实一致 |
 
