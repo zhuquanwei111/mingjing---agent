@@ -16,7 +16,7 @@
 | 需求与验收 | [通用工程规范需求](requirements/engineering-standard.md)、[任务记录目录](tasks/) | 已有项目需求摘要不代替用户持有的完整需求原件 |
 | 正式产品架构与选型 | [PR #14 独立终裁](designs/whole-product-decision.md)、[需求验收与证据](requirements/whole-product-acceptance-results.md) | 经调整的路线 B 已作为开发基线；W0、MVP 和上线各有后续验收 |
 | 技术决定 | [ADR 目录](adr/) | 记录拟议、接受、替代与撤回，状态必须与当前事实一致 |
-| 机构知识库选型专题 | [五层分类与待评候选](designs/knowledge-base-selection.md)、[岗位口语对话与判卷](requirements/knowledge-base-conversations.md) | 分类已确认，各层选型及实施待评审和批准 |
+| 机构知识库选型专题 | [五层选型与方案入口](designs/knowledge-base-selection.md)、[业务资料与维护](designs/knowledge-base-materials.md)、[岗位口语对话](requirements/knowledge-base-conversations.md)、[证据与验收](requirements/knowledge-base-evaluation.md) | 分类已确认，各层技术方案与验收指标待评审，搭建另行批准 |
 
 ## 当前架构与历史的区别
 

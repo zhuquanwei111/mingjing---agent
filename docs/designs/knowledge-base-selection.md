@@ -2,13 +2,24 @@
 
 **已确认的范围是下表五层分类。每层的实现、产品、模型和淘汰线均待评审。** 此稿用于比较方案和出题。正式搭建另由项目方批准。明镜现有路线 B 的任务入口和业务权威继续适用。[架构终裁](whole-product-decision.md) · [固定阶段方案](https://github.com/zhuquanwei111/mingjing---agent/blob/210a24f240c73e86746e608907242a200fc94cc0/docs/designs/whole-product-phased-implementation.md) · [组件选择原稿](https://github.com/zhuquanwei111/mingjing---agent/blob/8bb23800205d9444d66ce686cb89801cffc0ef6a/docs/designs/whole-product-component-selection.md)
 
+## 这份提案包括什么
+
+| 要回答的问题 | 评审入口和产物 |
+| --- | --- |
+| 全公司有哪些资料，该由谁维护，工作时如何用？ | [七个业务范围、四个同行样本与资料维护流程](knowledge-base-materials.md)。覆盖从个人辅导到跨客户素材复用、从单场记录到全机构规则。 |
+| 有哪些可搭的技术、何时改选？ | 本页的五层候选表与下文路线取舍。分类已确认，组合与试验次序是作者建议；正式采用须有对照结果。 |
+| 员工真的会这样问吗？ | [14 段公开校准题与连续对话示范](../requirements/knowledge-base-conversations.md)。用户只看日常问法，评阅人另持事实和失败条件。 |
+| 别的团队用下来怎样，我们已经测过什么，还缺什么？ | [外部团队经验、三组明镜隔离读数、同题比选和六类验收](../requirements/knowledge-base-evaluation.md)。有代表性的岗位签收与目标环境测试仍待取得。 |
+
+### 为什么要能回源、查词、按意思查
+
+“把上周五晴禾签回来的那单打开”通常可以按项目和编号取原件。“片尾一黑就掉人，还有哪几个组也是这样”需要按意思检索多个版本，并检查画面与时段。“明天下午哪个化妆师还有空”必须查实时排班。检索服务可以解释排班办法、协助识别项目，知识库中的历史排班表不能证明此刻有空。系统能回答“行业里有人这样做过”，并不意味着项目方已经批准把它写成制度。
+
 ## 业务材料从哪里来
 
 设计覆盖机构制度与协作、主播经纪与培养、内容与素材、直播与制作、商务与交付、经营财务与合规、行业研究与组织经验。约 300 名潜在用户是规模背景，实际岗位、场次、资料量及负载有待采样。资料按原件、授权对象、项目、版本、生效时间和衍生引用关联，同一知识可供多个岗位使用。
 
-- 长鲸传媒在策划、排练、妆造、运镜和复盘间使用视频回看。需要区分“说过”与“画面确实做到”，并能回到原片时段。[团队访谈](https://eu.36kr.com/zh/p/3556682743463042)
-- 据泰洋川禾披露，一次大促的 20 场直播约有 80 份复盘文档，团队从多场记录整理岗位手册。需要区分单次有效的经验、现行制度和历史制度。[团队访谈](https://i.ifeng.com/c/87SwREinH1B)
-- 二咖传媒客户案例描述了多地达人合同归档、商单协作与行业资料共享。需要分别判断资料能否查看、能否跨客户复用、能否再次交付。客户案例由工具供应商发布。[二咖传媒案例](https://www.feishu.cn/customers/erkamedia)
+公开参照覆盖近 300 人的内容制作团队、多地达人经纪团队、百人级商单团队和一次大促的资料样本。团队人数、达人资源、每月商单和每场材料分别计量。[四个同行的资料及可比范围](knowledge-base-materials.md)
 
 ## 五层待比较的实现
 
@@ -23,6 +34,19 @@
 产品资料用于核对能力和接入位置。WeKnora 的库级角色、解析后的文本偏移，都需在本项目验证其能否支撑对象授权和原件定位。固定发行版、镜像与模型摘要、许可、部署资源和数据出口应在实测清单逐项登记。[WeKnora 检索](https://github.com/Tencent/WeKnora/blob/v0.9.0/website-docs/03-features/05-retrieval-engines.md) · [解析接口](https://github.com/Tencent/WeKnora/blob/v0.9.0/website-docs/03-features/03-document-parsing.md) · [RAGFlow](https://github.com/infiniflow/ragflow/releases/tag/v1.0.0) · [Docling](https://github.com/docling-project/docling) · [MinerU 许可](https://github.com/opendatalab/MinerU/blob/mineru-4.2.3-released/LICENSE.md) · [Knowhere](https://github.com/Ontos-AI/knowhere) · [faster-whisper](https://github.com/SYSTRAN/faster-whisper) · [BGE](https://huggingface.co/BAAI/bge-small-zh-v1.5) · [Qwen](https://huggingface.co/Qwen/Qwen3-8B)
 
 若资料主要留在已有办公平台，同时比较按用户身份回源。若核心困难集中在多个源的权限同步，补评 Onyx 并核对所需版本及同步延迟；若需求集中在 Markdown 创作，可评 Obsidian 作为编辑入口。按“草稿可写、批准后发布、客户资料可见范围、发布后能撤回”的完整流程验收。[飞书云文档](https://open.feishu.cn/document/server-docs/docs/docs-overview?lang=zh-CN) · [Onyx 权限说明](https://github.com/onyx-dot-app/documentation/blob/main/security/architecture/access_controls.mdx) · [Obsidian 协作权限](https://help.obsidian.md/Obsidian+Sync/Collaborate+on+a+shared+vault)
+
+## 哪些路线值得优先试，什么结果会改变顺序
+
+| 路线 | 值得试的理由 | 主要代价与改选条件 |
+| --- | --- | --- |
+| 复用实际办公平台的搜索与原件 | 正式文档若已由业务持续维护，保留原编辑、审批和版本来源最省重复录入。 | 先确认实际平台和身份接口。若跨源题找不全、旧文档或附件权限在二次使用时无法核实，可保留原件并增加受控检索。 |
+| WeKnora 成套服务 | 作者建议优先隔离试其团队部署。关键词、向量、解析队列有现成接口，便于用同一来源对比精确词和口语改写。 | 需要单独的服务、检索数据库和队列；授权粒度、原文页码／单元格和撤回时序须实测。编辑端和检索端不得提供可绕过明镜发布与授权的受限入口。 |
+| RAGFlow 完整引擎 | 直接对照运营可复用的文档管理、解析、检索界面与引用能力，覆盖已有的候选路径。 | 与其他路线同测换版、引用、权限和实际运维步骤。通过相同硬项且维护更省时可以优先采用；开发机装不下须记录资源需求并在合适环境检验。 |
+| Docling＋pgvector＋明镜自己管发布和权限 | 可逐层替换解析、中文模型与存储，便于保留明镜的对象关系、版本和定位信息。 | 团队要承担索引重建、发布管理、界面和回滚。若成套产品无法贯通对象权限或原件定位，可分格式采用此路；必须列出新增维护工作。 |
+| Onyx 或同类企业搜索 | 若主要问题是大量分散的现有系统，要直接比较其连接器和权限同步。 | 核对所需版本、许可、同步周期。若权限变更与新请求之间存在窗口，需由实际数据源再次核权或限制相应用途。 |
+| Knowhere、Obsidian 等局部组合 | 对长篇图文可比较 Knowhere 的章节关系和关联资产；写作团队可用 Obsidian 编辑 Markdown，经原有审批后发布。 | 分别测跨章节题有无改善、编辑发布是否减少重复劳动。共享笔记库的可见性须与客户、个人记录的对象权限分别核实。只有局部收益时只采用对应一层。 |
+
+在明镜宿主与知识服务之间，候选适配须能传递当前身份与目的、项目或对象、资料号与版本、原件位置；返回足以复核的引用和已知缺口。索引是可重建的派生物。候选按获准接口取用原件；生成、受控分享与本人重开各再核权。权限源失联时停住受影响的调用，保留仍能核实的资料。标价、实际费用、运维工时分别记录。
 
 ## 如何做决定
 
