@@ -2,6 +2,12 @@
 
 **状态：已形成 Draft 候选。** 本机接续和两轮方案关卡运行证据见下，最终 CI 查 PR 当前 head。 交付目标是在专用分支形成可单独复用的 1.0 候选包，在明镜以真实任务验证，并通过 Draft PR 交给用户决定是否合并。
 
+## 2026-11-25 · 明镜项目的成熟工程能力复用原则
+
+[PR #25](https://github.com/zhuquanwei111/mingjing---agent/pull/25) 在项目层补充[选型与审查规则](../engineering-standard.md#最终效果优先与成熟工程能力复用原则)。基线为 `e759892`。后续独立回执、最终候选和合并门禁结果随同一 PR 保存，维护者决定合并。
+
+首稿 `9d6fcd2` 修改了项目 reviewer 的一份副本，角色一致性测试在三个作业中均失败。[独立初审 MJ25-R1](https://github.com/zhuquanwei111/mingjing---agent/pull/25#pullrequestreview-6054012298) 还指出模板里的规范链接进入 PR 正文后失效。修订恢复共用角色，通过根规则及送审材料传递明镜条款；模板改用正文可打开的仓库链接，并区分日常维护和已审方案的实施。通用包、测试与验收入口沿用既有版本。
+
 ## 任务边界和接续
 
 [受控需求 1.0](../requirements/engineering-standard.md)记录原始任务和追加验收，供评审按 Git 版本读取。
