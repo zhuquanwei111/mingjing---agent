@@ -1,8 +1,10 @@
 # 明镜：Codex 开发入口
 
 本文件是整个 Git 仓库的开发入口。先读取
-[原工程规则](mingjing-codex-engineering-v1/AGENTS.md)；其中的业务、安全和 P0–P3 阶段规则
-同样约束本仓库的代码目录。更具体的目录规则与用户当前授权继续适用。
+[原工程规则](mingjing-codex-engineering-v1/AGENTS.md)；其中的业务、安全、编码、停止条件和 P0–P3 **旧开发阶段门禁**继续适用。
+新路线的实际实施阶段为 H/W0a/W0b/G/M/T/P，按[新旧阶段衔接与门禁](docs/designs/current-architecture-baseline.md#stage-gate-crosswalk)执行；
+旧阶段门禁与新关口的适用要求同时满足，不因编号或技术路线变化豁免。EXEC-0 至 EXEC-3 仅为执行类型，不是阶段或实施授权。
+更具体的目录规则与用户当前授权继续适用。
 
 ## 项目地图
 

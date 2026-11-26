@@ -52,9 +52,18 @@ B04 不完整准入。禁止静态头/文件摘要归账，不凭来源列表重
 已发现以下独立 PR；本任务不接管、不合并、不改动其分支。它们包含旧架构或共享文档，合并前须核对最新 main、处理语义/文本冲突并按各自规范复验：
 
 - [#6 路线 B 候选开发包](https://github.com/zhuquanwei111/mingjing---agent/pull/6)：不能按旧栈直接开启新开发；保留可复用资产，后续由维护者裁决其处置。
-- [#20 分阶段方案](https://github.com/zhuquanwei111/mingjing---agent/pull/20)、[#21 已审交付归档](https://github.com/zhuquanwei111/mingjing---agent/pull/21)：含共享 README/index/layout 或历史方案，更新/标记历史架构并确保 G-before-M，不把旧设计误标新实现。
-- [#22 目录治理](https://github.com/zhuquanwei111/mingjing---agent/pull/22)：不因换线删除历史或仍有效规则。
+- [#20 分阶段方案](https://github.com/zhuquanwei111/mingjing---agent/pull/20)、[#21 已审交付归档](https://github.com/zhuquanwei111/mingjing---agent/pull/21)：含共享 README/index/layout 或历史方案，更新/标记历史架构并确保 G-before-M。#20 原 E1（独立能力接入）规定最迟首个未知实现类型放行前，须纠正 AC-17 为稳定 G 基座后、首个 M 之前的硬门槛；#21 保留已审原件指纹，不把旧设计误标新实现。
+- [#22 目录治理](https://github.com/zhuquanwei111/mingjing---agent/pull/22)：与本次修订共改[目录任务](directory-governance.md)。#22 独有迁移清单与历史原件必须保留；目标基线含 #27 后核对实际 main/head，安全合入本次现行入口、历史标记及新旧阶段衔接，处理冲突并复验，不恢复旧路线。
 - [#23 知识库](https://github.com/zhuquanwei111/mingjing---agent/pull/23)、[#24 身份权限](https://github.com/zhuquanwei111/mingjing---agent/pull/24)：保留专项责任，分别对齐 H2 及 B02 后端尚未建设的事实。
 - [#26 问题解决优先](https://github.com/zhuquanwei111/mingjing---agent/pull/26)：独立规则草稿；不重复制定，合并前核对根 AGENTS 的兼容差异。
 
-独立 Reviewer 应检查本候选的权威入口、原件与历史证据、H1 不外推、B04 未准入及正式阶段暂停的表述，并回流发现。按现有 CI `make check` / `P1 acceptance` 验证对应提交；旧 P1/P2 CI 不能证明新架构完成。独立评审及 CI 以实际回执为准，本次 GitHub 文档提交本身不计作通过；保持草稿，人工合并。
+## 独立评审回流及原执行者整改（2026-11-26）
+
+[独立评审回执](https://github.com/zhuquanwei111/mingjing---agent/pull/27#issuecomment-7181160254)对应 base `aced61ac3855670478c33cc3cb5a1dcb9699ae3e`、旧 head `2225b8d5775a56bef3d5c9051cd1194595705352`；由独立 solution_reviewer 回流，结论暂不建议合并，两个发现均由原执行者接受。
+
+| 发现 | 本次实际处置 | 复审要求 |
+| --- | --- | --- |
+| P1 旧路线仍被活跃文档指引 | 修订[目录治理任务](directory-governance.md)当前状态、历史定位和可执行后续清单；[P2 手册](../../core/README.md)明确旧实现维护/历史复用范围并导向现行入口。保留原历史事实及已有运行命令。#22 后续同步事项已列明。 | 核对旧入口不再误指新建设、迁移责任与历史证据保留 |
+| P2 执行类型与开发阶段同名 | F03 原执行类型 P0–P3 一一改记 EXEC-0–EXEC-3（不用 #20 已有 E1 等阶段编号）；[根规则](../../AGENTS.md)链接[新旧开发阶段衔接](../designs/current-architecture-baseline.md#stage-gate-crosswalk)，旧门禁与 H/W0/G/M/T/P 并用，P1 验收确认后 G，G 全部必要能力及 AC-17 通过且获准才 M；原规则文件与 CI 名称不改。 | 核对阶段语义无重叠、旧门禁未削弱，实施仍暂停 |
+
+旧 head 的 [CI run 45744315521](https://github.com/zhuquanwei111/mingjing---agent/actions/runs/45744315521)经实际回查：ARM64 P1 acceptance 及两项 amd64 回归均成功；该结果只属于旧 head 的现有验收，不是新 head 的验证，也不证明 Mastra/G 已实现。修订后需重新核对当前候选的 `make check` / `P1 acceptance` CI，并请独立 Reviewer 对本次改动复审，原执行者回流处置。完整原件及 61 件原始证据仍未取得，不改此前待核状态。保持草稿、人工合并，不启动正式实施。
