@@ -18,23 +18,23 @@
 | `docs/adr/` | 关键技术取舍、理由、方案和状态（拟议/接受/替代/撤回） | 没有版本与批准记录的临时口头决定 |
 | `docs/tasks/` | 具体任务计划、进展、审查反馈及验收位置 | 与同一任务并存的第二套真相 |
 | `docs/runbooks/`、`docs/reports/`（目标） | 有实际运行职责的操作手册和正式报告 | 自动复制敏感日志及秘密 |
-| `docs/archive/`（目标） | 不再作为现行入口的历史方案，保留原 SHA、日期和与现行方案的关系 | 有效的执行规则未经抽取就直接弃用 |
+| `docs/archive/` | 不再作为现行入口的历史方案，保留原 SHA、日期和与现行方案的关系 | 有效的执行规则未经抽取就直接弃用 |
 
 实际项目可以保持更简单的布局；以上“目标”类目录无需提前创建为空目录。现有工程规范的 [文档和权限约定](../engineering-standard/operations.md)继续适用。
 
-## 待执行的文件迁移映射
+## 文件迁移与保留位置
 
-| 来源 | 计划目标 / 处理方式 | 执行前必须检查 |
+| 来源 | 目标 / 处理方式 | 校验与适用范围 |
 | --- | --- | --- |
-| `mingjing-codex-engineering-v1/` | `docs/archive/engineering-v1/`，原文与文件名尽量保留 | 核对根 `AGENTS.md`、历史包中 `AGENTS.md`、脚本、CI 和所有 Markdown 链接；把仍适用的安全/阶段要求明确接入当前权威规则。旧包虽历史，其规则不可以无声消失 |
-| PR #6 的 `mingjing-codex-engineering-v2/` | 历史候选材料；受审后按维护者认可的历史设计目录归档，选择性复用契约和证据 | PR #6 尚未合并，不是现行实施基线；先核[现行架构](designs/current-architecture-baseline.md)及该 PR 实际状态，不得凭空从主分支搬迁不存在的文件 |
+| `mingjing-codex-engineering-v1/`（原址） | [v1 历史包](archive/engineering-v1/README.md)已按原名整体迁入 `docs/archive/engineering-v1/` | 根 AGENTS 显式加载[迁入的原规则](archive/engineering-v1/AGENTS.md)；[迁移任务](tasks/directory-governance.md)记录完整树及引用核对 |
+| PR #6 的 `mingjing-codex-engineering-v2/` | 历史候选材料；受审后按维护者认可的历史设计目录归档，选择性复用契约和证据 | PR #6 已关闭且未合并，不是现行实施基线；先核[现行架构](designs/current-architecture-baseline.md)及该 PR 实际状态，不得凭空从主分支搬迁不存在的文件 |
 | 已有 `docs/PLANS.md`、`docs/configuration.md`、`docs/development.md` | 原路径先保持，作为工作流程和配置事实入口 | 不为了目录整齐迁移活跃脚本引用的路径 |
 | `core/P2_REPORT.md`、`p1-walking-skeleton/P1_REPORT.md` | 暂留代码旁的历史版本证据，由 `docs/index.md` 链接 | 只有在完全追踪提交、测试证据与脚本引用后才考虑集中归档 |
 | `engineering-standard/` | 保留仓库根，作为可独立复制的通用规范包 | 不误放进 `docs/` 造成执行脚本和技能路径变化 |
 
 ## 迁移的实际执行门禁
 
-1. **准备和冻结对象。** 先读取 [文档索引](index.md)、根 [AGENTS](../AGENTS.md)、现行 PR、最终独立架构评审报告及其具体版本。核对任务工作区与其它分支。以[现行架构与实施门禁](designs/current-architecture-baseline.md)核对新旧权威；PR #14 为历史裁决，PR #6 仍是未合并候选；状态不因目录迁移而升级。
+1. **准备和冻结对象。** 先读取 [文档索引](index.md)、根 [AGENTS](../AGENTS.md)、现行 PR、最终独立架构评审报告及其具体版本。核对任务工作区与其它分支。以[现行架构与实施门禁](designs/current-architecture-baseline.md)核对新旧权威；PR #14 为历史裁决，PR #6 是已关闭的历史候选；状态不因目录迁移而升级。
 2. **独立评审迁移方案。** 让不参与本次目录设计的 Reviewer 检查历史业务规则保留、Git 路径引用、Codex 技能发现、文档权威与被其他 PR 引用的风险；记录并处理阻断。
 3. **仅在隔离分支迁移。** 用 Git 识别重命名，保留原内容，不混入业务重构。以全库文本查找旧路径，更新真实引用；不能只更新 README 里的链接。涉及有效规则的路径变更，重新验证 Codex 在新目录确实读到。
 4. **完整检查。** 运行 `make check`、文档引用和技能入口检查；人工核对 GitHub 相对路径、历史证据链接、重要 README 及架构图源。校验无失联或越界链接，必要时运行既有 CI。通过检查不自动证明业务架构已批准。

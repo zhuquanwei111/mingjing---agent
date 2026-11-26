@@ -1,6 +1,6 @@
 # Codex 开发与交付流程
 
-以下命令从仓库根目录执行。先读根目录 `AGENTS.md`；原有[工程原则、阶段门禁与安全要求](../mingjing-codex-engineering-v1/AGENTS.md)继续生效。本页把已有项目检查、Codex 独立审查和 GitHub 交付串起来，不增加自研调度器或 review-loop 脚本。
+以下命令从仓库根目录执行。先读根目录 `AGENTS.md`；原有[工程原则、阶段门禁与安全要求](archive/engineering-v1/AGENTS.md)继续生效。本页把已有项目检查、Codex 独立审查和 GitHub 交付串起来，不增加自研调度器或 review-loop 脚本。
 
 通用生命周期、独立方案评审与接入证据见[明镜工程规范](engineering-standard.md)。
 

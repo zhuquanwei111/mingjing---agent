@@ -21,8 +21,8 @@
 
 ## 当前架构与历史的区别
 
-- [v1 历史工程交付包](../mingjing-codex-engineering-v1/README.md) 仍暂存仓库根目录。这是**历史来源**，不应单凭其 `03_TECH_STACK.md` 或启动词确定新开发路线；其中仍被根 AGENTS 引用的安全/阶段约束必须在迁移前识别并保留。
-- [v2 路线 B 开发包候选 PR #6](https://github.com/zhuquanwei111/mingjing---agent/pull/6) 是**未合并的历史候选交付**，当前 main 不含该目录；不按该技术栈继续新建设。可复用契约和验证资产须按新组合复核。
+- [v1 历史工程交付包](archive/engineering-v1/README.md)已迁至归档目录。根 AGENTS 继续要求读取[原工程规则](archive/engineering-v1/AGENTS.md)，其中的安全、阶段及停止条件依然生效。新任务按现行架构与实施门禁接续。
+- [v2 路线 B 开发包候选 PR #6](https://github.com/zhuquanwei111/mingjing---agent/pull/6) 已关闭，保留为**未合并的历史候选交付**，当前 main 不含该目录；不按该技术栈继续新建设。可复用契约和验证资产须按新组合复核。
 - [早期架构评审 PR #7](https://github.com/zhuquanwei111/mingjing---agent/pull/7) 已合并，曾要求修订；[后续完整产品独立终裁 PR #14](https://github.com/zhuquanwei111/mingjing---agent/pull/14) **已合并，曾确认调整后的路线 B 为当时开发基线**。两次评审对应历史阶段；保留原证据，不再将 B 视作新开发指令。
 - [独立 Reviewer 机制 PR #8](https://github.com/zhuquanwei111/mingjing---agent/pull/8) 已合并，属于工程流程，不替代产品架构终裁。
 - [A/B 隔离实验 PR #5](https://github.com/zhuquanwei111/mingjing---agent/pull/5) 保存两路实际实验材料；它不是合并到 main 的产品实现。
@@ -31,7 +31,7 @@
 
 ## 目录治理及资料规则
 
-参见 [目录职责、迁移映射和验收](repository-layout.md)。目前优先完成入口梳理、引用清单及目录规范，**历史包搬迁与候选方案定版另作为后续受审迁移**，避免与进行中的 PR 冲突。`docs/designs/` 已保存完整产品选型与审查正文。`docs/architecture/` 仅在需要独立维护当前架构地图时再建，不为排版创建空目录。正式工程记录留在 Git；Space 可用于讨论和链接，但不自动替代正式提交。
+参见[目录职责、迁移映射和验收](repository-layout.md)及[16 件原件与校验记录](tasks/directory-governance.md)。正式设计保存在 `docs/designs/`；Git 保存正式工程记录。后续迁移按目录治理规则逐项审查。
 ## W0、MVP 和后续开发如何持续维护
 
 - **已有开发分支**不能假定自动继承本规范；启动 W0/MVP 或接续旧 PR 时要与最新 `main` 比较，安全同步适用规则及文档入口，再以该候选复验。不得为同步而覆盖未提交的他人改动。

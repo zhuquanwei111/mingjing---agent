@@ -52,7 +52,7 @@ Daytona 跑完整验收前需确认其当前 Docker/Compose 能力。
 - [目录结构与持续文档治理规则](docs/repository-layout.md)
 - [当前架构与实施门禁](docs/designs/current-architecture-baseline.md) · [历史 PR #14 终裁](docs/designs/whole-product-decision.md)
 
-- [历史 v1 开发包（有效的工程规则仍需保留）](mingjing-codex-engineering-v1/README.md)
+- [历史 v1 开发包（有效的工程规则仍需保留）](docs/archive/engineering-v1/README.md)
 - [P1 运行与复现说明](p1-walking-skeleton/README.md)
 - [P2 接口与操作手册](core/README.md)
 - [开发流程的来源与适配说明](docs/development.md#采用依据与核验版本)
