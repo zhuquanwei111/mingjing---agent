@@ -16,6 +16,7 @@
 | 需求与验收 | [通用工程规范需求](requirements/engineering-standard.md)、[任务记录目录](tasks/) | 已有项目需求摘要不代替用户持有的完整需求原件 |
 | 当前产品架构与选型 | [现行入口](designs/current-architecture-baseline.md)、[架构图与契约](designs/architecture-final/contracts.md)、[76 项映射](requirements/final-architecture-mapping.csv)、[工程门禁及风险](designs/architecture-final/gates-and-risks.md) | Mastra 主体、H2 知识域方案已裁决；W0/G 及业务待验 |
 | 历史架构与原需求证据 | [PR #14 独立终裁](designs/whole-product-decision.md)、[原 76 项历史填证](requirements/whole-product-acceptance-results.md) | 保留原需求、证据范围和失败；不作为新组合的通过证明 |
+| 首期设计历史原件 | [九份原件、文件指纹与 W0 设计回执](tasks/reviewed-deliverables.md) | 用于追溯早期业务范围、组件计划和验收设计；现行建设按上列最终架构执行 |
 | 技术决定 | [ADR 目录](adr/) | 记录拟议、接受、替代与撤回，状态必须与当前事实一致 |
 
 ## 当前架构与历史的区别
