@@ -3,7 +3,7 @@
 - 日期：2026-11-26。
 - 状态：总控已完成架构和技术选型裁决；本 Draft PR 待审核及合并。正式公共宿主和业务均未获施工批准。
 - 生效范围：合并后替代 [PR #14 的旧主体选型](../designs/whole-product-decision.md)作为后续设计/准备依据；不追溯否定历史裁决，不授权开发、部署、采购或流量。
-- 唯一现行设计入口：[当前架构与实施门禁](../designs/current-architecture-baseline.md)；[任务、H1 证据及未决清单](../tasks/architecture-baseline-transition.md)。
+- 唯一现行设计入口：[当前架构与实施门禁](../designs/current-architecture-baseline.md)；[施工记录、H1/H2 证据与校验入口](../tasks/architecture-baseline-transition.md)。
 
 ## 情境与决定
 

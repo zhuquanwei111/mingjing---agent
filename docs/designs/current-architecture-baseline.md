@@ -4,6 +4,8 @@
 
 [完整架构和可编辑图](architecture-final/contracts.md) · [技术清单](architecture-final/technology.csv) · [复用与开发边界](architecture-final/reuse.csv) · [许可清单](architecture-final/licenses.csv) · [76 项最终映射](../requirements/final-architecture-mapping.csv) · [关口与风险](architecture-final/gates-and-risks.md) · [ADR 0002](../adr/0002-mastra-architecture-transition.md) · [工程证据及校验入口](../tasks/architecture-baseline-transition.md)
 
+需求表的最晚关口对应所列公共工程判据。跨期条目还须在实际业务另行扩证；见[同编号分阶段取证索引](https://github.com/zhuquanwei111/mingjing---agent/blob/210a24f240c73e86746e608907242a200fc94cc0/docs/requirements/whole-product-phase-index.md)。AC-17 按本裁决在稳定 G 基座后、首个 M 前签收。
+
 ## 1. 建设目标与基本决定
 
 面向完整产品，以实际效果、安全、可靠性、长期维护与复用价值决定技术。重点开发明镜独有业务，不重新建设已成熟的通用运行、知识、身份、权限计算、评测或管理基础设施。普通程序、固定 Workflow、动态 Agent 和独立外部能力共享授权与能力合同，不强制所有任务调用模型。M 是首个正式业务开发阶段，不是全部产品；G 的全部必要公共能力须先实际建成并验收。软件许可及必要平台订阅原则上零费用，模型、计算、存储、外服和运维成本另算并按授权管理。
@@ -42,7 +44,7 @@
 | B01 Mastra | 接受 H1 限定机制结果、确认主体 | 固定 core 1.84.0 / pg 1.37.0，两进程及隔离 PG 17.12，五项报告通过；原生检查点和响应回放配合局部调用/受控出口适配。嵌套委派、并发分支、真实付费供应商、撤权前在途及完整宿主等仍验收 |
 | B02 宿主 | 建设方向确认；未建、未安全验收 | 不要求提供不存在的旧系统，Keycloak、SpiceDB、Mastra Server 与 PG 公共宿主、真实授权出口和交付纳入 G。中立资源和独立收端可验机制，具体业务接入仍验实际资源方 |
 | B03 操作及预算 | F03 v1.1 限定本地合同设计关闭；未完成实施 | 真正收端幂等、查单期限、费用上界、并发/未知核销及内外部出站必须按实际合同验证 |
-| B04 知识 | 限定采用 WeKnora v0.9.1 | H1 原生重编后正文残留、同 PDF 解析错归旧预算。H2 在同一后台按签名批次归属，关闭 A 后迟到调用在收端前拒绝，B 从合法原件重建。完整权限、多个同时活动批次和真实费用/知识质量在 G 取证。 |
+| B04 知识 | 限定采用 WeKnora v0.9.1 | H1 原生重编后正文残留、同 PDF 解析错归旧预算。H2 在同一后台按签名批次归属，清零 A 批预算后迟到调用在收端前拒绝，B 从合法原件重建。完整权限、多个同时活动批次和真实费用/知识质量在 G 取证。 |
 
 [工程证据记录](../tasks/architecture-baseline-transition.md#h1-evidence)保留实测试件、反例、收端计数及包内清单。H1/H2 使用合成模型和请求单位；各需求的完整工程验收按[76 项映射](../requirements/final-architecture-mapping.csv)执行。
 

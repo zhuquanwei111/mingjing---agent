@@ -36,7 +36,7 @@
 <path d="M420 710 V695 H1110" fill="none" stroke="#b06022" stroke-width="2" stroke-dasharray="6 5" marker-end="url(#amber)"/>
 <text x="1123" y="688" font-family="PingFang SC, Noto Sans CJK SC, sans-serif" font-size="16" fill="#9a4b18" text-anchor="start" font-weight="700">内部出站</text>
 <rect x="35" y="105" width="1035" height="53" rx="12" fill="#eaf3f8" stroke="#b7c8d4" stroke-width="1.5"/>
-<text x="51" y="134" font-family="PingFang SC, Noto Sans CJK SC, sans-serif" font-size="21" fill="#20394b" text-anchor="start" font-weight="700">App / API / 事件 / 受控管理入口</text>
+<text x="51" y="134" font-family="PingFang SC, Noto Sans CJK SC, sans-serif" font-size="21" fill="#20394b" text-anchor="start" font-weight="700">App / API / 事件入口 · 控制面按版本发布能力、模型与规则</text>
 <rect x="35" y="180" width="1035" height="88" rx="12" fill="#ffffff" stroke="#b7c8d4" stroke-width="1.5"/>
 <text x="51" y="209" font-family="PingFang SC, Noto Sans CJK SC, sans-serif" font-size="21" fill="#20394b" text-anchor="start" font-weight="700">可信受理 · Task/Run 与版本/owner 唯一绑定</text>
 <text x="51" y="236" font-family="PingFang SC, Noto Sans CJK SC, sans-serif" font-size="16" fill="#20394b" text-anchor="start" font-weight="400">新建公共宿主 · Keycloak OIDC · 稳定受理键与原生 Run 绑定 · 受控能力发布</text>
