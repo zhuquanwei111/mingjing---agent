@@ -1,6 +1,6 @@
 # 明镜智能体 · 当前架构与实施门禁
 
-**MJ-ARCH-FINAL · 总控最终架构裁决，2026-11-26。** 采用 Mastra OSS 主体、Keycloak 公共身份、SpiceDB、PostgreSQL、Apache Hop、SeaweedFS 和限定使用的 WeKnora v0.9.1。本 PR 合并后替代 PR #14 路线 B 的仓库基线。公共宿主待建；建设、首个业务和真实流量分别另行批准。
+**MJ-ARCH-FINAL · 总控最终架构裁决，2026-11-26。** 采用 Mastra OSS 主体、Keycloak 公共身份、SpiceDB、PostgreSQL、Apache Hop、SeaweedFS 和限定使用的 WeKnora v0.9.1。PR #27 已于 2026-11-26 合并，本裁决已替代 PR #14 路线 B 的仓库基线。公共宿主待建；建设、首个业务和真实流量分别另行批准。
 
 [完整架构和可编辑图](architecture-final/contracts.md) · [技术清单](architecture-final/technology.csv) · [复用与开发边界](architecture-final/reuse.csv) · [许可清单](architecture-final/licenses.csv) · [76 项最终映射](../requirements/final-architecture-mapping.csv) · [关口与风险](architecture-final/gates-and-risks.md) · [ADR 0002](../adr/0002-mastra-architecture-transition.md) · [工程证据及校验入口](../tasks/architecture-baseline-transition.md)
 
