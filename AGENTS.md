@@ -9,9 +9,9 @@
 ## 项目地图
 
 - [当前项目状态](README.md#当前项目状态)；[统一文档索引](docs/index.md)与[持续目录治理规范](docs/repository-layout.md)。
-- [当前架构与实施门禁](docs/designs/current-architecture-baseline.md)：Mastra OSS 主线；[历史 PR #14 终裁](docs/designs/whole-product-decision.md)只作历史证据。知识库已按 H2 裁决限定采用 WeKnora v0.9.1；正式实施仍暂停，必要公共基座通过 G 后才进入首个正式业务 M。
-- [现行阶段及接续记录](docs/tasks/architecture-baseline-transition.md)；[v1 历史方案与仍有效规则](docs/archive/engineering-v1/README.md)；[P2 历史接口与操作](core/README.md)。
-- 历史验收：[P1 报告](p1-walking-skeleton/P1_REPORT.md)、[P2 早期报告](core/P2_REPORT.md)；新提交以对应 CI 为准。
+- [当前架构与实施门禁](docs/designs/current-architecture-baseline.md)：Mastra OSS 主线；[历史 PR #14 终裁](docs/archive/route-b/designs/whole-product-decision.md)只作历史证据。知识库已按 H2 裁决限定采用 WeKnora v0.9.1；正式实施仍暂停，必要公共基座通过 G 后才进入首个正式业务 M。
+- [现行阶段及接续记录](docs/tasks/architecture-baseline-transition.md)；[v1 历史方案与仍有效规则](docs/archive/engineering-v1/README.md)；[P2 历史接口与操作](docs/archive/legacy-runtime/core/README.md)。
+- 历史验收：[P1 报告](docs/archive/legacy-runtime/p1-walking-skeleton/P1_REPORT.md)、[P2 早期报告](docs/archive/legacy-runtime/core/P2_REPORT.md)；新提交以对应 CI 为准。
 - [开发流程](docs/development.md)、[长任务计划与接续](docs/PLANS.md)、[配置与环境边界](docs/configuration.md)。
 - [明镜采用的工程规范](docs/engineering-standard.md)；[通用规范包](engineering-standard/README.md)可独立复用。
 - [规范建设与验证任务](docs/tasks/engineering-standard.md)记录独立方案评审、候选及恢复入口。

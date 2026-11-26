@@ -30,7 +30,7 @@
 | 命令 | 实际验证范围 | 前置条件 |
 | --- | --- | --- |
 | `make check` | Python/Shell 语法、代码空白、核心静态依赖边界及其用例、开发入口和任务记录的行内相对文件链接；不等于类型、业务或完整安全验收 | Python 3.10+、Git、sh/bash；服务运行仍用锁定的 Python 3.12 |
-| `make smoke` | 现有 macOS Temporal CLI 冒烟脚本 | 按 [P1 README](../p1-walking-skeleton/README.md)准备 `p1-walking-skeleton/.venv` 和已校验的 `.p1/bin/temporal` |
+| `make smoke` | 现有 macOS Temporal CLI 冒烟脚本 | 按 [P1 README](archive/legacy-runtime/p1-walking-skeleton/README.md)准备 `docs/archive/legacy-runtime/p1-walking-skeleton/.venv` 和已校验的 `.p1/bin/temporal` |
 | `make acceptance` | 既有全验收、备份恢复、Temporal 重启、独立重建；失败即停 | 隔离的 Linux ARM64 或 x86_64 环境与 Docker Compose |
 | `make p2-acceptance` | P2 迁移和公共层测试，包含真实 PostgreSQL、Temporal 及 LangGraph | 独立 Linux ARM64/x86_64 checkout 与 Docker Compose |
 
@@ -49,7 +49,7 @@ x86_64 的 P1 与 P2 检查独立提供辅助反馈，不设为合并必需项�
 | 已有 Daytona 沙盒 | 隔离开发、试验性修改、独立复现 | 先核实当前沙盒；`make check` 不需要 Docker。完整验收还需可用的 Docker daemon、Compose、兼容架构及拉取固定镜像/锁定依赖的网络 |
 | GitHub Actions | 每个 PR 的统一合并前检查 | 正式 ARM64 `P1 acceptance` 覆盖 P1 与 P2，x86_64 独立辅助；以实际启用规则和候选提交结果约束合并 |
 
-Instabox 的既有证据及平台限制见 [Instabox 验收记录](../p1-walking-skeleton/evidence/instabox/README.md)。`requirements/linux-x86_64.lock` 原样复用该次 amd64 锁；Docker 构建按目标架构选择它或原有的 `linux-aarch64.lock`，无需临时改 Dockerfile。两个锁保持原先各平台的精确版本和 wheel 哈希。
+Instabox 的既有证据及平台限制见 [Instabox 验收记录](archive/legacy-runtime/p1-walking-skeleton/evidence/instabox/README.md)。`requirements/linux-x86_64.lock` 原样复用该次 amd64 锁；Docker 构建按目标架构选择它或原有的 `linux-aarch64.lock`，无需临时改 Dockerfile。两个锁保持原先各平台的精确版本和 wheel 哈希。
 
 首次在云端 checkout 运行前，先作只读能力确认：
 

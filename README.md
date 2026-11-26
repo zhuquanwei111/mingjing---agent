@@ -1,20 +1,12 @@
 # 明镜业务智能体工程
 
-本仓库保存工程方案、P1 隔离验证和 P2 最小公共层。
+本仓库维护明镜现行架构、工程规范和历史回归资产。
 
 ## 当前项目状态
 
-**总控最终裁决采用 Mastra OSS 主体和 WeKnora v0.9.1 限定方案。** [现行架构与实施门禁](docs/designs/current-architecture-baseline.md)、[完整架构与图](docs/designs/architecture-final/contracts.md)及 [ADR 0002](docs/adr/0002-mastra-architecture-transition.md)说明建设边界。[PR #27](https://github.com/zhuquanwei111/mingjing---agent/pull/27) 合并后已取代[历史路线 B / PR #14](docs/designs/whole-product-decision.md)。应用后端纳入新公共宿主建设，项目方另批开工；W0a、W0b 及全部必需公共能力 G 通过后，才可另批首个业务 M。
+**总控最终裁决采用 Mastra OSS 主体和 WeKnora v0.9.1 限定方案。** [现行架构与实施门禁](docs/designs/current-architecture-baseline.md)、[完整架构与图](docs/designs/architecture-final/contracts.md)及 [ADR 0002](docs/adr/0002-mastra-architecture-transition.md)说明建设边界。[PR #27](https://github.com/zhuquanwei111/mingjing---agent/pull/27) 合并后已取代[历史路线 B / PR #14](docs/archive/route-b/designs/whole-product-decision.md)。应用后端纳入新公共宿主建设，项目方另批开工；W0a、W0b 及全部必需公共能力 G 通过后，才可另批首个业务 M。
 
-P2 最小公共层已由 [PR #2](https://github.com/zhuquanwei111/mingjing---agent/pull/2)
-合并交付，当前公共层实现及操作入口在 [core/README.md](core/README.md)。
-后续新阶段交付时同步更新本入口。新任务先核对实际分支、HEAD 和该提交的检查结果，
-不要把这里的阶段记录或旧日志当作当前候选已经通过的证明。
-
-- [P1 验收报告](p1-walking-skeleton/P1_REPORT.md)保留隔离验证和未放行事项。
-- [P2 早期验收记录](core/P2_REPORT.md)明确对应历史提交 `7d4df4f`，其中 11 项测试不是当前版本的验收结论。
-- 当前改动的验证以同一候选提交的 PR、CI 作业和完整日志为准；生产制品等未放行事项继续适用。
-- [Codex 配置与验收任务历史](docs/tasks/codex-development-configuration.md)记录 C01–C09；具体进度须与现行 PR、代码和测试对照。
+早期 P1 隔离验证与 P2 公共层已归入[历史代码与证据](docs/archive/legacy-runtime/README.md)。两套实现仍供 CI 复跑；正式公共宿主的建设状态以[基线任务](docs/tasks/architecture-baseline-transition.md)为准。
 
 ## 用 Codex 开发
 
@@ -50,9 +42,9 @@ Daytona 跑完整验收前需确认其当前 Docker/Compose 能力。
 
 - [统一文档索引（现行架构、W0/MVP 和历史资料）](docs/index.md)
 - [目录结构与持续文档治理规则](docs/repository-layout.md)
-- [当前架构与实施门禁](docs/designs/current-architecture-baseline.md) · [历史 PR #14 终裁](docs/designs/whole-product-decision.md)
+- [当前架构与实施门禁](docs/designs/current-architecture-baseline.md) · [历史 PR #14 终裁](docs/archive/route-b/designs/whole-product-decision.md)
 
 - [历史 v1 开发包（有效的工程规则仍需保留）](docs/archive/engineering-v1/README.md)
-- [P1 运行与复现说明](p1-walking-skeleton/README.md)
-- [P2 接口与操作手册](core/README.md)
+- [P1 运行与复现说明](docs/archive/legacy-runtime/p1-walking-skeleton/README.md)
+- [P2 接口与操作手册](docs/archive/legacy-runtime/core/README.md)
 - [开发流程的来源与适配说明](docs/development.md#采用依据与核验版本)

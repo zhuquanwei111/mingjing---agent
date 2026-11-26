@@ -1,32 +1,50 @@
 # 明镜 P2 最小公共层
 
-**适用范围：历史 P2 隔离实现及其维护、复现和回归测试。** 下文不是新 Mastra 主线的宿主接入说明，不授予正式开发或部署权限。新能力与新阶段从[当前架构与实施门禁](../docs/designs/current-architecture-baseline.md#capability-onboarding)进入；旧 P2 API、类型及运行命令不直接外推新宿主。
+**适用范围：历史 P2 隔离实现及其维护、复现和回归测试。** 下文不是新 Mastra 主线的宿主接入说明，不授予正式开发或部署权限。新能力与新阶段从[当前架构与实施门禁](../../../designs/current-architecture-baseline.md#capability-onboarding)进入；旧 P2 API、类型及运行命令不直接外推新宿主。
 
 P2 提供能力目录、版本发布、资源授权、任务与 Run API、审批、收据、预算和产物读取。业务模板与统一执行路径见 [SDK 示例](src/mingjing/examples.py)。执行版本和迁移规则见 [VERSIONING.md](VERSIONING.md)。
+
+## 历史 P2 容器视图
+
+```mermaid
+flowchart LR
+    Client["已授权的 API 调用方"]
+    subgraph Runtime["明镜 P2 开发环境"]
+        API["HTTP API"]
+        Worker["Temporal Worker 与 LangGraph"]
+        Server["Temporal 服务"]
+        DB[("PostgreSQL")]
+        Blobs[("开发产物卷")]
+    end
+    Client -->|任务与状态请求| API
+    API -->|启动与查询| Server
+    Worker -->|轮询与结果| Server
+    Server -->|引擎持久状态| DB
+    API -->|产品状态| DB
+    Worker -->|产品状态与收据| DB
+    API -->|存取| Blobs
+    Worker -->|存取| Blobs
+```
 
 ## 日常开发
 
 使用独立的原生 Linux ARM64 或 AMD64 checkout。从 Git 根目录执行 `make p2-acceptance` 可创建一次性 Compose project，运行测试并清理。需要保留开发卷时，从根目录执行以下命令。
 
-    sh core/infra/dev.sh init
-    sh core/infra/dev.sh test
-    sh core/infra/dev.sh status
+    sh docs/archive/legacy-runtime/core/infra/dev.sh init
+    sh docs/archive/legacy-runtime/core/infra/dev.sh test
+    sh docs/archive/legacy-runtime/core/infra/dev.sh status
 
-init 创建专用项目名称和合成数据库密码，使用 PostgreSQL 17.12、Temporal Server 1.32.2 和 CPython 3.12.16 的固定镜像，执行三库初始化和产品迁移。test 在内部网络运行 API、Temporal Worker 和合成调用场景。手动测试的 JUnit 位于 `core/.runtime/junit.xml`，自动验收写入命令输出指定的独立目录。构建按目标架构选择 [ARM64 锁](requirements/linux-aarch64.lock)或 [AMD64 锁](requirements/linux-x86_64.lock)，复用 P1 对应架构的相同版本与已验证 wheel 哈希。固定多架构镜像索引保留原 AMD64 子镜像并选择对应的原生 ARM64 子镜像；这不是镜像版本升级。服务使用内部网络，API 在容器内绑定回环，Worker 为 UID 10101。生产制品放行仍需处理 [P1 镜像安全发现](../p1-walking-skeleton/evidence/lima/image-scan.json)。
+init 创建专用项目名称和合成数据库密码，使用 PostgreSQL 17.12、Temporal Server 1.32.2 和 CPython 3.12.16 的固定镜像，执行三库初始化和产品迁移。test 在内部网络运行 API、Temporal Worker 和合成调用场景。手动测试的 JUnit 位于所选环境文件旁的 `junit.xml`，自动验收写入命令输出指定的独立目录。构建按目标架构选择 [ARM64 锁](requirements/linux-aarch64.lock)或 [AMD64 锁](requirements/linux-x86_64.lock)，复用 P1 对应架构的相同版本与已验证 wheel 哈希。固定多架构镜像索引保留原 AMD64 子镜像并选择对应的原生 ARM64 子镜像；这不是镜像版本升级。服务使用内部网络，API 在容器内绑定回环，Worker 为 UID 10101。生产制品放行仍需处理 [P1 镜像安全发现](../p1-walking-skeleton/evidence/lima/image-scan.json)。
 
 GitHub 正式 ARM64 作业沿用 `P1 acceptance` 名称，同时运行 P1 与本公共层验收；`P2 regression (amd64, advisory)` 仅作辅助。候选提交是否通过以其完整 CI 日志为准，配置支持某个架构不等于已完成该候选的实际验收。
 
-从根目录执行 `sh core/infra/dev.sh run`，它在数据库和 Temporal 就绪并执行迁移后启动 API 与 Worker。API 容器内地址为 `127.0.0.1:8080`。`sh core/infra/dev.sh stop` 停止此项目容器，开发卷供下次启动复用。迁移和凭据开通使用专用的 `MINGJING_MIGRATION_DSN`。应用角色通过受限认证函数读取身份，凭据开通和撤销由迁移角色管理。
+从根目录执行 `sh docs/archive/legacy-runtime/core/infra/dev.sh run`，它在数据库和 Temporal 就绪并执行迁移后启动 API 与 Worker。API 容器内地址为 `127.0.0.1:8080`。`sh docs/archive/legacy-runtime/core/infra/dev.sh stop` 停止此项目容器，开发卷供下次启动复用。迁移和凭据开通使用专用的 `MINGJING_MIGRATION_DSN`。应用角色通过受限认证函数读取身份，凭据开通和撤销由迁移角色管理。
 
-已有开发栈升级后，脚本在 `core/.runtime/dev.env` 缺失时读取原来的 `p2-core/.runtime/dev.env`。两处配置都存在时，默认使用 `core/.runtime/dev.env`。删除旧栈的卷需要在 `clean` 命令显式指定旧配置。迁移配置时在原 checkout 的 Git 根目录运行以下命令，沿用同一项目名、凭据、命名空间和开发卷。
+同一 checkout 升级时，从仓库根使用上方归档脚本。默认先使用归档目录的 `.runtime/dev.env`，其次使用根目录旧 `core/.runtime/dev.env`，最后使用更早的 `p2-core/.runtime/dev.env`。由选定文件读取原 Compose 项目标识和凭据。单独传入的 `P2_ENV_FILE` 优先；相对路径从归档后的 `core` 计算。旧调用可从仓库根显式传入绝对路径，例如：
 
-    test -f p2-core/.runtime/dev.env &&
-      test ! -e core/.runtime/dev.env &&
-      mkdir -p core/.runtime &&
-      P2_ENV_FILE=../p2-core/.runtime/dev.env sh core/infra/dev.sh stop &&
-      mv -nT p2-core/.runtime/dev.env core/.runtime/dev.env &&
-      test ! -e p2-core/.runtime/dev.env &&
-      P2_ENV_FILE=.runtime/dev.env sh core/infra/dev.sh run
+    P2_ENV_FILE="$PWD/core/.runtime/dev.env" sh docs/archive/legacy-runtime/core/infra/dev.sh status
+
+需要停用某一旧栈时，先按相同文件执行 `status` 核对项目，再按任务授权执行 `stop`。删除卷的 `clean` 仅处理显式指定或归档位置的配置，旧位置需显式指定。CI 为每次 P2 验收生成独立环境文件。
 
 ### API v1
 
@@ -50,7 +68,7 @@ GitHub 正式 ARM64 作业沿用 `P1 acceptance` 名称，同时运行 P1 与本
 
 ### 开发能力与扩展
 
-本节的类、URL 和测试只对应历史 P2 隔离实现；[原路线 B 接入指南](../docs/designs/whole-product-decision.md#capability-onboarding)仅作为当时的契约与验证资产，不能据此开始新路线开发。新 Mastra 主线采用[现行能力接入边界](../docs/designs/current-architecture-baseline.md#capability-onboarding)，实际宿主建成并验收后才提供相应 API/SDK 和接入手册。
+本节的类、URL 和测试只对应历史 P2 隔离实现；[原路线 B 接入指南](../../route-b/designs/whole-product-decision.md#capability-onboarding)仅作为当时的契约与验证资产，不能据此开始新路线开发。新 Mastra 主线采用[现行能力接入边界](../../../designs/current-architecture-baseline.md#capability-onboarding)，实际宿主建成并验收后才提供相应 API/SDK 和接入手册。
 
 定义 Model 的输入输出类型和 CapabilityContext 上下文，再在应用加载配置中注册 Capability。业务函数通过 NotesPort 使用同库事务。普通程序 normalize_text 返回产物，固定 Workflow 的 write_note 审批后记一条合成笔记，Agent 的 draft_note 使用固定决策和受控工具复用同一笔记实现。业务函数的签名与 Temporal 和 LangGraph 无关。应用根据可信契约决定执行入口。
 

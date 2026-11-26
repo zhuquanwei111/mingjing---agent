@@ -21,7 +21,8 @@ class DevelopmentDocsTests(unittest.TestCase):
 
     def test_current_documentation_entrypoints_cannot_be_silently_dropped(self):
         required = {"README.md", "AGENTS.md", "docs/index.md", "docs/repository-layout.md",
-                    "docs/designs/whole-product-decision.md"}
+                    "docs/designs/current-architecture-baseline.md",
+                    "docs/archive/route-b/designs/whole-product-decision.md"}
         self.assertTrue(required.issubset(set(ENTRY_POINTS)))
 
     def test_package_can_be_checked_without_project_docs(self):

@@ -8,8 +8,8 @@ import tempfile
 import unittest
 
 
-REPOSITORY_ROOT = Path(__file__).resolve().parents[2]
-P1_INFRA = REPOSITORY_ROOT / "p1-walking-skeleton" / "infra"
+LEGACY_ROOT = Path(__file__).resolve().parents[2]
+P1_INFRA = LEGACY_ROOT / "p1-walking-skeleton" / "infra"
 
 
 class RebuildCleanupTests(unittest.TestCase):

@@ -1,16 +1,30 @@
 # 工程目录治理与开发交付包迁移
 
-**现行状态：v1 的 16 件文件已按独立评审方案归档，v2 仍保留在已关闭的 #6 历史候选中。** [MJ-ARCH-FINAL 架构与实施门禁](../designs/current-architecture-baseline.md)及[基线任务](architecture-baseline-transition.md)继续适用，公共基座建设须另获批准。
+**前期归档记录：v1 的 16 件文件已按独立评审方案归档，v2 仍保留在已关闭的 #6 历史候选中。** [MJ-ARCH-FINAL 架构与实施门禁](../designs/current-architecture-baseline.md)及[基线任务](architecture-baseline-transition.md)继续适用，公共基座建设须另获批准。
 
 历史状态（第一阶段记录）：当时 PR #14 确认调整后的路线 B 为开发基线，W0/MVP 尚未完成。保留以下历史记录及证据；不据旧方案恢复开发。
 最初授权限于目录准备。本轮维护者明确要求先审并合并 #21，再按审过的方案执行 #22，最终复审及 CI 通过后合并。
+
+## 全仓旧路线清理
+
+本次逐项核对 395a7ed 上的 261 个跟踪文件。项目原有 42 个 Python 文件，34 个位于旧 P1/P2 内，另有 3 个专属检查文件。根目录只保留通用工程和现行项目入口。[历史实现与证据](../archive/legacy-runtime/README.md)给出源树、证据校验和升级时旧状态的处理方法。
+
+| 原职责 | 核查结果与处置 |
+| --- | --- |
+| 产品实现 | P1 的 138 个文件、P2 的 35 个文件完整移入历史运行目录。旧 Python API、Worker、模型循环、授权与恢复逻辑仅用于复现。现行 Mastra、Keycloak、SpiceDB 等公共宿主仍待建设。 |
+| 工程检查 | P2 静态导入检查和对应测试、P1 重建清理测试随归档运行。仓库脚本继续负责文档、评审流程、项目角色和技能入口。 |
+| 工程包和隐藏目录 | 通用规范包、技能链接、Codex 配置与评审角色、PR 模板、分支保护配置和 GitHub Actions 有独立使用方。根 Makefile 与 CI 仍驱动历史回归。 |
+| 文档与证据 | 路线 B 和 PR #14 的 7 份设计、3 份判据或历史填证、2 份任务记录归入 [route-b](../archive/route-b/)。现行决定、技术清单、原编号 76 项最终映射、H1/H2 记录、旧版仍生效的原规则、九件原件及工程流程保留各自入口。 |
+| 本地与未合并历史 | Git 工作区、被忽略的凭据和缓存留在原持有位置；其他历史分支和未合并实验按固定提交追溯。此次候选只交付主分支已跟踪内容的整理。 |
+
+独立方案评审 LAYOUT-395a7ed-D1 确认目录方案，要求保留旧卷选择和凭据忽略边界、已迁任务文档检查与同版三项 CI。回退可反向应用本次迁移提交，旧运行身份与卷分别核对，不随 Git 回退。实施复审、最终候选与逐项运行结果见本次迁移 PR。
 
 ## 冻结对象与当时事实（2026-11-23 历史记录）
 
 - 初始基线为 `main` `3b5b9d2c285de011c523174d794792eb7cafbd97`；PR #14 合并后主分支为 `ef8bb05c79d02004d66e48e5ee8dc55c5491c723`，当前目录治理分支为 `docs/directory-governance-20261123`。
 - 明镜根规则、通用规范 `engineering-standard/`、旧 v1 包 `mingjing-codex-engineering-v1/`、代码 `core/` 和 `p1-walking-skeleton/` 已存在。
 - 路线 B v2 开发包仍在 [PR #6](https://github.com/zhuquanwei111/mingjing---agent/pull/6) 未合并；[PR #7](https://github.com/zhuquanwei111/mingjing---agent/pull/7) 和 [PR #8](https://github.com/zhuquanwei111/mingjing---agent/pull/8) 均已合并，[PR #14](https://github.com/zhuquanwei111/mingjing---agent/pull/14) 为当时最新的完整产品架构终裁。各 PR 实际状态及现行裁决须在任务运行时复核。
-- **当时独立终裁（历史）：**[PR #14 完整产品终裁](https://github.com/zhuquanwei111/mingjing---agent/pull/14) 已把调整后的 B 作为开发基线，[终裁正文](../designs/whole-product-decision.md)明确模型出口与 Agent 工具回合恢复两个调整。PR #7 先前的“需修订后复审”属于**历史阶段**；W0/MVP 开发和上线仍要单独授权/验收。
+- **当时独立终裁（历史）：**[PR #14 完整产品终裁](https://github.com/zhuquanwei111/mingjing---agent/pull/14) 已把调整后的 B 作为开发基线，[终裁正文](../archive/route-b/designs/whole-product-decision.md)明确模型出口与 Agent 工具回合恢复两个调整。PR #7 先前的“需修订后复审”属于**历史阶段**；W0/MVP 开发和上线仍要单独授权/验收。
 
 ## 第一阶段准备（历史记录）
 

@@ -25,7 +25,8 @@ ENTRY_POINTS = (
     "README.md",
     "docs/index.md",
     "docs/repository-layout.md",
-    "docs/designs/whole-product-decision.md",
+    "docs/designs/current-architecture-baseline.md",
+    "docs/archive/route-b/designs/whole-product-decision.md",
     "docs/development.md",
     "docs/PLANS.md",
     "docs/configuration.md",
@@ -33,7 +34,9 @@ ENTRY_POINTS = (
     "docs/engineering-standard-execution.md",
     "docs/requirements/engineering-standard.md",
     "docs/adr/0001-versioned-engineering-standard.md",
-    "core/README.md",
+    "docs/archive/legacy-runtime/README.md",
+    "docs/archive/legacy-runtime/core/README.md",
+    "docs/archive/legacy-runtime/p1-walking-skeleton/README.md",
 )
 LINK = re.compile(r"!?\[[^\]\n]*\]\(\s*(?:<([^>\n]+)>|([^\s)]+))(?:\s+(?:\"[^\"]*\"|'[^']*'))?\s*\)")
 FENCE = re.compile(r"^\s*(`{3,}|~{3,})")
@@ -144,7 +147,8 @@ def main() -> int:
         if task is not None and task.suffix.lower() != ".md":
             raise ValueError("--task must name a Markdown record")
         sources = {local_path(ROOT, path) for path in ENTRY_POINTS}
-        sources.update(path.resolve() for path in (ROOT / "docs/tasks").rglob("*.md"))
+        for folder in ("docs/tasks", "docs/archive/route-b"):
+            sources.update(path.resolve() for path in (ROOT / folder).rglob("*.md"))
         if task is not None:
             sources.add(task)
         for source in sources:
