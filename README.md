@@ -4,7 +4,7 @@
 
 ## 当前项目状态
 
-[PR #14 完整产品架构独立终裁](docs/designs/whole-product-decision.md)已合并：**采用经模型出口与工具回合恢复调整的路线 B**（Python、PostgreSQL、Temporal、Pydantic AI）作为后续开发基线。**W0、正式 MVP 和真实流量尚未因此获准或完成**；v2 开发包仍在 [PR #6](https://github.com/zhuquanwei111/mingjing---agent/pull/6) 的独立分支。
+**总控最终裁决采用 Mastra OSS 主体和 WeKnora v0.9.1 限定方案。** [现行架构与实施门禁](docs/designs/current-architecture-baseline.md)、[完整架构与图](docs/designs/architecture-final/contracts.md)及 [ADR 0002](docs/adr/0002-mastra-architecture-transition.md)说明建设边界。合并本 PR 后取代[历史路线 B / PR #14](docs/designs/whole-product-decision.md)。应用后端纳入新公共宿主建设，项目方另批开工；W0a、W0b 及全部必需公共能力 G 通过后，才可另批首个业务 M。
 
 P2 最小公共层已由 [PR #2](https://github.com/zhuquanwei111/mingjing---agent/pull/2)
 合并交付，当前公共层实现及操作入口在 [core/README.md](core/README.md)。
@@ -50,7 +50,7 @@ Daytona 跑完整验收前需确认其当前 Docker/Compose 能力。
 
 - [统一文档索引（现行架构、W0/MVP 和历史资料）](docs/index.md)
 - [目录结构与持续文档治理规则](docs/repository-layout.md)
-- [PR #14 完整产品架构终裁](docs/designs/whole-product-decision.md)
+- [当前架构与实施门禁](docs/designs/current-architecture-baseline.md) · [历史 PR #14 终裁](docs/designs/whole-product-decision.md)
 
 - [历史 v1 开发包（有效的工程规则仍需保留）](mingjing-codex-engineering-v1/README.md)
 - [P1 运行与复现说明](p1-walking-skeleton/README.md)
