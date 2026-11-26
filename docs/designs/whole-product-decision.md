@@ -133,7 +133,7 @@
 | 效果与完成 | 声明只读、准备草稿或正式写入，是否同步返回，谁能证明业务完成、质量合格、已收件。纯查询可当次返回；只有任务要求持久交付时，才以独立交付号取得收件收据。声明超时、可重试条件、所需限额或费用上界；无消耗也明确说明。 |
 | 异步和有副作用时补充 | 声明稳定操作号的作用域及保留期、同号同载荷去重保证、可查终局及来源、回调鉴别、取消语义和历史版本兼容期。写明哪些错误能证明“未受理”，哪些只能判为未知。有副作用的同步 API 同样执行这些防重和查证约束。 |
 
-**现成类型的对照。** P2 的 `Capability`、`CapabilityContext`、`Handler`、`ExternalPort`、`Result`、`ProviderReceipt` 可直接查签名。`Capability.description()` 和 `fingerprint` 演示如何从类型生成目录说明和摘要。P2 将内部处理统一标成 `internal_transaction`，外部协议只有 `send(data, context)` 与 `lookup(operation_id)`。路线 B 必须另声明实际读写、异步受理、取消、来源与校验语义；不能从 P2 的枚举自动推断这些保证。[P2 类型与协议](../../core/src/mingjing/contracts.py) · [原契约与生命周期](../../mingjing-codex-engineering-v1/04_CAPABILITY_CONTRACT.md)
+**现成类型的对照。** P2 的 `Capability`、`CapabilityContext`、`Handler`、`ExternalPort`、`Result`、`ProviderReceipt` 可直接查签名。`Capability.description()` 和 `fingerprint` 演示如何从类型生成目录说明和摘要。P2 将内部处理统一标成 `internal_transaction`，外部协议只有 `send(data, context)` 与 `lookup(operation_id)`。路线 B 必须另声明实际读写、异步受理、取消、来源与校验语义；不能从 P2 的枚举自动推断这些保证。[P2 类型与协议](../../core/src/mingjing/contracts.py) · [原契约与生命周期](../archive/engineering-v1/04_CAPABILITY_CONTRACT.md)
 
 ### 四种实现怎样接
 

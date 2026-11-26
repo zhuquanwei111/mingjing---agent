@@ -29,7 +29,7 @@
 
 验收分批在云端执行。对比了各容器内 Python 源文件的哈希。所有批次使用一致的核心实现，后续新增 Temporal 探针。AT09 批次到 AT10 的探针差异是清理闲置导入和记录插件实际加载路径。 [源文件核对](source-revisions.txt) · [探针差异](probe-revision.diff) · [AT10 源文件哈希](at10-source.sha256)
 
-在临时 Linux amd64 检出目录中，将此处的 amd64 锁复制到 `requirements/`，将 Dockerfile 的锁路径从 `linux-aarch64.lock` 替换为 `linux-x86_64.lock`。用 `sh infra/new-run.sh` 创建专用凭据和运行 ID，再启动固定镜像。Compose 5.6 对一次性 namespace 容器的 `up --wait` 会报告其已退出，此处独立验证该初始化步骤的退出码。 [隔离计划](../../../mingjing-codex-engineering-v1/P1_EXECUTION_PLAN.md)
+在临时 Linux amd64 检出目录中，将此处的 amd64 锁复制到 `requirements/`，将 Dockerfile 的锁路径从 `linux-aarch64.lock` 替换为 `linux-x86_64.lock`。用 `sh infra/new-run.sh` 创建专用凭据和运行 ID，再启动固定镜像。Compose 5.6 对一次性 namespace 容器的 `up --wait` 会报告其已退出，此处独立验证该初始化步骤的退出码。 [隔离计划](../../../docs/archive/engineering-v1/P1_EXECUTION_PLAN.md)
 
 ```bash
 sh infra/compose.sh up -d --wait db temporal

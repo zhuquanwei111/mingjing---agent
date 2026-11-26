@@ -21,7 +21,7 @@
 
 ## 当前技术事实
 
-根 [Makefile](../../Makefile) 在 #3 候选中统一运行 Python/Shell 语法、源码空白、静态架构导入、脚本单测和开发文档导航。P1 与 P2 使用 Python、pytest、固定分平台 wheel 哈希锁和隔离 Docker Compose。P1 包含 Temporal、PostgreSQL 及不同能力接入路径，P2 的 `core/` 为当前公共层，含契约、服务、存储、Temporal/LangGraph 适配与数据库迁移。具体边界和阶段由[项目规范](../../mingjing-codex-engineering-v1/AGENTS.md)与[当前 P2 入口](../../core/README.md)说明。
+根 [Makefile](../../Makefile) 在 #3 候选中统一运行 Python/Shell 语法、源码空白、静态架构导入、脚本单测和开发文档导航。P1 与 P2 使用 Python、pytest、固定分平台 wheel 哈希锁和隔离 Docker Compose。P1 包含 Temporal、PostgreSQL 及不同能力接入路径，P2 的 `core/` 为当前公共层，含契约、服务、存储、Temporal/LangGraph 适配与数据库迁移。具体边界和阶段由[项目规范](../archive/engineering-v1/AGENTS.md)与[当前 P2 入口](../../core/README.md)说明。
 
 [生效规则集](https://github.com/zhuquanwei111/mingjing---agent/rules/27699996) 保护默认分支，要求 PR、解决评审线程，并严格要求 GitHub Actions 的 `P1 acceptance`。服务器规则的必需批准人数为 0，独立审查由项目流程落实。当前 `main` 的同名 ARM64 job 跑 P1，#3 候选在同一 job 加入 P2；amd64 jobs 是辅助回归。#3 的[对应 ARM64 日志](https://github.com/zhuquanwei111/mingjing---agent/actions/runs/44691533084/job/136138243374)属于 #3 head。
 
