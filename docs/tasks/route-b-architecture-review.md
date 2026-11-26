@@ -1,6 +1,6 @@
 # 路线 B 架构准入与最短端到端方案审查任务
 
-> **历史任务记录。** 下文记录当时的审查和裁决，不是新任务授权。接续新架构请从[架构过渡任务](architecture-baseline-transition.md)和[现行架构](../designs/current-architecture-baseline.md)进入。
+> **历史任务记录。** 下文记录当时的审查和裁决，不是新任务授权。接续新架构请从[架构基线任务](architecture-baseline-transition.md)和[现行架构](../designs/current-architecture-baseline.md)进入。
 
 **当前状态：R4 独立总评通过，路线 B 成为正式 W0 的设计基线。W0 实施、正式 MVP 和真实流量继续暂停。**
 **日期：** 2026-11-23。**来源基线：** `main` `3b5b9d2c285de011c523174d794792eb7cafbd97`。**工作分支：** `codex/review-route-b-architecture-20261123`。本分支只提交供独立评审的需求和候选方案，不接管现有开发工作区。

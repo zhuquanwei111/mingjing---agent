@@ -1,17 +1,26 @@
-# 架构基线过渡与 H2 接续
+# 最终架构基线切换与工程证据
 
-**状态：文档草稿交付；正式公共基座建设未获准。** 基线 main `aced61ac3855670478c33cc3cb5a1dcb9699ae3e`，任务分支 `docs/mastra-architecture-baseline-transition-20261126`。以 [当前架构](../designs/current-architecture-baseline.md) 和 [ADR 0002](../adr/0002-mastra-architecture-transition.md) 为唯一新路线入口，不创建第二套任务总账。实际 HEAD、PR 和 CI 使用时重新核对。
+**任务状态**　总控已完成选型，独立分支以 Draft PR [#27](https://github.com/zhuquanwei111/mingjing---agent/pull/27) 交审。改动限于架构及工程文档。进入公共基座正式建设仍需项目方批准。
 
-## 来源与归档边界
+## 可追溯原件与公开范围
 
-- F03 v1.1（2026-11-25，15 个文件）：总控此前核对 ZIP 内容及 14 个 SHA-256 条目一致，整包 SHA-256 `7ff9ffd25a54b237d0588cd987250c6d709eb0f3305f3ff5a324fc8c7ab05638`。本 PR 记录已裁决的架构摘要，不把摘要当完整交付。
-- F04 独立报告：4 项阻断、11 项必要修订、合并 V01–V10；F03 R1 设计修订后 H/H1 定向核查。原件、版本及全部细表仍须通过受控交付归档；本公开仓库只保存经授权的非敏感摘要。
-- H1 回执日期 2026-11-25，用户已提供正文；执行会话报告证据包 `MJ-ARCH-H1-evidence.tar.gz` 有 61 份材料及逐文件清单，SHA-256 `fb1671f8cafc189e69c78b6d76ca2af40c61a4954e9bfe0432a7d5982e0cb6b6`。当前仅取得回执正文及报告散列，没有直接取得原始压缩包、实验代码和日志，不能宣称校验通过或独立复跑。云机路径不当作公开可下载链接。H2 应交可独立取得的回执、脱敏证据包和代码，逐文件核验后按 docs 现有职责归档。
-- [历史 PR #14 裁决](../designs/whole-product-decision.md)与[原始 76 项历史填证](../requirements/whole-product-acceptance-results.md)原判据/数据保留。历史 [Mastra PR #16](https://github.com/zhuquanwei111/mingjing---agent/pull/16) 采用不同 core 版本，不能与 H1 当作同一个试件。原件非公开部分不擅自提交。
+项目方持有本次会话附件 `MJ-ARCH-FINAL-执行会话完整交接包.zip`，整包 SHA-256 为 `e02759806467a496b0025b788e2258b12f7de46523d9045717990c339a4e2b37`。从包根的 `00-阅读索引.md` 和 `SHA256SUMS.txt` 进入，以下路径相对于总包。公开仓库保存经审核的技术选择、合成计数、失败结论及散列。受控原包内的实验代码、日志、凭据相关配置、环境标识与真实需求原件由项目方保管，不随公开 PR 分发。
+
+| 文件或目录 | SHA-256 / 核对范围 |
+| --- | --- |
+| 总包校验清单 | 8 项原字节逐项一致。两个历史 ZIP 仅供追溯。 |
+| 01-正式架构与评审 / F03 v1.1 最终送审 ZIP | `7ff9ffd25a54b237d0588cd987250c6d709eb0f3305f3ff5a324fc8c7ab05638`；内部 14 项一致。 |
+| 同目录 F04 独立综合报告 | `7c07ec4327c276ba7c239684f7208311dcf3904b026ec5e5d7c47b586670e7e3`；B01–B04、S01–S11、V01–V10 分别归入实施入口及风险。 |
+| 02-前置核查与实际证据 / H 核查回执 | `d0ead67a7c9097e1e97c3ce2249d56a7a3ca2e2790bab04f09e6c8aacc7fed1b`；属固定接口与实施前置核查。 |
+| 同目录 MJ-ARCH-H2-delivery.zip | `4b3a0becc8626952aef469130987de6931b9bceb4ac306e8b9a88cfeeab5d7cb`；内层 `SHA256SUMS` 的 26 项一致。 |
+| H2 内 H1/MJ-ARCH-H1-evidence.tar.gz | `fb1671f8cafc189e69c78b6d76ca2af40c61a4954e9bfe0432a7d5982e0cb6b6`；包内 `evidence-SHA256SUMS` 的 61 项一致。相邻 H1 回执为 `327aaa10ae8aa62ba8b4020353ffa18750f33ac0eded9b728ea60e7cbf0f6f6c`。 |
+| H2 内 H2/evidence/H2-results.json | `e44589a1877e97f15f89f23f918459cfe002e7fd7bb1445f23823d76b042fbc5`；可按 H2/RUN.md 离线重核收端、重试、拒绝和发布观察。 |
+
+需求单独核对项目方《明镜智能体应用_通用工程架构需求说明书_v0.4.1_合并版.docx》，其字节 SHA-256 为 `75ac634a98393b5f99fb28901a6a91bc7431290143b6458bbf1f9a2af5f23062`，与 F04 原件记录一致。正文 41 FR、11 NFR、7 TS、17 AC 共 76 个唯一编号与 F03/06、[固定 23 组阶段索引](https://github.com/zhuquanwei111/mingjing---agent/blob/210a24f240c73e86746e608907242a200fc94cc0/docs/requirements/whole-product-phase-index.md)逐号相合。原件的四面、核心对象、分阶段及容量/成本待定条款仍适用。新的[76 项映射](../requirements/final-architecture-mapping.csv)保留原组、可观察判据及 G 前的独立盲接；历史填证表保持原貌。
 
 <a id="h1-evidence"></a>
 
-## H1 回执摘要（报告结果，未独立重验）
+## H1 限定实测与失败记录（原包已核，未重新运行服务）
 
 B01：core 1.84.0、pg 1.37.0，隔离 PostgreSQL 17.12、两个执行进程、可独立计数的模型及工具收端。固定 [Mastra 源码](https://github.com/mastra-ai/mastra/blob/10484e3b5544f0a160bc28446e4584be1a32c8e5/packages/core/src/agent/durable/durable-agent.ts) 和[原响应回放](https://github.com/mastra-ai/mastra/blob/10484e3b5544f0a160bc28446e4584be1a32c8e5/packages/core/src/agent/durable/workflows/steps/llm-execution.ts#L1689-L1719)。
 
@@ -37,17 +46,29 @@ B04：WeKnora v0.9.1 标准版、App/DocReader/PG/Redis、两测试租户、合�
 | 发送与重试 | 共享试验 43 次模型/向量接收、5 次解析接收，报告原生队列及模型失败后的后台重试 |
 | 额度耗尽 | 最后一单位产生 1 次接收；此后 24 次聊天、1 次向量、4 次解析尝试拒绝，下游新增接收 0 |
 
-B04 不完整准入。禁止静态头/文件摘要归账，不凭来源列表重开旧页；独占同权限批次、旧版关闭与干净重建仅为部分证据。没有证明真实问答质量、全部来源闭包、实际付费、批次容量或所有内部请求可信归属。
+上述 H1 的共享后台路径未通过。H2 使用新的批次接入方式验证了下列边界，原负例仍保留。
 
-## 下一步、并行 PR 与施工记录
+## H2 补充实测与最终裁决
 
-| 日期/动作 | 状态 |
+固定 WeKnora v0.9.1（`71c32af9273482e0dad013d0e3bea2f4d719516c`）。同租户、一个 App/原生队列/DocReader，全程 App 重启 0 次。A 从两份合成 PDF 编出双来源页；关闭 A 后在空白 B 只导入仍获准的同字节 PDF。签发的批次凭据随文档解析配置持久化并传给 DocReader，模型凭据固定到版本。收端观察如下。
+
+| 观察项 | 原始记录支持的结果 |
 | --- | --- |
-| 2026-11-25 F03 v1.1 / F04 / H | 架构设计及前置核查已交付，完整归档待取得 |
-| 2026-11-25 H1 | 回执报告 B01 限定通过，B02 设计准备，B04 未完整准入；原始证据待核 |
-| 2026-11-26 架构入口同步 | 本文档 PR；只调整导航、ADR、历史标识及阶段门槛；未修改代码 |
-| H2 | 首先查上游真实修复、类似故障及成熟解决办法；合适时仅定向验证，提交知识库保留/修复/局部反转的证据与维护边界，不先逃避必要问题 |
-| 最终批准与实施 | H2 收口、完整材料受控归档、目标环境/版本/许可/外发/费用/实际供应商合同明确并获准后，进入 W0a/W0b/G；G 后才 M |
+| 物理计数 | 30 次准入对应 27 次模型/向量接收、3 次 PDF 解析。A 为 11 聊天、5 向量、2 解析；B 为 8 聊天、3 向量、1 解析。同字节原件在两批各记入正确父预算。 |
+| 拒绝与重试 | 关闭 A、B 活动期间，A 的 4 次解析和 1 次向量尝试在下游前被拒，A 新增接收 0。B 的摘要模型首次受控返回 503，原生阶段由失败重试到完成。 |
+| 新版读回 | B 的新 Wiki 引用与检索命中只含合法来源，撤回标记消失、保留标记可见。H1 的旧链接、旧引用、预热缓存已实测关闭。 |
+| 证据边界 | 没有两批同时活动的并发证明，没有逐物理模型调用的原生子作业 ID 保证。请求单位、合成模型与两份 PDF 不能证明实际收费、复杂资料质量、生产负载或完整权限。 |
+
+总控限定采用 WeKnora。[上游已合并修复](https://github.com/Tencent/WeKnora/pull/5186)处理重解析误删；[索引修复](https://github.com/Tencent/WeKnora/pull/5024)保留更新失败前的旧内容；[后台费用议题](https://github.com/Tencent/WeKnora/issues/3258)不能提供发包前预算。完整上游修复状态、合并提交与首个适用版本见受控 H2 包的《上游核对表》。合并状态按 H2 固定时点记录。局部适配和剩余 G 判据见[知识契约](../designs/architecture-final/contracts.md)及[风险表](../designs/architecture-final/gates-and-risks.md)。
+
+## 施工记录与接续
+
+| 时间 | 可核记录与动作 |
+| --- | --- |
+| 2026-11-25 | F03 v1.1 修订 F04 设计；H 核固定接口，H1 作限定实验并保留 B04 负例。 |
+| 2026-11-26 过渡 | PR #27 的 `de70569` 记录 H1 当时可见范围。该版[独立复审](https://github.com/zhuquanwei111/mingjing---agent/pull/27#issuecomment-7181281866)与[同版 CI](https://github.com/zhuquanwei111/mingjing---agent/actions/runs/45745396068)只证明当轮文档修复和旧仓库回归。 |
+| 2026-11-26 最终基线 | 读取受控原件及最新裁决，校验嵌套包，更新选型、开发边界、风险、76 项与可编辑 SVG。当前候选 SHA、独立评审结果和该提交 CI 随本 PR 交付。 |
+| 合并与开工 | 待总控审核和人工合并，再由项目方明确建设授权。首项是按建设清单确认目标环境和受控供方、搭建真实中立宿主，W0a 全部通过才入 W0b。G 全部必需项通过并另获 M 授权后开始首个正式业务。 |
 
 已发现以下独立 PR；本任务不接管、不合并、不改动其分支。它们包含旧架构或共享文档，合并前须核对最新 main、处理语义/文本冲突并按各自规范复验：
 
@@ -57,7 +78,7 @@ B04 不完整准入。禁止静态头/文件摘要归账，不凭来源列表重
 - [#23 知识库](https://github.com/zhuquanwei111/mingjing---agent/pull/23)、[#24 身份权限](https://github.com/zhuquanwei111/mingjing---agent/pull/24)：保留专项责任，分别对齐 H2 及 B02 后端尚未建设的事实。
 - [#26 问题解决优先](https://github.com/zhuquanwei111/mingjing---agent/pull/26)：独立规则草稿；不重复制定，合并前核对根 AGENTS 的兼容差异。
 
-## 独立评审回流及原执行者整改（2026-11-26）
+## 过渡版独立评审回流及整改（历史记录）
 
 [独立评审回执](https://github.com/zhuquanwei111/mingjing---agent/pull/27#issuecomment-7181160254)对应 base `aced61ac3855670478c33cc3cb5a1dcb9699ae3e`、旧 head `2225b8d5775a56bef3d5c9051cd1194595705352`；由独立 solution_reviewer 回流，结论暂不建议合并，两个发现均由原执行者接受。
 
@@ -66,4 +87,4 @@ B04 不完整准入。禁止静态头/文件摘要归账，不凭来源列表重
 | P1 旧路线仍被活跃文档指引 | 修订[目录治理任务](directory-governance.md)当前状态、历史定位和可执行后续清单；[P2 手册](../../core/README.md)明确旧实现维护/历史复用范围并导向现行入口。保留原历史事实及已有运行命令。#22 后续同步事项已列明。 | 核对旧入口不再误指新建设、迁移责任与历史证据保留 |
 | P2 执行类型与开发阶段同名 | F03 原执行类型 P0–P3 一一改记 EXEC-0–EXEC-3（不用 #20 已有 E1 等阶段编号）；[根规则](../../AGENTS.md)链接[新旧开发阶段衔接](../designs/current-architecture-baseline.md#stage-gate-crosswalk)，旧门禁与 H/W0/G/M/T/P 并用，P1 验收确认后 G，G 全部必要能力及 AC-17 通过且获准才 M；原规则文件与 CI 名称不改。 | 核对阶段语义无重叠、旧门禁未削弱，实施仍暂停 |
 
-旧 head 的 [CI run 45744315521](https://github.com/zhuquanwei111/mingjing---agent/actions/runs/45744315521)经实际回查：ARM64 P1 acceptance 及两项 amd64 回归均成功；该结果只属于旧 head 的现有验收，不是新 head 的验证，也不证明 Mastra/G 已实现。修订后需重新核对当前候选的 `make check` / `P1 acceptance` CI，并请独立 Reviewer 对本次改动复审，原执行者回流处置。完整原件及 61 件原始证据仍未取得，不改此前待核状态。保持草稿、人工合并，不启动正式实施。
+过渡阶段两个 head 的回归与独立复审以各自固定提交为准。当时未取得完整材料的限制已由本次受控原包及逐项核验补齐，见本页开头。本次在临时副本分别执行 H1 的 verify-evidence.py 和 H2 的 check.py，只对已有记录离线对账，两份输出都与原 results JSON 逐字节一致。未重新运行原实验服务。

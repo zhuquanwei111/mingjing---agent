@@ -14,7 +14,7 @@
 | 明镜如何采用工程规范 | [项目接入说明](engineering-standard.md)、[执行性审查](engineering-standard-execution.md) | 通用层与项目例外分开 |
 | 开发与任务接续 | [开发流程](development.md)、[长任务计划](PLANS.md)、[设置及环境边界](configuration.md) | 任务具体状态以所属任务记录和实际 Git 状态核对 |
 | 需求与验收 | [通用工程规范需求](requirements/engineering-standard.md)、[任务记录目录](tasks/) | 已有项目需求摘要不代替用户持有的完整需求原件 |
-| 当前产品架构与选型 | [现行架构与实施门禁](designs/current-architecture-baseline.md)、[ADR 0002](adr/0002-mastra-architecture-transition.md)、[架构过渡任务](tasks/architecture-baseline-transition.md) | Mastra 主体收敛；B04 条件选型待 H2；正式实施未获准 |
+| 当前产品架构与选型 | [现行入口](designs/current-architecture-baseline.md)、[架构图与契约](designs/architecture-final/contracts.md)、[76 项映射](requirements/final-architecture-mapping.csv)、[工程门禁及风险](designs/architecture-final/gates-and-risks.md) | Mastra 主体、H2 知识域方案已裁决；W0/G 及业务待验 |
 | 历史架构与原需求证据 | [PR #14 独立终裁](designs/whole-product-decision.md)、[原 76 项历史填证](requirements/whole-product-acceptance-results.md) | 保留原需求、证据范围和失败；不作为新组合的通过证明 |
 | 技术决定 | [ADR 目录](adr/) | 记录拟议、接受、替代与撤回，状态必须与当前事实一致 |
 
@@ -26,7 +26,7 @@
 - [独立 Reviewer 机制 PR #8](https://github.com/zhuquanwei111/mingjing---agent/pull/8) 已合并，属于工程流程，不替代产品架构终裁。
 - [A/B 隔离实验 PR #5](https://github.com/zhuquanwei111/mingjing---agent/pull/5) 保存两路实际实验材料；它不是合并到 main 的产品实现。
 
-**当前架构入口：**[F03 v1.1 / H1 架构过渡基线](designs/current-architecture-baseline.md)。主体技术路线已收敛；知识库 B04 尚未完整准入，H2 先核上游修复及成熟工程解法。完整 F03/F04/H1 可核原件与证据尚待受控归档，当前仓库记录仅为裁决及证据摘要。正式实施继续暂停；批准后依次 W0a/W0b/G，G 的必要公共能力全部实际通过后方可开始 M（正式首期业务）。合并文档不等于实施授权。
+**当前架构入口**为 [MJ-ARCH-FINAL](designs/current-architecture-baseline.md)。[ADR 0002](adr/0002-mastra-architecture-transition.md)记录旧路线替代与授权边界，[施工与证据记录](tasks/architecture-baseline-transition.md)保留 H1/H2 正反例、受控原包定位及 SHA-256。正式公共基座建设仍待项目方授权。
 
 ## 目录治理及资料规则
 

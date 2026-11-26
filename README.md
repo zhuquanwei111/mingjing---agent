@@ -4,7 +4,7 @@
 
 ## 当前项目状态
 
-**架构正在由历史路线 B 转入 Mastra OSS 主线。** 从[当前架构与实施门禁](docs/designs/current-architecture-baseline.md)进入；[ADR 0002](docs/adr/0002-mastra-architecture-transition.md)记录替换理由、证据边界和剩余裁决。[PR #14](docs/designs/whole-product-decision.md)及 [PR #6](https://github.com/zhuquanwei111/mingjing---agent/pull/6) 保留为历史设计/候选与证据，不是新开发依据。H1 已报告限定动态恢复机制通过；知识库 B04 尚待 H2 定向解决，正式实施仍暂停。合入本次文档 PR 也不授予 W0、G、MVP 或真实流量的实施权限。
+**总控最终裁决采用 Mastra OSS 主体和 WeKnora v0.9.1 限定方案。** [现行架构与实施门禁](docs/designs/current-architecture-baseline.md)、[完整架构与图](docs/designs/architecture-final/contracts.md)及 [ADR 0002](docs/adr/0002-mastra-architecture-transition.md)说明建设边界。合并本 PR 后取代[历史路线 B / PR #14](docs/designs/whole-product-decision.md)。应用后端纳入新公共宿主建设，项目方另批开工；W0a、W0b 及全部必需公共能力 G 通过后，才可另批首个业务 M。
 
 P2 最小公共层已由 [PR #2](https://github.com/zhuquanwei111/mingjing---agent/pull/2)
 合并交付，当前公共层实现及操作入口在 [core/README.md](core/README.md)。

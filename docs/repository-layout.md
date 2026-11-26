@@ -42,7 +42,7 @@
 
 ## 本次治理与正式架构关系
 
-[早期架构评审 PR #7](https://github.com/zhuquanwei111/mingjing---agent/pull/7) 已合并，随后 [完整产品终裁 PR #14](https://github.com/zhuquanwei111/mingjing---agent/pull/14) 也已合并：当时确认调整后的路线 B。后续以[当前架构与实施门禁](designs/current-architecture-baseline.md)为架构过渡入口；旧终裁保留历史，PR #6 的旧版 v2 包仍未合并，不自动转入新开发。正式实施、G、MVP 与真实流量仍必须分别获准和验收。旧 v1 的有效规则及历史证据继续保留。
+[早期架构评审 PR #7](https://github.com/zhuquanwei111/mingjing---agent/pull/7) 已合并，随后 [完整产品终裁 PR #14](https://github.com/zhuquanwei111/mingjing---agent/pull/14) 也已合并：当时确认调整后的路线 B。后续以[当前架构与实施门禁](designs/current-architecture-baseline.md)为最终架构入口，详细设计、SVG 和选型矩阵归 designs/architecture-final，76 项映射归 requirements，受控证据校验入口归 tasks；旧终裁保留历史，PR #6 的旧版 v2 包仍未合并，不自动转入新开发。正式实施、G、MVP 与真实流量仍必须分别获准和验收。旧 v1 的有效规则及历史证据继续保留。
 
 ## 贯穿 W0、MVP 和长期开发的维护动作
 
