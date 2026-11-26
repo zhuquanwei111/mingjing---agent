@@ -1,6 +1,6 @@
 # 明镜智能体 · 当前架构与实施门禁
 
-**MJ-ARCH-FINAL · 总控最终架构裁决，2026-11-26。** 采用 Mastra OSS 主体、Keycloak 公共身份、SpiceDB、PostgreSQL、Apache Hop、SeaweedFS 和限定使用的 WeKnora v0.9.1。本 PR 合并后替代 PR #14 路线 B 的仓库基线。公共宿主待建；建设、首个业务和真实流量分别另行批准。
+**MJ-ARCH-FINAL · 总控最终架构裁决，2026-11-26。** 采用 Mastra OSS 主体、Keycloak 公共身份、SpiceDB、PostgreSQL、Apache Hop、SeaweedFS 和限定使用的 WeKnora v0.9.1。PR #27 已于 2026-11-26 合并，本裁决已替代 PR #14 路线 B 的仓库基线。公共宿主待建；建设、首个业务和真实流量分别另行批准。
 
 [完整架构和可编辑图](architecture-final/contracts.md) · [技术清单](architecture-final/technology.csv) · [复用与开发边界](architecture-final/reuse.csv) · [许可清单](architecture-final/licenses.csv) · [76 项最终映射](../requirements/final-architecture-mapping.csv) · [关口与风险](architecture-final/gates-and-risks.md) · [ADR 0002](../adr/0002-mastra-architecture-transition.md) · [工程证据及校验入口](../tasks/architecture-baseline-transition.md)
 
@@ -54,7 +54,7 @@
 
 开发者提供稳定 Capability ID/version、用途、输入输出 Schema、处理函数/Workflow/Agent 或外部适配器、发布及许可条件、真实读写/副作用、成本上界、超时、幂等、查单、取消/回执、质量规则和契约测试。普通程序可直接受理，固定流程和动态 Agent 复用同一个已授权的能力实现；登记、正式发布、授权发现和实际调用是独立动作。新任务固定 Task、原生 Run/owner、版本及操作身份；未获权、未发布、不兼容、未知或预算不足不得放行。能力不自行重建调度、权限、账本或交付系统。
 
-旧[接入指南](whole-product-decision.md#capability-onboarding)及 [P2 实际接口](../../core/README.md)是可核的历史契约/测试资产，不是新 TypeScript 宿主已经具有的端点。实际新宿主实现后补接入手册、Schema、鉴权、真实接口和测试。AC-17 在 G 基座稳定后冻结构建，由独立接入者盲接未预置中立能力，记录实际核心改动并验证真实授权、计量、效果、评测及交付。
+旧[接入指南](../archive/route-b/designs/whole-product-decision.md#capability-onboarding)及 [P2 实际接口](../archive/legacy-runtime/core/README.md)是可核的历史契约/测试资产，不是新 TypeScript 宿主已经具有的端点。实际新宿主实现后补接入手册、Schema、鉴权、真实接口和测试。AC-17 在 G 基座稳定后冻结构建，由独立接入者盲接未预置中立能力，记录实际核心改动并验证真实授权、计量、效果、评测及交付。
 
 ## 6. 阶段及硬门槛
 

@@ -5,7 +5,7 @@
 | 项目 | 机制及一手依据 | 实际触发方式 | 失败处理与可复验方法 |
 | --- | --- | --- | --- |
 | C01 需求、兼容与验收 | [任务模板](../engineering-standard/templates/task.md)与四项实施边界。采用 Agents SDK 的 implementation-strategy 经验 | Agent 识别有影响的变更，在计划记录需求、兼容、范围外及现有路径 | 缺关键取舍交给用户判断。用本任务和其独立方案评审核对每条验收、权限和对应输出 |
-| C02 调查与权威入口 | 根入口、Git 代码、测试及历史记录。采用 Harness Engineering 的导航思路 | 开始任务时核对 Git 与相关入口，`make check` 自动检查导航 | 失效或越界链接返回非零，恢复前纠正入口。核对 C4 视图、当前 P2 路径、历史报告和 PR 实际 head |
+| C02 调查与权威入口 | 根入口、Git 代码、测试及历史记录。采用 Harness Engineering 的导航思路 | 开始任务时核对 Git 与相关入口，`make check` 自动检查导航 | 失效或越界链接返回非零，恢复前纠正入口。核对 现行架构图、历史 P2 复现路径、历史报告和 PR 实际 head |
 | C03 计划、边界和冷恢复（R1） | 单一任务记录、只读状态脚本、仓库接续技能。采用 ExecPlans、Agents SDK 与 Codex 的仓库发现机制 | 新会话按任务位置或技能调用，从仓库读取当前状态 | 对齐旧计划与真实工作区。Mac 新会话实际执行记录内命令并结束只读恢复；复验以命令、SHA 和下一步为准 |
 | C04 代码与架构 | Python 静态导入检查、行为测试、编辑式架构图。采用 Harness Engineering、C4、Google 审查维度和 Willison 反例方法 | `make check` 与影响范围测试，Agent 更新架构或接口 | 静态边界损坏作业失败。已有架构反例覆盖传递导入，P2 行为仍由实际入口验证。通用 lint、类型、动态导入和生产安全各需对应证据 |
 | C05 分层测试与合并门禁 | 现有 Make／GitHub Actions；采用 Fowler 的自测试构建、GitHub Rulesets | 本地 `make check`/`make smoke`；PR 触发原生 ARM64 正式作业和 amd64 辅助作业 | 非零失败保留日志；由实施者诊断复验。核对 PR head、实际合并 checkout、runner 架构、作业步骤、完整输出及默认分支生效规则 |

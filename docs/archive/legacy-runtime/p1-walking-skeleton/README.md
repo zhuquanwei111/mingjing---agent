@@ -1,12 +1,14 @@
 # Mingjing P1 Walking Skeleton
 
-这是 [P1 执行计划](../docs/archive/engineering-v1/P1_EXECUTION_PLAN.md) 的隔离验证仓库。所有数据、身份、模型输出和外部回执均由测试夹具生成。验收结论和证据索引见 [P1_REPORT.md](P1_REPORT.md)。
+这是 [P1 执行计划](../../engineering-v1/P1_EXECUTION_PLAN.md) 的隔离验证仓库。所有数据、身份、模型输出和外部回执均由测试夹具生成。验收结论和证据索引见 [P1_REPORT.md](P1_REPORT.md)。
 
 `record_marker@1` 通过普通 HTTP API、Temporal Workflow 和受控 LangGraph 工具调用同一个 PostgreSQL 执行边界。API 使用回环地址。Worker 和 API 在独立进程运行。Temporal 主库、可见性库与明镜业务库分库分角色，业务数据库保存任务、审批、预算、收据及审计。Workflow History 保存执行与重放事件。产物字节使用试验目录，版本和读取权限按业务库记录判断。
 
+同一 checkout 更新时，Git 仅迁移跟踪文件。若旧目录仍有 `.p1/runtime.env`，先在原版本完成或停止该次运行，或在确认旧进程已停止且新目录尚无 `.p1` 后，将原 `.p1` 整体移到本目录，再以原运行 ID 接续。两套运行目录同时存在时分别核对，不能合并或覆盖。仅含旧冒烟结果和 CLI 的目录也可原样留存；在新位置按下文准备独立环境。虚拟环境按锁重建。
+
 ## macOS arm64 本地冒烟
 
-需要 CPython 3.12.16、curl 及 shasum。以下命令从本仓库的 `p1-walking-skeleton/` 目录执行。脚本使用空闲回环端口和项目临时目录，并在退出时关闭 CLI Server。
+需要 CPython 3.12.16、curl 及 shasum。以下命令从本仓库的 `docs/archive/legacy-runtime/p1-walking-skeleton/` 目录执行。脚本使用空闲回环端口和项目临时目录，把本次日志和 JUnit 写入新建的私有 .p1/smoke.* 目录，并在退出时关闭 CLI Server。
 
 ```bash
 python3.12 -m venv .venv
@@ -22,11 +24,11 @@ bash infra/smoke.sh
 
 ## Linux ARM64/x86_64 隔离验收
 
-从 Git 仓库根目录执行 `make acceptance`，可按同一顺序运行以下验收和恢复检查，并在成功或失败后清理本次 Compose project。支持原有 ARM64 环境与已有 Instabox 的 x86_64 环境；Docker 构建按目标架构选择对应带哈希的依赖锁，无需手工修改 Dockerfile。各环境分工见[开发流程](../docs/development.md#现有环境怎么使用)。
+从 Git 仓库根目录执行 `make acceptance`，可按同一顺序运行以下验收和恢复检查，并在成功或失败后清理本次 Compose project。支持原有 ARM64 环境与已有 Instabox 的 x86_64 环境；Docker 构建按目标架构选择对应带哈希的依赖锁，无需手工修改 Dockerfile。各环境分工见[开发流程](../../../development.md#现有环境怎么使用)。
 
 在专用 Linux VM 中复制本仓库的文件，排除 `.git/`、`.p1/`、`.venv/`。本次使用 Lima 2.3.0 和 [VM 配置](infra/lima.yaml)。配置未挂载宿主机目录或转发 SSH agent，容器运行时仅安装在该 VM 中。
 
-需要逐步运行时，以下命令从 VM 内的 `p1-walking-skeleton/` 目录执行。以项目私有的 `.p1/runtime.env` 保存新生成的合成凭据。Compose 仅使用内部网络，并且没有对宿主机发布任何服务端口。测试 runner 以 UID 10101 执行。旧版插件的测试程序使用独立 Python 环境，避免同名 namespace 包从新版环境加载。
+需要逐步运行时，以下命令从 VM 内归档后的 P1 目录执行。以项目私有的 `.p1/runtime.env` 保存新生成的合成凭据。Compose 仅使用内部网络，并且没有对宿主机发布任何服务端口。测试 runner 以 UID 10101 执行。旧版插件的测试程序使用独立 Python 环境，避免同名 namespace 包从新版环境加载。
 
 ```bash
 sh infra/new-run.sh

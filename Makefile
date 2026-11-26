@@ -9,7 +9,9 @@ SHELL := /bin/bash
 .SHELLFLAGS := -eu -o pipefail -c
 .DEFAULT_GOAL := help
 
-P1_DIR := p1-walking-skeleton
+LEGACY_DIR := docs/archive/legacy-runtime
+P1_DIR := $(LEGACY_DIR)/p1-walking-skeleton
+P2_DIR := $(LEGACY_DIR)/core
 PYTHON ?= python3
 EXPECTED_RUN_ID ?=
 export EXPECTED_RUN_ID
@@ -43,14 +45,15 @@ check:
 	    *) sh -n "$$script" ;; \
 	  esac; \
 	done < <(git ls-files -z --cached --others --exclude-standard -- '*.sh')
-	$(PYTHON) scripts/check_architecture.py
+	$(PYTHON) $(LEGACY_DIR)/scripts/check_architecture.py
+	$(PYTHON) -m unittest discover -s $(LEGACY_DIR)/scripts/tests -p 'test_*.py'
 	$(PYTHON) -m unittest discover -s scripts/tests -p 'test_*.py'
 	$(PYTHON) scripts/check_development_docs.py
 	@printf '%s\n' 'Source, architecture import boundaries, and development links passed. No general lint or type-check gate is configured.'
 
 smoke:
 	@test -x "$(P1_DIR)/.venv/bin/python" -a -x "$(P1_DIR)/.p1/bin/temporal" || { \
-	  printf '%s\n' 'Prepare the macOS environment in p1-walking-skeleton/README.md first.' >&2; exit 1; \
+	  printf '%s\n' 'Prepare the macOS environment in $(P1_DIR)/README.md first.' >&2; exit 1; \
 	}
 	bash "$(P1_DIR)/infra/smoke.sh"
 
@@ -84,6 +87,9 @@ acceptance:
 # delete generated credentials only after this project's containers/volumes stop.
 cleanup:
 	@set -euo pipefail; cd "$(P1_DIR)"; \
+	if [[ ! -f .p1/runtime.env && -e "$(CURDIR)/p1-walking-skeleton/.p1/runtime.env" ]]; then \
+	  echo "Previous checkout has an active P1 run. Follow the archived P1 README before cleanup." >&2; exit 1; \
+	fi; \
 	if [[ ! -f .p1/runtime.env ]]; then \
 	  if [[ -n "$${EXPECTED_RUN_ID:-}" ]]; then \
 	    printf '%s\n' 'Missing runtime.env for the run that requires cleanup.' >&2; exit 1; \
@@ -103,17 +109,17 @@ p2-acceptance:
 	  *) printf '%s\n' 'P2 acceptance requires isolated Linux ARM64/AMD64 with Docker Compose.' >&2; exit 1 ;; \
 	esac
 	@set -euo pipefail; \
-	umask 077; mkdir -p "$(CURDIR)/core/.runtime"; \
-	run_dir="$$(mktemp -d "$(CURDIR)/core/.runtime/accept.XXXXXXXX")"; \
+	umask 077; mkdir -p "$(CURDIR)/$(P2_DIR)/.runtime"; \
+	run_dir="$$(mktemp -d "$(CURDIR)/$(P2_DIR)/.runtime/accept.XXXXXXXX")"; \
 	export P2_ENV_FILE="$$run_dir/dev.env"; \
 	printf 'P2 isolated results: %s\n' "$$run_dir"; \
 	finish() { \
 	  status=$$?; trap - EXIT; \
-	  if ! sh core/infra/dev.sh clean; then [[ "$$status" -ne 0 ]] || status=1; fi; \
+	  if ! sh $(P2_DIR)/infra/dev.sh clean; then [[ "$$status" -ne 0 ]] || status=1; fi; \
 	  exit "$$status"; \
 	}; \
 	trap finish EXIT; \
 	trap 'exit 130' INT; \
 	trap 'exit 143' TERM; \
-	sh core/infra/dev.sh init; \
-	sh core/infra/dev.sh test
+	sh $(P2_DIR)/infra/dev.sh init; \
+	sh $(P2_DIR)/infra/dev.sh test

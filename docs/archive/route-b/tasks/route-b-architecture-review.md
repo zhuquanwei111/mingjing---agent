@@ -1,6 +1,6 @@
 # 路线 B 架构准入与最短端到端方案审查任务
 
-> **历史任务记录。** 下文记录当时的审查和裁决，不是新任务授权。接续新架构请从[架构基线任务](architecture-baseline-transition.md)和[现行架构](../designs/current-architecture-baseline.md)进入。
+> **历史任务记录。** 下文记录当时的审查和裁决，不是新任务授权。接续新架构请从[架构基线任务](../../../tasks/architecture-baseline-transition.md)和[现行架构](../../../designs/current-architecture-baseline.md)进入。
 
 **当前状态：R4 独立总评通过，路线 B 成为正式 W0 的设计基线。W0 实施、正式 MVP 和真实流量继续暂停。**
 **日期：** 2026-11-23。**来源基线：** `main` `3b5b9d2c285de011c523174d794792eb7cafbd97`。**工作分支：** `codex/review-route-b-architecture-20261123`。本分支只提交供独立评审的需求和候选方案，不接管现有开发工作区。
@@ -20,7 +20,7 @@
 
 ## 按既有工程规范实施审查
 
-[通用开发规范](../../engineering-standard/workflow.md)、[独立评审契约](../../engineering-standard/templates/review.md)与 [Codex CLI 关卡](../../engineering-standard/adapters/codex-cli/README.md)继续适用。
+[通用开发规范](../../../../engineering-standard/workflow.md)、[独立评审契约](../../../../engineering-standard/templates/review.md)与 [Codex CLI 关卡](../../../../engineering-standard/adapters/codex-cli/README.md)继续适用。
 
 1. 独立 Reviewer 从**全新、只读、无原设计聊天历史**的上下文开始。固定需求、方案、基线版本，提供必要项目事实。若本机子代理无只读权限或 CLI 初始化失败，改用用户允许的独立只读会话人工转交；不得假称已独立评审。
 2. Reviewer 根据 TS-01–07、FR-01–41、NFR-01–11 与 AC-01–17 的实际覆盖范围，对候选方案给出 **阻断 / 必要修正 / 待实测 / 可选**，每条有证据、影响和建议处理。评审中不修改正式业务代码。

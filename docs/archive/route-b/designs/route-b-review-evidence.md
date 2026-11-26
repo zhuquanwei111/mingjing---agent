@@ -1,5 +1,7 @@
 # 架构复审证据与同门槛比较
 
+> 历史评审资料。当前建设依据见[现行架构与实施门禁](../../../designs/current-architecture-baseline.md)。
+
 ## RB34 Lab
 
 [PR #10](https://github.com/zhuquanwei111/mingjing---agent/pull/10) 从 #5 实验分支的 `bb55c843b8dd2e9ad646e982a38cda350b3df952` 分出，按预先冻结的[八例协议](https://github.com/zhuquanwei111/mingjing---agent/blob/e263e9403097fbee12d2d12da82efd2ea66cd941/lab/rb34/PLAN.md)检验[上轮独立复审的两项必要修改](https://github.com/zhuquanwei111/mingjing---agent/pull/7#issuecomment-7100697588)。本次引用的[测试提交](https://github.com/zhuquanwei111/mingjing---agent/commit/51c47060826cc3cae0347a4f22d22c29f9288a3f)为 `51c47060826cc3cae0347a4f22d22c29f9288a3f`，[目标 CI](https://github.com/zhuquanwei111/mingjing---agent/actions/runs/45175497629)成功。版本与完整历史、原始收端和产品记录在[永久归档](https://github.com/zhuquanwei111/mingjing---agent/tree/9c39c0f624e0736985491c1aaa49fb471df27ca9/lab/rb34/evidence/45175497629)；[Actions 原始制品](https://github.com/zhuquanwei111/mingjing---agent/actions/runs/45175497629/artifacts/14817864455)另含服务日志。

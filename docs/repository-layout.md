@@ -9,12 +9,12 @@
 | 根 `AGENTS.md` / `README.md` | 简短规则导航、当前项目入口 | 完整旧开发包、第二套任务事实 |
 | `.agents/`、`.codex/`、`.github/` | 可发现技能、Codex 配置、服务器 CI 定义 | 项目业务设计正文 |
 | `engineering-standard/` | 跨项目复用的规范、模板、技能、执行脚本与可选适配 | 明镜专用技术选型或历史方案 |
-| `core/`、`p1-walking-skeleton/` | 仍有代码、测试、迁移、可执行环境和与版本强关联的证据 | 不断增加与代码脱钩的正式项目方案 |
+| `docs/archive/legacy-runtime/` | P1/P2 历史源码、回归脚本、迁移与原始证据。CI 从这里运行两套隔离测试 | 不断增加与代码脱钩的正式项目方案 |
 | `app/`（候选） | 按[现行架构与实施门禁](designs/current-architecture-baseline.md)，获单独授权后开发的正式源码与测试 | 未经过 W0/MVP 对应准入时擅自宣称完成 |
 | `scripts/`、`Makefile` | 确定性检测、回归入口及辅助程序 | 只有口头承诺的自动检查 |
 | `docs/requirements/` | 受控需求摘要及获准可公开的需求文档 | 未授权公开的原始材料、秘密 |
 | `docs/architecture/`（目标） | 当前经确认的架构说明、C4/Mermaid 源和边界 | 尚未被批准的设计冒充当前事实 |
-| `docs/designs/`（现有） | 已评审的设计、[现行架构](designs/current-architecture-baseline.md)、[历史完整产品裁决](designs/whole-product-decision.md)、候选及证据边界 | 业务运行代码 |
+| `docs/designs/`（现有） | 已评审的设计、[现行架构](designs/current-architecture-baseline.md)、最终技术清单及契约 | 业务运行代码 |
 | `docs/adr/` | 关键技术取舍、理由、方案和状态（拟议/接受/替代/撤回） | 没有版本与批准记录的临时口头决定 |
 | `docs/tasks/` | 具体任务计划、进展、审查反馈及验收位置 | 与同一任务并存的第二套真相 |
 | `docs/runbooks/`、`docs/reports/`（目标） | 有实际运行职责的操作手册和正式报告 | 自动复制敏感日志及秘密 |
@@ -29,7 +29,7 @@
 | `mingjing-codex-engineering-v1/`（原址） | [v1 历史包](archive/engineering-v1/README.md)已按原名整体迁入 `docs/archive/engineering-v1/` | 根 AGENTS 显式加载[迁入的原规则](archive/engineering-v1/AGENTS.md)；[迁移任务](tasks/directory-governance.md)记录完整树及引用核对 |
 | PR #6 的 `mingjing-codex-engineering-v2/` | 历史候选材料；受审后按维护者认可的历史设计目录归档，选择性复用契约和证据 | PR #6 已关闭且未合并，不是现行实施基线；先核[现行架构](designs/current-architecture-baseline.md)及该 PR 实际状态，不得凭空从主分支搬迁不存在的文件 |
 | 已有 `docs/PLANS.md`、`docs/configuration.md`、`docs/development.md` | 原路径先保持，作为工作流程和配置事实入口 | 不为了目录整齐迁移活跃脚本引用的路径 |
-| `core/P2_REPORT.md`、`p1-walking-skeleton/P1_REPORT.md` | 暂留代码旁的历史版本证据，由 `docs/index.md` 链接 | 只有在完全追踪提交、测试证据与脚本引用后才考虑集中归档 |
+| `core/P2_REPORT.md`、`p1-walking-skeleton/P1_REPORT.md` | [历史运行目录](archive/legacy-runtime/README.md)内保留与源码对应的报告 | 根 Makefile 接续原回归入口；证据按固定版本核验 |
 | `engineering-standard/` | 保留仓库根，作为可独立复制的通用规范包 | 不误放进 `docs/` 造成执行脚本和技能路径变化 |
 
 ## 迁移的实际执行门禁

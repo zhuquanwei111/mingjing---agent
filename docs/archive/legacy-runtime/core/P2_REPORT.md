@@ -26,7 +26,7 @@
 
 ## 放行条件与回退
 
-复用 P1 已核验的 Temporal Server 1.32.2、Temporal Python SDK 1.36.1、LangGraph 1.2.22、集成插件 1.0.0 及 Python 3.12.16。运行镜像按 linux/amd64 manifest 摘要固定，Python 52 个包以 wheel SHA-256 锁定并通过 pip check。四个核心组件的许可与原始版本证据见 [P0 依赖记录](../docs/archive/engineering-v1/DEPENDENCY_LOCK.md)。
+复用 P1 已核验的 Temporal Server 1.32.2、Temporal Python SDK 1.36.1、LangGraph 1.2.22、集成插件 1.0.0 及 Python 3.12.16。运行镜像按 linux/amd64 manifest 摘要固定，Python 52 个包以 wheel SHA-256 锁定并通过 pip check。四个核心组件的许可与原始版本证据见 [P0 依赖记录](../../engineering-v1/DEPENDENCY_LOCK.md)。
 
 仍需独立验证生产身份集成、对象存储、真实供应商限额及回执语义，以及负载、备份与高可用。开发镜像沿用 P1 的固定基线，[已知镜像扫描命中](../p1-walking-skeleton/evidence/lima/image-scan.json) 仍是生产制品放行项。跨版本运行沿用固定旧 Worker 的策略，P2 测试使用单一已验证版本。
 

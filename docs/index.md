@@ -7,17 +7,19 @@
 | 目的 | 当前权威入口 | 备注 |
 | --- | --- | --- |
 | 仓库状态与使用方法 | [根 README](../README.md) 与 [根 AGENTS](../AGENTS.md) | 开发前检查实际分支、工作区和相关 PR |
-| 已合并 P2 的代码和行为 | [P2 操作说明](../core/README.md) 与 [旧版本说明](../core/VERSIONING.md) | 对应旧代码及回归资产，不代表 Mastra 新路线已经实现 |
+| 历史 P2 实现与回归 | [P2 操作说明](archive/legacy-runtime/core/README.md) 与 [旧版本说明](archive/legacy-runtime/core/VERSIONING.md) | 对应旧代码及回归资产，不代表 Mastra 新路线已经实现 |
 | 新能力开发者从这里开始 | [现行能力接入边界](designs/current-architecture-baseline.md#capability-onboarding) | 旧 P2 可复现接口仅作历史样例；新宿主和正式 API 尚未建设，AC-17 在 G 实际验收 |
-| P1 验证与可复现环境 | [P1 说明](../p1-walking-skeleton/README.md)、[P1 历史报告](../p1-walking-skeleton/P1_REPORT.md) | 历史记录以原 SHA 和 CI 为准 |
+| P1 验证与可复现环境 | [P1 说明](archive/legacy-runtime/p1-walking-skeleton/README.md)、[P1 历史报告](archive/legacy-runtime/p1-walking-skeleton/P1_REPORT.md) | 历史记录以原 SHA 和 CI 为准 |
 | 通用 Codex 工程规范 | [通用规范包](../engineering-standard/README.md) | 含执行脚本、Skills、模板，不是明镜业务交付包 |
 | 明镜如何采用工程规范 | [项目接入说明](engineering-standard.md)、[执行性审查](engineering-standard-execution.md) | 通用层与项目例外分开 |
 | 开发与任务接续 | [开发流程](development.md)、[长任务计划](PLANS.md)、[设置及环境边界](configuration.md) | 任务具体状态以所属任务记录和实际 Git 状态核对 |
 | 需求与验收 | [通用工程规范需求](requirements/engineering-standard.md)、[任务记录目录](tasks/) | 已有项目需求摘要不代替用户持有的完整需求原件 |
 | 当前产品架构与选型 | [现行入口](designs/current-architecture-baseline.md)、[架构图与契约](designs/architecture-final/contracts.md)、[76 项映射](requirements/final-architecture-mapping.csv)、[工程门禁及风险](designs/architecture-final/gates-and-risks.md) | Mastra 主体、H2 知识域方案已裁决；W0/G 及业务待验 |
-| 历史架构与原需求证据 | [PR #14 独立终裁](designs/whole-product-decision.md)、[原 76 项历史填证](requirements/whole-product-acceptance-results.md) | 保留原需求、证据范围和失败；不作为新组合的通过证明 |
+| 历史架构与原需求证据 | [PR #14 独立终裁](archive/route-b/designs/whole-product-decision.md)、[原 76 项历史填证](archive/route-b/requirements/whole-product-acceptance-results.md) | 保留原需求、证据范围和失败；不作为新组合的通过证明 |
 | 首期设计历史原件 | [九份原件、文件指纹与 W0 设计回执](tasks/reviewed-deliverables.md) | 用于追溯早期业务范围、组件计划和验收设计；现行建设按上列最终架构执行 |
 | 技术决定 | [ADR 目录](adr/) | 记录拟议、接受、替代与撤回，状态必须与当前事实一致 |
+
+历史工程材料可从[P1/P2 回归与原始证据](archive/legacy-runtime/README.md)和[历史路线 B 裁决](archive/route-b/designs/whole-product-decision.md)进入。
 
 ## 当前架构与历史的区别
 

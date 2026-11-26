@@ -1,3 +1,11 @@
 .DS_Store
 /p2-core/.runtime/
 __pycache__/
+
+# Local state left by checkouts preceding the P1/P2 archive move.
+/core/**/.runtime/
+/core/**/.venv/
+/core/**/.pytest_cache/
+/p1-walking-skeleton/**/.p1/
+/p1-walking-skeleton/**/.venv/
+/p1-walking-skeleton/**/.pytest_cache/

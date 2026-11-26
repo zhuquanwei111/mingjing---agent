@@ -1,6 +1,6 @@
 # 明镜智能体 · 完整产品工程验证与技术选型
 
-> **历史资料（2026-11-23 对应评审与实验）。** 下文保留当时的裁决、契约和证据，不再作为新路线的实施指令。现行架构、未决事项及阶段门禁以[当前架构与实施门禁](current-architecture-baseline.md)为准。
+> **历史资料（2026-11-23 对应评审与实验）。** 下文保留当时的裁决、契约和证据，不再作为新路线的实施指令。现行架构、未决事项及阶段门禁以[当前架构与实施门禁](../../../designs/current-architecture-baseline.md)为准。
 
 ## 独立终裁
 
@@ -133,7 +133,7 @@
 | 效果与完成 | 声明只读、准备草稿或正式写入，是否同步返回，谁能证明业务完成、质量合格、已收件。纯查询可当次返回；只有任务要求持久交付时，才以独立交付号取得收件收据。声明超时、可重试条件、所需限额或费用上界；无消耗也明确说明。 |
 | 异步和有副作用时补充 | 声明稳定操作号的作用域及保留期、同号同载荷去重保证、可查终局及来源、回调鉴别、取消语义和历史版本兼容期。写明哪些错误能证明“未受理”，哪些只能判为未知。有副作用的同步 API 同样执行这些防重和查证约束。 |
 
-**现成类型的对照。** P2 的 `Capability`、`CapabilityContext`、`Handler`、`ExternalPort`、`Result`、`ProviderReceipt` 可直接查签名。`Capability.description()` 和 `fingerprint` 演示如何从类型生成目录说明和摘要。P2 将内部处理统一标成 `internal_transaction`，外部协议只有 `send(data, context)` 与 `lookup(operation_id)`。路线 B 必须另声明实际读写、异步受理、取消、来源与校验语义；不能从 P2 的枚举自动推断这些保证。[P2 类型与协议](../../core/src/mingjing/contracts.py) · [原契约与生命周期](../archive/engineering-v1/04_CAPABILITY_CONTRACT.md)
+**现成类型的对照。** P2 的 `Capability`、`CapabilityContext`、`Handler`、`ExternalPort`、`Result`、`ProviderReceipt` 可直接查签名。`Capability.description()` 和 `fingerprint` 演示如何从类型生成目录说明和摘要。P2 将内部处理统一标成 `internal_transaction`，外部协议只有 `send(data, context)` 与 `lookup(operation_id)`。路线 B 必须另声明实际读写、异步受理、取消、来源与校验语义；不能从 P2 的枚举自动推断这些保证。[P2 类型与协议](../../legacy-runtime/core/src/mingjing/contracts.py) · [原契约与生命周期](../../engineering-v1/04_CAPABILITY_CONTRACT.md)
 
 ### 四种实现怎样接
 
@@ -148,12 +148,12 @@
 
 ### 从安装到停用
 
-1. **定义并安装。** 先写完成条件与权威收端，再写 Schema 和处理器。在隔离环境加载受信实现，让目录拿到版本、清单和摘要。P2 已有 `builtins(db)` 安装清单，`service()` 用清单构建 `Catalog`。把新能力列入装配清单要在差异中记录，业务开发者无需修改网关的分支判断。[四类示例](../../core/src/mingjing/examples.py) · [P2 装配入口](../../core/src/mingjing/__main__.py)
+1. **定义并安装。** 先写完成条件与权威收端，再写 Schema 和处理器。在隔离环境加载受信实现，让目录拿到版本、清单和摘要。P2 已有 `builtins(db)` 安装清单，`service()` 用清单构建 `Catalog`。把新能力列入装配清单要在差异中记录，业务开发者无需修改网关的分支判断。[四类示例](../../legacy-runtime/core/src/mingjing/examples.py) · [P2 装配入口](../../legacy-runtime/core/src/mingjing/__main__.py)
 2. **登记和验证。** 发布者登记指定版本，仍不可发现为可执行项。运行正负契约用例，校验 Schema、返回、错误、效果、去重、资源权限和版本兼容。异步写另外检查收端和丢回执。通过后登记验证结果与对应构建。
 3. **发布和授权。** 发布者在指定环境激活已验证版本。资源管理员另按租户、主体、对象、版本和动作授予权限。已发布但未授权，应发现不到、调用不到；仅登记或已停用也一样。执行权本身不授予收据内容和产物读权。
 4. **发现和调用。** 宿主先按当前主体、环境、发布版本、目标、输入输出筛选，再将相关且获准的候选交调用者。直接 API 带客户请求键提交；固定工作流在 Activity 调同一能力；Agent 只提出已提供的工具名和参数，由网关解析能力和版本，验证参数、当前分项目标、预算、权限与效果。实际执行端独立核权，正式写前核业务质量。前两个入口不为选择已知动作调用模型。
 5. **回传和追踪。** 同步结果通过 Schema 和适用的质量校验后返回；异步先返回 Task／Run 或受理引用，再按下表查询。开发者区分参数错误、权限拒绝、明确未受理、在途、未知及执行终局。返回机器可读的类别、可安全展示的原因、操作引用及允许的下一步。宿主按 Task → Run → 操作／尝试串联 Trace、版本、授权决定与权威收据。日志及引擎历史只留必要引用。操作号跨重试稳定，尝试号逐次改变。
-6. **升级和停用。** 在隔离环境并行装载新旧版本；先验新输入、旧任务恢复、停接和回退，再将新流量切到新版本。废弃时停止新受理，在途按原契约且仍有权才可继续；紧急禁用拦住尚未交接的新动作。保留只读对账和既有收据的受控访问。不兼容的在途任务留给旧 Worker 或隔离待核，回退也不恢复旧授权。[版本与停用样例](../../core/VERSIONING.md)
+6. **升级和停用。** 在隔离环境并行装载新旧版本；先验新输入、旧任务恢复、停接和回退，再将新流量切到新版本。废弃时停止新受理，在途按原契约且仍有权才可继续；紧急禁用拦住尚未交接的新动作。保留只读对账和既有收据的受控访问。不兼容的在途任务留给旧 Worker 或隔离待核，回退也不恢复旧授权。[版本与停用样例](../../legacy-runtime/core/VERSIONING.md)
 
 **路线 B 接线时索取的逻辑接口。** 下列是宿主和能力方要落实的输入输出，实际方法名、URL 与鉴权方式由目标构建提供。
 
@@ -177,7 +177,7 @@
 
 ### 第一次接入怎样自验
 
-**先复现一项确实存在的接入。** 在专用 Linux ARM64／AMD64、Docker Compose 及固定依赖就绪后，从仓库根执行 `make p2-acceptance`。其中 `test_api_lifecycle_grants_schema_idempotency_and_artifacts` 核对文本能力的登记、授权、直接调用及产物读回。外部故障另由 `test_post_dispatch_commit_loss_is_unknown_and_retriable_as_lookup_only` 和 `test_unverifiable_external_keeps_hold_without_resend` 覆盖。实际接口、凭据要求及结果位置见 [P2 操作说明](../../core/README.md) 与 [契约测试源码](../../core/tests/test_core.py)。
+**先复现一项确实存在的接入。** 在专用 Linux ARM64／AMD64、Docker Compose 及固定依赖就绪后，从仓库根执行 `make p2-acceptance`。其中 `test_api_lifecycle_grants_schema_idempotency_and_artifacts` 核对文本能力的登记、授权、直接调用及产物读回。外部故障另由 `test_post_dispatch_commit_loss_is_unknown_and_retriable_as_lookup_only` 和 `test_unverifiable_external_keeps_hold_without_resend` 覆盖。实际接口、凭据要求及结果位置见 [P2 操作说明](../../legacy-runtime/core/README.md) 与 [契约测试源码](../../legacy-runtime/core/tests/test_core.py)。
 
 | 现有 P2 调用 | 在合成数据上应观察到 |
 | --- | --- |
