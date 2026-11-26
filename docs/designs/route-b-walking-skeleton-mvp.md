@@ -1,5 +1,7 @@
 # 路线 B 最短端到端链路与正式 MVP 边界（评审草案）
 
+> **历史资料（2026-11-23 对应评审与实验）。** 下文保留当时的裁决、契约和证据，不再作为新路线的实施指令。现行架构、未决事项及阶段门禁以[当前架构与实施门禁](current-architecture-baseline.md)为准。
+
 首轮文档级独立评审要求修订。本稿建议顺序实施 W0a、W0b，等待复审及授权。[七项修订与关闭条件](route-b-architecture-revisions.md) · [证据与完整应用对照](route-b-review-evidence.md)
 - **基础：**完整需求原件 v0.4.1（SHA-256 `75ac634a98393b5f99fb28901a6a91bc7431290143b6458bbf1f9a2af5f23062`）、[实验结论](https://github.com/zhuquanwei111/mingjing---agent/blob/553114d2114cc77081c415ad1697e74be282c9a8/lab/architecture/DECISION.md)、[路线 B 候选开发包](https://github.com/zhuquanwei111/mingjing---agent/pull/6)。
 - **先区分两种交付：**Walking Skeleton（W0）验证新架构的真实集成；MVP 是目标用户能够完成的第一项有价值业务任务。**W0 通过不等于 MVP、生产或全部 v0.4.1 验收通过。**

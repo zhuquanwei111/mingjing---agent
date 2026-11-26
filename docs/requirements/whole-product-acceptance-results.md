@@ -1,5 +1,7 @@
 # v0.4.1 完整产品验收表 · 本轮证据与选型判定
 
+> **历史填证，非当前组合验收。** 保留 PR #14 对 v0.4.1 的 23 组/76 个原编号、冻结判据和原结果。现行架构及 G-before-M 要求见[当前架构与实施门禁](../designs/current-architecture-baseline.md)；历史证据不得直接外推 Mastra 新组合。
+
 本页沿用 PR #7 已冻结主表，对每个需求编号单列本轮判定，并按原 23 组比较各候选。原有“观察什么、验收方法、分阶段应取得什么证据”三列仍以[冻结主表](https://github.com/zhuquanwei111/mingjing---agent/blob/52208b482fab9c74b3193a9789a0ff0abf2f5d99/docs/requirements/route-b-w0-acceptance.md)为准。[R4 当时的填证稿](https://github.com/zhuquanwei111/mingjing---agent/blob/9d61564347dbea5ada09678c1aa8b9d16f36a2df/docs/requirements/route-b-w0-acceptance.md) · [每组失败会改变哪个组件](../designs/whole-product-review.md) · [选型裁决和独立评审](../designs/whole-product-decision.md)
 
 需求原件 SHA-256 为 `75ac634a98393b5f99fb28901a6a91bc7431290143b6458bbf1f9a2af5f23062`。41 项 FR、11 项 NFR、7 项 TS 和 17 项 AC 保持原分组，各编号一次。按第 7 章的阶段二裁决架构，阶段三在真实宿主贯通，阶段四面向运营加固，稳定后再进行能力扩展。逐项说明适用阶段，使后续验证有责任、时限和失败处置。凡已有反例必须先修正或封闭有问题的路径；线上准入仍取决于目标环境实证。
