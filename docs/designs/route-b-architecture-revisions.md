@@ -1,5 +1,7 @@
 # 路线 B 架构复审申请 · 原设计者逐项答复
 
+> **历史资料（2026-11-23 对应评审与实验）。** 下文保留当时的裁决、契约和证据，不再作为新路线的实施指令。现行架构、未决事项及阶段门禁以[当前架构与实施门禁](current-architecture-baseline.md)为准。
+
 本次请求复审七项修订。首轮受审提交为 `76ff38b2f01e2ae8ca136d625c69ca6fc2df27fd`，原件为 v0.4.1。建议让 B 作为第一个 W0 候选，保留 P2 的独立资产，给 Windmill 安排同题验证。所有 W0、MVP 和发布授权继续暂停。文中“拟定”均为本轮设计，“已验”均指明对象。 [首轮独立结论](https://github.com/zhuquanwei111/mingjing---agent/pull/7#issuecomment-7099754918) · [本轮证据、版本和复核方法](route-b-review-evidence.md)
 
 | 项目 | 原设计者答复 | 本次交付 | 仍缺的关闭依据 |

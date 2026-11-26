@@ -1,14 +1,16 @@
 # 明镜：Codex 开发入口
 
 本文件是整个 Git 仓库的开发入口。先读取
-[原工程规则](mingjing-codex-engineering-v1/AGENTS.md)；其中的业务、安全和 P0–P3 阶段规则
-同样约束本仓库的代码目录。更具体的目录规则与用户当前授权继续适用。
+[原工程规则](mingjing-codex-engineering-v1/AGENTS.md)；其中的业务、安全、编码、停止条件和 P0–P3 **旧开发阶段门禁**继续适用。
+新路线的实际实施阶段为 H/W0a/W0b/G/M/T/P，按[新旧阶段衔接与门禁](docs/designs/current-architecture-baseline.md#stage-gate-crosswalk)执行；
+旧阶段门禁与新关口的适用要求同时满足，不因编号或技术路线变化豁免。EXEC-0 至 EXEC-3 仅为执行类型，不是阶段或实施授权。
+更具体的目录规则与用户当前授权继续适用。
 
 ## 项目地图
 
 - [当前项目状态](README.md#当前项目状态)；[统一文档索引](docs/index.md)与[持续目录治理规范](docs/repository-layout.md)。
-- [完整产品架构独立终裁](docs/designs/whole-product-decision.md)：PR #14 的开发基线；不等于 W0、MVP 或生产已获准。
-- [方案与阶段计划](mingjing-codex-engineering-v1/README.md)；[P2 接口与操作](core/README.md)。
+- [当前架构与实施门禁](docs/designs/current-architecture-baseline.md)：Mastra OSS 主线；[历史 PR #14 终裁](docs/designs/whole-product-decision.md)只作历史证据。知识库已按 H2 裁决限定采用 WeKnora v0.9.1；正式实施仍暂停，必要公共基座通过 G 后才进入首个正式业务 M。
+- [现行阶段及接续记录](docs/tasks/architecture-baseline-transition.md)；[v1 历史方案与仍有效规则](mingjing-codex-engineering-v1/README.md)；[P2 历史接口与操作](core/README.md)。
 - 历史验收：[P1 报告](p1-walking-skeleton/P1_REPORT.md)、[P2 早期报告](core/P2_REPORT.md)；新提交以对应 CI 为准。
 - [开发流程](docs/development.md)、[长任务计划与接续](docs/PLANS.md)、[配置与环境边界](docs/configuration.md)。
 - [明镜采用的工程规范](docs/engineering-standard.md)；[通用规范包](engineering-standard/README.md)可独立复用。
@@ -26,8 +28,8 @@
   明确必需行为、兼容边界、不支持范围和既有替代路径，再做最小适用修改。
 - 实质技术取舍先按[项目接入说明](docs/engineering-standard.md)优先委派新的 `solution_reviewer` 子代理评审（不继承原设计聊天历史），由原设计者处理返回意见；子代理不可用时使用 CLI 或人工独立评审。无需证明强制只读权限，但必须核对真实材料、问题及反馈。已有工作通过任务记录接续。
 - 复杂或跨会话任务按 [计划与接续约定](docs/PLANS.md)维护既有记录；验收写可观察结果。
-- 优先使用项目已有实现、依赖和验证入口。新增依赖先核对官方接口、版本、许可
-  与现有架构的适配，不为一个局部需求建设新的通用平台。
+- 架构、实质选型或新增、替换通用能力时，按[最终效果优先与成熟工程能力复用原则](docs/engineering-standard.md#最终效果优先与成熟工程能力复用原则)先核对成熟应用的原生实现，再说明哪些职责由配置、适配或必要自研承担。委派独立方案评审时，把同一提交的该节和候选方案一并交给评审者；PR 审查再按已审边界核对实际改动。
+- 对不涉及实质技术取舍的日常维护和小改动，优先沿用合理的项目现有实现、依赖和验证入口，不重复开展选型研究。新增依赖仍核对官方接口、版本、许可、安全、维护和架构适配。不得以复用为由降低产品要求或安全、可靠性及验收标准。
 - 将需求实现、必要验证、独立审查、问题修复和交付视为同一项任务。
   已授权、可继续的步骤不要逐项停下来索要“继续”。
 - 遇到真实范围取舍、缺少关键输入、超出授权或证据表明当前路线不能推进时，

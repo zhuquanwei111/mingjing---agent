@@ -1,0 +1,129 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1720" height="1200" viewBox="0 0 1720 1200">
+<defs>
+<marker id="arr" markerWidth="9" markerHeight="8" refX="8" refY="4" orient="auto">
+<path d="M0 0L8 4L0 8z" fill="#52748c"/>
+</marker>
+<marker id="amber" markerWidth="9" markerHeight="8" refX="8" refY="4" orient="auto">
+<path d="M0 0L8 4L0 8z" fill="#b06022"/>
+</marker>
+</defs>
+<rect width="1720" height="1200" fill="#f7f9fb"/>
+<text x="35" y="48" font-family="PingFang SC, Noto Sans CJK SC, sans-serif" font-size="34" fill="#20394b" text-anchor="start" font-weight="700">明镜智能体应用 · MJ-ARCH-FINAL 总体架构</text>
+<text x="35" y="82" font-family="PingFang SC, Noto Sans CJK SC, sans-serif" font-size="20" fill="#9a4b18" text-anchor="start" font-weight="400">总控最终裁决 · Mastra 主体与 WeKnora 限定采用 · 公共宿主待建 · W0 / G 尚未验收</text>
+<path d="M465 158 V180" fill="none" stroke="#52748c" stroke-width="2"  marker-end="url(#arr)"/>
+<path d="M465 268 V294 H140 V315" fill="none" stroke="#52748c" stroke-width="2"  marker-end="url(#arr)"/>
+<path d="M465 294 H365 V315" fill="none" stroke="#52748c" stroke-width="2"  marker-end="url(#arr)"/>
+<path d="M465 294 H596 V315" fill="none" stroke="#52748c" stroke-width="2"  marker-end="url(#arr)"/>
+<path d="M465 294 H833 V315" fill="none" stroke="#52748c" stroke-width="2"  marker-end="url(#arr)"/>
+<path d="M140 420 V457 H465 V480" fill="none" stroke="#52748c" stroke-width="2"  marker-end="url(#arr)"/>
+<path d="M365 420 V457" fill="none" stroke="#52748c" stroke-width="2"  marker-end="url(#arr)"/>
+<path d="M596 420 V457" fill="none" stroke="#52748c" stroke-width="2"  marker-end="url(#arr)"/>
+<path d="M833 420 V457 H465" fill="none" stroke="#52748c" stroke-width="2"  marker-end="url(#arr)"/>
+<path d="M465 650 V682 H157 V710" fill="none" stroke="#52748c" stroke-width="2"  marker-end="url(#arr)"/>
+<path d="M465 682 H420 V710" fill="none" stroke="#52748c" stroke-width="2"  marker-end="url(#arr)"/>
+<path d="M465 682 H690 V710" fill="none" stroke="#52748c" stroke-width="2"  marker-end="url(#arr)"/>
+<path d="M465 682 H965 V710" fill="none" stroke="#52748c" stroke-width="2"  marker-end="url(#arr)"/>
+<path d="M157 860 V890 H465 V910" fill="none" stroke="#52748c" stroke-width="2"  marker-end="url(#arr)"/>
+<path d="M420 860 V890" fill="none" stroke="#52748c" stroke-width="2"  marker-end="url(#arr)"/>
+<path d="M690 860 V890" fill="none" stroke="#52748c" stroke-width="2"  marker-end="url(#arr)"/>
+<path d="M965 860 V890 H465" fill="none" stroke="#52748c" stroke-width="2"  marker-end="url(#arr)"/>
+<path d="M1070 222 H1210" fill="none" stroke="#52748c" stroke-width="2"  marker-end="url(#arr)"/>
+<path d="M1070 367 H1210" fill="none" stroke="#52748c" stroke-width="2"  marker-end="url(#arr)"/>
+<path d="M1070 565 H1210" fill="none" stroke="#52748c" stroke-width="2"  marker-end="url(#arr)"/>
+<path d="M1070 783 H1210" fill="none" stroke="#52748c" stroke-width="2"  marker-end="url(#arr)"/>
+<path d="M1070 965 H1210" fill="none" stroke="#52748c" stroke-width="2"  marker-end="url(#arr)"/>
+<path d="M690 710 V695 H1110 V600 H1080" fill="none" stroke="#b06022" stroke-width="2" stroke-dasharray="6 5" marker-end="url(#amber)"/>
+<path d="M420 710 V695 H1110" fill="none" stroke="#b06022" stroke-width="2" stroke-dasharray="6 5" marker-end="url(#amber)"/>
+<text x="1123" y="688" font-family="PingFang SC, Noto Sans CJK SC, sans-serif" font-size="16" fill="#9a4b18" text-anchor="start" font-weight="700">内部出站</text>
+<rect x="35" y="105" width="1035" height="53" rx="12" fill="#eaf3f8" stroke="#b7c8d4" stroke-width="1.5"/>
+<text x="51" y="134" font-family="PingFang SC, Noto Sans CJK SC, sans-serif" font-size="21" fill="#20394b" text-anchor="start" font-weight="700">App / API / 事件入口 · 控制面按版本发布能力、模型与规则</text>
+<rect x="35" y="180" width="1035" height="88" rx="12" fill="#ffffff" stroke="#b7c8d4" stroke-width="1.5"/>
+<text x="51" y="209" font-family="PingFang SC, Noto Sans CJK SC, sans-serif" font-size="21" fill="#20394b" text-anchor="start" font-weight="700">可信受理 · Task/Run 与版本/owner 唯一绑定</text>
+<text x="51" y="236" font-family="PingFang SC, Noto Sans CJK SC, sans-serif" font-size="16" fill="#20394b" text-anchor="start" font-weight="400">新建公共宿主 · Keycloak OIDC · 稳定受理键与原生 Run 绑定 · 受控能力发布</text>
+<rect x="35" y="315" width="210" height="105" rx="12" fill="#f0f6fa" stroke="#b7c8d4" stroke-width="1.5"/>
+<text x="51" y="344" font-family="PingFang SC, Noto Sans CJK SC, sans-serif" font-size="21" fill="#20394b" text-anchor="start" font-weight="700">EXEC-0 直接程序</text>
+<text x="51" y="371" font-family="PingFang SC, Noto Sans CJK SC, sans-serif" font-size="16" fill="#20394b" text-anchor="start" font-weight="400">普通 TS / 业务 API</text>
+<text x="51" y="394" font-family="PingFang SC, Noto Sans CJK SC, sans-serif" font-size="16" fill="#20394b" text-anchor="start" font-weight="400">确定性无额外推理</text>
+<rect x="260" y="315" width="210" height="105" rx="12" fill="#f0f6fa" stroke="#b7c8d4" stroke-width="1.5"/>
+<text x="276" y="344" font-family="PingFang SC, Noto Sans CJK SC, sans-serif" font-size="21" fill="#20394b" text-anchor="start" font-weight="700">EXEC-1 短流程</text>
+<text x="276" y="371" font-family="PingFang SC, Noto Sans CJK SC, sans-serif" font-size="16" fill="#20394b" text-anchor="start" font-weight="400">短 Agent / Workflow</text>
+<text x="276" y="394" font-family="PingFang SC, Noto Sans CJK SC, sans-serif" font-size="16" fill="#20394b" text-anchor="start" font-weight="400">原生工具、分支及评审</text>
+<rect x="485" y="315" width="223" height="105" rx="12" fill="#f0f6fa" stroke="#b7c8d4" stroke-width="1.5"/>
+<text x="501" y="344" font-family="PingFang SC, Noto Sans CJK SC, sans-serif" font-size="21" fill="#20394b" text-anchor="start" font-weight="700">EXEC-2 动态耐久</text>
+<text x="501" y="371" font-family="PingFang SC, Noto Sans CJK SC, sans-serif" font-size="16" fill="#20394b" text-anchor="start" font-weight="400">default / evented</text>
+<text x="501" y="394" font-family="PingFang SC, Noto Sans CJK SC, sans-serif" font-size="16" fill="#20394b" text-anchor="start" font-weight="400">顶层恢复 H1 限定验证</text>
+<rect x="724" y="315" width="346" height="105" rx="12" fill="#f0f6fa" stroke="#b7c8d4" stroke-width="1.5"/>
+<text x="740" y="344" font-family="PingFang SC, Noto Sans CJK SC, sans-serif" font-size="21" fill="#20394b" text-anchor="start" font-weight="700">EXEC-3 固定耐久</text>
+<text x="740" y="371" font-family="PingFang SC, Noto Sans CJK SC, sans-serif" font-size="16" fill="#20394b" text-anchor="start" font-weight="400">官方 Temporal 转换子集</text>
+<text x="740" y="394" font-family="PingFang SC, Noto Sans CJK SC, sans-serif" font-size="16" fill="#20394b" text-anchor="start" font-weight="400">或原生 TS SDK；H 互斥选择</text>
+<rect x="35" y="480" width="1035" height="170" rx="12" fill="#fff5e9" stroke="#d2a16e" stroke-width="1.5"/>
+<text x="51" y="509" font-family="PingFang SC, Noto Sans CJK SC, sans-serif" font-size="21" fill="#20394b" text-anchor="start" font-weight="700">实际受端 / 受控物理出口：非第二运行器</text>
+<text x="51" y="536" font-family="PingFang SC, Noto Sans CJK SC, sans-serif" font-size="16" fill="#20394b" text-anchor="start" font-weight="400">五出口终核：读取、模型发送、Tool 发送、正式提交、受限交付；凭据仅实际执行者持有。</text>
+<text x="51" y="559" font-family="PingFang SC, Noto Sans CJK SC, sans-serif" font-size="16" fill="#20394b" text-anchor="start" font-weight="400">SpiceDB 当前许可 + 权威事务终核 + 单活动传输责任者与物理栅栏；撤权先关闭域，确认后更新。</text>
+<text x="51" y="582" font-family="PingFang SC, Noto Sans CJK SC, sans-serif" font-size="16" fill="#20394b" text-anchor="start" font-weight="400">PG 稳定 Operation / Attempt，发送前 MAY_HAVE_SENT，真实 Receipt / Settlement，父预算可证明上界。</text>
+<text x="51" y="605" font-family="PingFang SC, Noto Sans CJK SC, sans-serif" font-size="16" fill="#20394b" text-anchor="start" font-weight="400">禁止裸网络/裸凭据/旧 Worker 绕过；失联或原代次不明关闭。宿主待建，B03 事务待集成。</text>
+<rect x="35" y="710" width="245" height="150" rx="12" fill="#ffffff" stroke="#b7c8d4" stroke-width="1.5"/>
+<text x="51" y="739" font-family="PingFang SC, Noto Sans CJK SC, sans-serif" font-size="21" fill="#20394b" text-anchor="start" font-weight="700">真实业务资源</text>
+<text x="51" y="766" font-family="PingFang SC, Noto Sans CJK SC, sans-serif" font-size="16" fill="#20394b" text-anchor="start" font-weight="400">实时事实/API</text>
+<text x="51" y="789" font-family="PingFang SC, Noto Sans CJK SC, sans-serif" font-size="16" fill="#20394b" text-anchor="start" font-weight="400">当前权限、事务效果</text>
+<text x="51" y="812" font-family="PingFang SC, Noto Sans CJK SC, sans-serif" font-size="16" fill="#20394b" text-anchor="start" font-weight="400">真实操作/取消收据</text>
+<text x="51" y="835" font-family="PingFang SC, Noto Sans CJK SC, sans-serif" font-size="16" fill="#20394b" text-anchor="start" font-weight="400">独立受端查证</text>
+<rect x="295" y="710" width="250" height="150" rx="12" fill="#ffffff" stroke="#b7c8d4" stroke-width="1.5"/>
+<text x="311" y="739" font-family="PingFang SC, Noto Sans CJK SC, sans-serif" font-size="21" fill="#20394b" text-anchor="start" font-weight="700">Apache Hop</text>
+<text x="311" y="766" font-family="PingFang SC, Noto Sans CJK SC, sans-serif" font-size="16" fill="#20394b" text-anchor="start" font-weight="400">GUI/Run/规则工程</text>
+<text x="311" y="789" font-family="PingFang SC, Noto Sans CJK SC, sans-serif" font-size="16" fill="#20394b" text-anchor="start" font-weight="400">Data Validator/错误流</text>
+<text x="311" y="812" font-family="PingFang SC, Noto Sans CJK SC, sans-serif" font-size="16" fill="#20394b" text-anchor="start" font-weight="400">源/外部连接器受控</text>
+<text x="311" y="835" font-family="PingFang SC, Noto Sans CJK SC, sans-serif" font-size="16" fill="#20394b" text-anchor="start" font-weight="400">staging 与正式发布分离</text>
+<rect x="560" y="710" width="260" height="150" rx="12" fill="#fff5e9" stroke="#d2a16e" stroke-width="1.5"/>
+<text x="576" y="739" font-family="PingFang SC, Noto Sans CJK SC, sans-serif" font-size="21" fill="#20394b" text-anchor="start" font-weight="700">WeKnora 原生</text>
+<text x="576" y="766" font-family="PingFang SC, Noto Sans CJK SC, sans-serif" font-size="16" fill="#20394b" text-anchor="start" font-weight="400">App / DocReader / Wiki</text>
+<text x="576" y="789" font-family="PingFang SC, Noto Sans CJK SC, sans-serif" font-size="16" fill="#20394b" text-anchor="start" font-weight="400">同权限域 / 固定来源版本</text>
+<text x="576" y="812" font-family="PingFang SC, Noto Sans CJK SC, sans-serif" font-size="16" fill="#20394b" text-anchor="start" font-weight="400">先关旧版 / 受影响域重建</text>
+<text x="576" y="835" font-family="PingFang SC, Noto Sans CJK SC, sans-serif" font-size="16" fill="#20394b" text-anchor="start" font-weight="400">签名批次 / 每次外发前准入</text>
+<rect x="835" y="710" width="235" height="150" rx="12" fill="#ffffff" stroke="#b7c8d4" stroke-width="1.5"/>
+<text x="851" y="739" font-family="PingFang SC, Noto Sans CJK SC, sans-serif" font-size="21" fill="#20394b" text-anchor="start" font-weight="700">文件/模型/外服</text>
+<text x="851" y="766" font-family="PingFang SC, Noto Sans CJK SC, sans-serif" font-size="16" fill="#20394b" text-anchor="start" font-weight="400">SeaweedFS S3 私有桶</text>
+<text x="851" y="789" font-family="PingFang SC, Noto Sans CJK SC, sans-serif" font-size="16" fill="#20394b" text-anchor="start" font-weight="400">固定版本/真实 hash</text>
+<text x="851" y="812" font-family="PingFang SC, Noto Sans CJK SC, sans-serif" font-size="16" fill="#20394b" text-anchor="start" font-weight="400">获准模型和解析端点</text>
+<text x="851" y="835" font-family="PingFang SC, Noto Sans CJK SC, sans-serif" font-size="16" fill="#20394b" text-anchor="start" font-weight="400">真实费用及对象收据</text>
+<rect x="35" y="910" width="1035" height="98" rx="12" fill="#eaf3f8" stroke="#b7c8d4" stroke-width="1.5"/>
+<text x="51" y="939" font-family="PingFang SC, Noto Sans CJK SC, sans-serif" font-size="21" fill="#20394b" text-anchor="start" font-weight="700">候选结果 → 正式质量门 → 实际提交 / 独立收件 → 状态投影</text>
+<text x="51" y="966" font-family="PingFang SC, Noto Sans CJK SC, sans-serif" font-size="16" fill="#20394b" text-anchor="start" font-weight="400">任何正式写入及交付前均校验；事后评测不代替；文件及流逐次授权；晚回执只核事实和费用。</text>
+<text x="51" y="989" font-family="PingFang SC, Noto Sans CJK SC, sans-serif" font-size="16" fill="#20394b" text-anchor="start" font-weight="400">投影只读，不触发第二执行；部分结果/等待/待核/失败可见。</text>
+<rect x="1210" y="105" width="475" height="130" rx="12" fill="#f1f5f9" stroke="#b7c8d4" stroke-width="1.5"/>
+<text x="1226" y="134" font-family="PingFang SC, Noto Sans CJK SC, sans-serif" font-size="21" fill="#20394b" text-anchor="start" font-weight="700">关系授权与真实业务权威</text>
+<text x="1226" y="161" font-family="PingFang SC, Noto Sans CJK SC, sans-serif" font-size="16" fill="#20394b" text-anchor="start" font-weight="400">SpiceDB 原生 Check / Lookup / 关系</text>
+<text x="1226" y="184" font-family="PingFang SC, Noto Sans CJK SC, sans-serif" font-size="16" fill="#20394b" text-anchor="start" font-weight="400">真实资源端权限与操作/收件收据</text>
+<text x="1226" y="207" font-family="PingFang SC, Noto Sans CJK SC, sans-serif" font-size="16" fill="#20394b" text-anchor="start" font-weight="400">PG 栅栏不是第二 ACL</text>
+<rect x="1210" y="260" width="475" height="167" rx="12" fill="#f1f5f9" stroke="#b7c8d4" stroke-width="1.5"/>
+<text x="1226" y="289" font-family="PingFang SC, Noto Sans CJK SC, sans-serif" font-size="21" fill="#20394b" text-anchor="start" font-weight="700">运行权威及事件（分别保存）</text>
+<text x="1226" y="316" font-family="PingFang SC, Noto Sans CJK SC, sans-serif" font-size="16" fill="#20394b" text-anchor="start" font-weight="400">EXEC-1/EXEC-2：Mastra 原生 PG Store/快照/owner</text>
+<text x="1226" y="339" font-family="PingFang SC, Noto Sans CJK SC, sans-serif" font-size="16" fill="#20394b" text-anchor="start" font-weight="400">EXEC-3：Temporal history / visibility（按需）</text>
+<text x="1226" y="362" font-family="PingFang SC, Noto Sans CJK SC, sans-serif" font-size="16" fill="#20394b" text-anchor="start" font-weight="400">Valkey Streams：事件/pending/ACK</text>
+<text x="1226" y="385" font-family="PingFang SC, Noto Sans CJK SC, sans-serif" font-size="16" fill="#20394b" text-anchor="start" font-weight="400">共享 Cache：有限续流；非审计/事实</text>
+<rect x="1210" y="452" width="475" height="180" rx="12" fill="#f1f5f9" stroke="#b7c8d4" stroke-width="1.5"/>
+<text x="1226" y="481" font-family="PingFang SC, Noto Sans CJK SC, sans-serif" font-size="21" fill="#20394b" text-anchor="start" font-weight="700">产品事实及硬预算</text>
+<text x="1226" y="508" font-family="PingFang SC, Noto Sans CJK SC, sans-serif" font-size="16" fill="#20394b" text-anchor="start" font-weight="400">PG Task/Run 绑定、发布/撤回/版本</text>
+<text x="1226" y="531" font-family="PingFang SC, Noto Sans CJK SC, sans-serif" font-size="16" fill="#20394b" text-anchor="start" font-weight="400">PG 操作认领、共享预留、费用核销</text>
+<text x="1226" y="554" font-family="PingFang SC, Noto Sans CJK SC, sans-serif" font-size="16" fill="#20394b" text-anchor="start" font-weight="400">真实效果/收据仍由外部权威提供</text>
+<text x="1226" y="577" font-family="PingFang SC, Noto Sans CJK SC, sans-serif" font-size="16" fill="#20394b" text-anchor="start" font-weight="400">不得复制原生步骤游标或另造队列</text>
+<text x="1226" y="600" font-family="PingFang SC, Noto Sans CJK SC, sans-serif" font-size="16" fill="#20394b" text-anchor="start" font-weight="400">未知费用不释放，超估如实入账</text>
+<rect x="1210" y="657" width="475" height="208" rx="12" fill="#f1f5f9" stroke="#b7c8d4" stroke-width="1.5"/>
+<text x="1226" y="686" font-family="PingFang SC, Noto Sans CJK SC, sans-serif" font-size="21" fill="#20394b" text-anchor="start" font-weight="700">数据与知识权威分离</text>
+<text x="1226" y="713" font-family="PingFang SC, Noto Sans CJK SC, sans-serif" font-size="16" fill="#20394b" text-anchor="start" font-weight="400">SeaweedFS 对象字节/filer；固定版本</text>
+<text x="1226" y="736" font-family="PingFang SC, Noto Sans CJK SC, sans-serif" font-size="16" fill="#20394b" text-anchor="start" font-weight="400">Hop 暂存/错误流；PG 正式发布指针</text>
+<text x="1226" y="759" font-family="PingFang SC, Noto Sans CJK SC, sans-serif" font-size="16" fill="#20394b" text-anchor="start" font-weight="400">WeKnora 原生索引、编译及作业</text>
+<text x="1226" y="782" font-family="PingFang SC, Noto Sans CJK SC, sans-serif" font-size="16" fill="#20394b" text-anchor="start" font-weight="400">ParadeDB PG17 独立库/实例</text>
+<text x="1226" y="805" font-family="PingFang SC, Noto Sans CJK SC, sans-serif" font-size="16" fill="#20394b" text-anchor="start" font-weight="400">知识原生 Redis/Valkey 独立域</text>
+<text x="1226" y="828" font-family="PingFang SC, Noto Sans CJK SC, sans-serif" font-size="16" fill="#20394b" text-anchor="start" font-weight="400">MinerU / 模态及视频按合规范围启用</text>
+<rect x="1210" y="890" width="475" height="118" rx="12" fill="#f1f5f9" stroke="#b7c8d4" stroke-width="1.5"/>
+<text x="1226" y="919" font-family="PingFang SC, Noto Sans CJK SC, sans-serif" font-size="21" fill="#20394b" text-anchor="start" font-weight="700">治理观测（非授权/非事实）</text>
+<text x="1226" y="946" font-family="PingFang SC, Noto Sans CJK SC, sans-serif" font-size="16" fill="#20394b" text-anchor="start" font-weight="400">原生 PG Observability / Scorers / Vitest</text>
+<text x="1226" y="969" font-family="PingFang SC, Noto Sans CJK SC, sans-serif" font-size="16" fill="#20394b" text-anchor="start" font-weight="400">Studio、Hop GUI、知识工作台及 App</text>
+<text x="1226" y="992" font-family="PingFang SC, Noto Sans CJK SC, sans-serif" font-size="16" fill="#20394b" text-anchor="start" font-weight="400">Prometheus / Alertmanager；最小独立审计</text>
+<rect x="35" y="1033" width="1650" height="113" rx="12" fill="#e7eef4" stroke="#b7c8d4" stroke-width="1.5"/>
+<text x="51" y="1062" font-family="PingFang SC, Noto Sans CJK SC, sans-serif" font-size="22" fill="#20394b" text-anchor="start" font-weight="700">运行与交付边界</text>
+<text x="51" y="1090" font-family="PingFang SC, Noto Sans CJK SC, sans-serif" font-size="18" fill="#20394b" text-anchor="start" font-weight="400">Linux OCI / Compose / Caddy（入口） · PG/对象/索引/权限/配置跨权威备份恢复 · 实际制品/许可/SBOM 与 G 目标在建设前锁定</text>
+<text x="51" y="1120" font-family="PingFang SC, Noto Sans CJK SC, sans-serif" font-size="18" fill="#214b63" text-anchor="start" font-weight="700">获准建设 → W0a → W0b → G 必需公共基座全部通过（含独立 AC-17）→ M 首个正式业务 → T 试用 → P 生产</text>
+<text x="35" y="1177" font-family="PingFang SC, Noto Sans CJK SC, sans-serif" font-size="16" fill="#617383" text-anchor="start" font-weight="400">实线：逻辑调用/状态关联；橙色虚线：Hop 与知识内部真实出站也须受控。图为责任边界，不等于物理部署拓扑、运行结果或服务数量。</text>
+</svg>

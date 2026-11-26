@@ -10,11 +10,11 @@
 | `.agents/`、`.codex/`、`.github/` | 可发现技能、Codex 配置、服务器 CI 定义 | 项目业务设计正文 |
 | `engineering-standard/` | 跨项目复用的规范、模板、技能、执行脚本与可选适配 | 明镜专用技术选型或历史方案 |
 | `core/`、`p1-walking-skeleton/` | 仍有代码、测试、迁移、可执行环境和与版本强关联的证据 | 不断增加与代码脱钩的正式项目方案 |
-| `app/`（候选） | 按 PR #14 调整后的路线 B，获单独授权后开发的正式源码与测试 | 未经过 W0/MVP 对应准入时擅自宣称完成 |
+| `app/`（候选） | 按[现行架构与实施门禁](designs/current-architecture-baseline.md)，获单独授权后开发的正式源码与测试 | 未经过 W0/MVP 对应准入时擅自宣称完成 |
 | `scripts/`、`Makefile` | 确定性检测、回归入口及辅助程序 | 只有口头承诺的自动检查 |
 | `docs/requirements/` | 受控需求摘要及获准可公开的需求文档 | 未授权公开的原始材料、秘密 |
 | `docs/architecture/`（目标） | 当前经确认的架构说明、C4/Mermaid 源和边界 | 尚未被批准的设计冒充当前事实 |
-| `docs/designs/`（现有） | 已评审的设计、[完整产品架构终裁](designs/whole-product-decision.md)、对应候选方案及证据边界 | 业务运行代码 |
+| `docs/designs/`（现有） | 已评审的设计、[现行架构](designs/current-architecture-baseline.md)、[历史完整产品裁决](designs/whole-product-decision.md)、候选及证据边界 | 业务运行代码 |
 | `docs/adr/` | 关键技术取舍、理由、方案和状态（拟议/接受/替代/撤回） | 没有版本与批准记录的临时口头决定 |
 | `docs/tasks/` | 具体任务计划、进展、审查反馈及验收位置 | 与同一任务并存的第二套真相 |
 | `docs/runbooks/`、`docs/reports/`（目标） | 有实际运行职责的操作手册和正式报告 | 自动复制敏感日志及秘密 |
@@ -27,14 +27,14 @@
 | 来源 | 计划目标 / 处理方式 | 执行前必须检查 |
 | --- | --- | --- |
 | `mingjing-codex-engineering-v1/` | `docs/archive/engineering-v1/`，原文与文件名尽量保留 | 核对根 `AGENTS.md`、历史包中 `AGENTS.md`、脚本、CI 和所有 Markdown 链接；把仍适用的安全/阶段要求明确接入当前权威规则。旧包虽历史，其规则不可以无声消失 |
-| PR #6 的 `mingjing-codex-engineering-v2/` | 后续依据 [PR #14 终裁](designs/whole-product-decision.md)修订并考虑整理至 `docs/designs/route-b/`，或由维护者认可的新设计目录 | 已采纳的是**调整后的 B**；须核对新旧模型派发/Agent 回合恢复设计、PR #6 尚未合并的现实，以及其自身后续合并/变基；不得凭空从主分支搬迁不存在的文件 |
+| PR #6 的 `mingjing-codex-engineering-v2/` | 历史候选材料；受审后按维护者认可的历史设计目录归档，选择性复用契约和证据 | PR #6 尚未合并，不是现行实施基线；先核[现行架构](designs/current-architecture-baseline.md)及该 PR 实际状态，不得凭空从主分支搬迁不存在的文件 |
 | 已有 `docs/PLANS.md`、`docs/configuration.md`、`docs/development.md` | 原路径先保持，作为工作流程和配置事实入口 | 不为了目录整齐迁移活跃脚本引用的路径 |
 | `core/P2_REPORT.md`、`p1-walking-skeleton/P1_REPORT.md` | 暂留代码旁的历史版本证据，由 `docs/index.md` 链接 | 只有在完全追踪提交、测试证据与脚本引用后才考虑集中归档 |
 | `engineering-standard/` | 保留仓库根，作为可独立复制的通用规范包 | 不误放进 `docs/` 造成执行脚本和技能路径变化 |
 
 ## 迁移的实际执行门禁
 
-1. **准备和冻结对象。** 先读取 [文档索引](index.md)、根 [AGENTS](../AGENTS.md)、现行 PR、最终独立架构评审报告及其具体版本。核对任务工作区与其它分支。已有的 PR #14 架构终裁作为当前基线，PR #6 仍是未合并候选；状态不因目录迁移而升级。
+1. **准备和冻结对象。** 先读取 [文档索引](index.md)、根 [AGENTS](../AGENTS.md)、现行 PR、最终独立架构评审报告及其具体版本。核对任务工作区与其它分支。以[现行架构与实施门禁](designs/current-architecture-baseline.md)核对新旧权威；PR #14 为历史裁决，PR #6 仍是未合并候选；状态不因目录迁移而升级。
 2. **独立评审迁移方案。** 让不参与本次目录设计的 Reviewer 检查历史业务规则保留、Git 路径引用、Codex 技能发现、文档权威与被其他 PR 引用的风险；记录并处理阻断。
 3. **仅在隔离分支迁移。** 用 Git 识别重命名，保留原内容，不混入业务重构。以全库文本查找旧路径，更新真实引用；不能只更新 README 里的链接。涉及有效规则的路径变更，重新验证 Codex 在新目录确实读到。
 4. **完整检查。** 运行 `make check`、文档引用和技能入口检查；人工核对 GitHub 相对路径、历史证据链接、重要 README 及架构图源。校验无失联或越界链接，必要时运行既有 CI。通过检查不自动证明业务架构已批准。
@@ -42,7 +42,7 @@
 
 ## 本次治理与正式架构关系
 
-[早期架构评审 PR #7](https://github.com/zhuquanwei111/mingjing---agent/pull/7) 已合并，随后 [完整产品终裁 PR #14](https://github.com/zhuquanwei111/mingjing---agent/pull/14) 也已合并：**调整模型出口与 Agent 回合恢复后，采纳路线 B 作为开发基线**。正式 W0、MVP 与真实流量仍必须另行验收。PR #6 的旧版 v2 包尚未合并，只有核对终裁差异后才能按单独迁移 PR 处理。旧 v1 的有效规则及历史证据继续保留。
+[早期架构评审 PR #7](https://github.com/zhuquanwei111/mingjing---agent/pull/7) 已合并，随后 [完整产品终裁 PR #14](https://github.com/zhuquanwei111/mingjing---agent/pull/14) 也已合并：当时确认调整后的路线 B。后续以[当前架构与实施门禁](designs/current-architecture-baseline.md)为最终架构入口，详细设计、SVG 和选型矩阵归 designs/architecture-final，76 项映射归 requirements，受控证据校验入口归 tasks；旧终裁保留历史，PR #6 的旧版 v2 包仍未合并，不自动转入新开发。正式实施、G、MVP 与真实流量仍必须分别获准和验收。旧 v1 的有效规则及历史证据继续保留。
 
 ## 贯穿 W0、MVP 和长期开发的维护动作
 

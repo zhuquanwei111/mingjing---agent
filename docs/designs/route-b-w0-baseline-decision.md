@@ -1,5 +1,7 @@
 # 明镜架构裁决与独立总评
 
+> **历史资料（2026-11-23 对应评审与实验）。** 下文保留当时的裁决、契约和证据，不再作为新路线的实施指令。现行架构、未决事项及阶段门禁以[当前架构与实施门禁](current-architecture-baseline.md)为准。
+
 **裁决通过。** 明镜正式 W0 设计采用 **Python、PostgreSQL、Temporal、Pydantic AI** 作为基线。Python 宿主受理任务并执行策略，PostgreSQL 保存产品任务、授权关联、操作意图、费用与预算事实，Temporal 调度和恢复持久工作，Pydantic AI 负责动态模型与工具循环。业务服务仍保有正式写入和结果依据，交付端提供实际接收记录。首条链路使用合成数据和受控内部接收端。正式 W0 实施、首期 MVP 和真实流量继续暂停。[冻结标准](https://github.com/zhuquanwei111/mingjing---agent/blob/52208b482fab9c74b3193a9789a0ff0abf2f5d99/docs/requirements/route-b-w0-acceptance.md) · [带判定的验收主表](../requirements/route-b-w0-acceptance.md)
 
 ## 独立总评 R4-BASELINE

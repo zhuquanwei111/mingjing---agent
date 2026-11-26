@@ -1,5 +1,7 @@
 # 完整产品架构复审任务
 
+> **历史任务记录。** 下文记录当时的审查和裁决，不是新任务授权。接续新架构请从[架构基线任务](architecture-baseline-transition.md)和[现行架构](../designs/current-architecture-baseline.md)进入。
+
 目标是决定整个明镜智能体开发可依赖的架构，而非批准功能开发。以 v0.4.1 原件（SHA-256 `75ac634a98393b5f99fb28901a6a91bc7431290143b6458bbf1f9a2af5f23062`）、R4 固定 `9d61564347dbea5ada09678c1aa8b9d16f36a2df` 和原 23 组/76 个编号为准。PR #7 在本轮进行期间由仓库端合入 main；本轮审查在单独分支 `codex/whole-product-architecture-review-20261123`，其文档草稿为 [#14](https://github.com/zhuquanwei111/mingjing---agent/pull/14)。旧 W0 裁决及原冻结表作固定输入。
 
 [设计者逐组分析与责任边界](../designs/whole-product-review.md) · [扩大候选及入围依据](../designs/whole-product-alternatives.md)
