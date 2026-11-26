@@ -7,34 +7,34 @@
 | 目的 | 当前权威入口 | 备注 |
 | --- | --- | --- |
 | 仓库状态与使用方法 | [根 README](../README.md) 与 [根 AGENTS](../AGENTS.md) | 开发前检查实际分支、工作区和相关 PR |
-| 已合并 P2 的代码和行为 | [P2 操作说明](../core/README.md) 与 [旧版本说明](../core/VERSIONING.md) | 只代表对应代码版本，不等于新路线 B 已完成 |
-| 新能力开发者从这里开始 | [通用契约、四类适配、发布与接入验收](designs/whole-product-decision.md#capability-onboarding) | 区分现有 P2 可复现接口、路线 B 设计和待执行的 AC-17 独立盲接 |
+| 已合并 P2 的代码和行为 | [P2 操作说明](../core/README.md) 与 [旧版本说明](../core/VERSIONING.md) | 对应旧代码及回归资产，不代表 Mastra 新路线已经实现 |
+| 新能力开发者从这里开始 | [现行能力接入边界](designs/current-architecture-baseline.md#capability-onboarding) | 旧 P2 可复现接口仅作历史样例；新宿主和正式 API 尚未建设，AC-17 在 G 实际验收 |
 | P1 验证与可复现环境 | [P1 说明](../p1-walking-skeleton/README.md)、[P1 历史报告](../p1-walking-skeleton/P1_REPORT.md) | 历史记录以原 SHA 和 CI 为准 |
 | 通用 Codex 工程规范 | [通用规范包](../engineering-standard/README.md) | 含执行脚本、Skills、模板，不是明镜业务交付包 |
 | 明镜如何采用工程规范 | [项目接入说明](engineering-standard.md)、[执行性审查](engineering-standard-execution.md) | 通用层与项目例外分开 |
 | 开发与任务接续 | [开发流程](development.md)、[长任务计划](PLANS.md)、[设置及环境边界](configuration.md) | 任务具体状态以所属任务记录和实际 Git 状态核对 |
 | 需求与验收 | [通用工程规范需求](requirements/engineering-standard.md)、[任务记录目录](tasks/) | 已有项目需求摘要不代替用户持有的完整需求原件 |
-| 正式产品架构与选型 | [PR #14 独立终裁](designs/whole-product-decision.md)、[需求验收与证据](requirements/whole-product-acceptance-results.md) | 经调整的路线 B 已作为开发基线；W0、MVP 和上线各有后续验收 |
-| W0 设计与验收 | [宿主接线](designs/w0-host-design.md)、[16 个验收场景](designs/w0-host-acceptance.md)、[复审与文件指纹](tasks/reviewed-deliverables.md) | W0a/W0b 的设计基线，实际结果待真实宿主验证 |
-| 首期业务与通用基座 | [首期产品范围](requirements/first-mvp-product-scope.md)、[调用图](designs/mvp-operation-call-graph.md)、[组件选型](designs/whole-product-component-selection.md)、[公共架构图](architecture/明镜公共架构.svg) | [HTML 说明](architecture/明镜完整产品公共架构与首期通用基座.html)、[可编辑图](architecture/明镜公共架构.drawio)、[运行与证据表](architecture/明镜公共组件选型_首期运行与证据.csv) |
+| 当前产品架构与选型 | [现行入口](designs/current-architecture-baseline.md)、[架构图与契约](designs/architecture-final/contracts.md)、[76 项映射](requirements/final-architecture-mapping.csv)、[工程门禁及风险](designs/architecture-final/gates-and-risks.md) | Mastra 主体、H2 知识域方案已裁决；W0/G 及业务待验 |
+| 历史架构与原需求证据 | [PR #14 独立终裁](designs/whole-product-decision.md)、[原 76 项历史填证](requirements/whole-product-acceptance-results.md) | 保留原需求、证据范围和失败；不作为新组合的通过证明 |
+| 首期设计历史原件 | [九份原件、文件指纹与 W0 设计回执](tasks/reviewed-deliverables.md) | 用于追溯早期业务范围、组件计划和验收设计；现行建设按上列最终架构执行 |
 | 技术决定 | [ADR 目录](adr/) | 记录拟议、接受、替代与撤回，状态必须与当前事实一致 |
 
 ## 当前架构与历史的区别
 
 - [v1 历史工程交付包](../mingjing-codex-engineering-v1/README.md) 仍暂存仓库根目录。这是**历史来源**，不应单凭其 `03_TECH_STACK.md` 或启动词确定新开发路线；其中仍被根 AGENTS 引用的安全/阶段约束必须在迁移前识别并保留。
-- [v2 路线 B 开发包候选 PR #6](https://github.com/zhuquanwei111/mingjing---agent/pull/6) 是**未合并的候选交付**，当前 main 不含该目录；不能用 PR 描述等同于独立架构评审完成。
-- [早期架构评审 PR #7](https://github.com/zhuquanwei111/mingjing---agent/pull/7) 已合并，曾要求修订；[后续完整产品独立终裁 PR #14](https://github.com/zhuquanwei111/mingjing---agent/pull/14) **已合并并确认调整后的路线 B 为开发基线**。两次评审对应不同阶段和修订，须保留历史证据。
+- [v2 路线 B 开发包候选 PR #6](https://github.com/zhuquanwei111/mingjing---agent/pull/6) 是**未合并的历史候选交付**，当前 main 不含该目录；不按该技术栈继续新建设。可复用契约和验证资产须按新组合复核。
+- [早期架构评审 PR #7](https://github.com/zhuquanwei111/mingjing---agent/pull/7) 已合并，曾要求修订；[后续完整产品独立终裁 PR #14](https://github.com/zhuquanwei111/mingjing---agent/pull/14) **已合并，曾确认调整后的路线 B 为当时开发基线**。两次评审对应历史阶段；保留原证据，不再将 B 视作新开发指令。
 - [独立 Reviewer 机制 PR #8](https://github.com/zhuquanwei111/mingjing---agent/pull/8) 已合并，属于工程流程，不替代产品架构终裁。
 - [A/B 隔离实验 PR #5](https://github.com/zhuquanwei111/mingjing---agent/pull/5) 保存两路实际实验材料；它不是合并到 main 的产品实现。
 
-**当前正式架构入口：**[PR #14 终裁文件](designs/whole-product-decision.md)。它不表示正式 W0、MVP 或真实流量已完成；仍未合并的 v2 交付包必须对齐终裁中的模型出站与 Agent 回合恢复调整，不能直接冒充 `main` 的已批准成品。
+**当前架构入口**为 [MJ-ARCH-FINAL](designs/current-architecture-baseline.md)。[ADR 0002](adr/0002-mastra-architecture-transition.md)记录旧路线替代与授权边界，[施工与证据记录](tasks/architecture-baseline-transition.md)保留 H1/H2 正反例、受控原包定位及 SHA-256。正式公共基座建设仍待项目方授权。
 
 ## 目录治理及资料规则
 
-参见 [目录职责、迁移映射和验收](repository-layout.md)。目前优先完成入口梳理、引用清单及目录规范，**历史包搬迁与候选方案定版另作为后续受审迁移**，避免与进行中的 PR 冲突。`docs/designs/` 已保存完整产品选型与审查正文。`docs/architecture/` 保存首期通用基座的图文说明、可编辑图源及组件表。正式工程记录留在 Git；Space 可用于讨论和链接，但不自动替代正式提交。
+参见 [目录职责、迁移映射和验收](repository-layout.md)。目前优先完成入口梳理、引用清单及目录规范，**历史包搬迁与候选方案定版另作为后续受审迁移**，避免与进行中的 PR 冲突。`docs/designs/` 已保存完整产品选型与审查正文。`docs/architecture/` 仅在需要独立维护当前架构地图时再建，不为排版创建空目录。正式工程记录留在 Git；Space 可用于讨论和链接，但不自动替代正式提交。
 ## W0、MVP 和后续开发如何持续维护
 
 - **已有开发分支**不能假定自动继承本规范；启动 W0/MVP 或接续旧 PR 时要与最新 `main` 比较，安全同步适用规则及文档入口，再以该候选复验。不得为同步而覆盖未提交的他人改动。
 - **每次阶段交付之前**，实施者根据实际代码、受控需求与验收结果核对本索引、根 README、受影响的架构设计/ADR、任务记录、运行说明和相关引用；完成状态必须给出具体 PR、提交及运行证据，不能只凭 CI 绿灯宣布用户目标完成。
-- **W0 通过时**，标明最短端到端技术链路实测范围和剩余风险，不写成 MVP 或生产已完成；**MVP 通过时**，单独补用户任务、业务权限、目标环境与业务验收。后续功能/架构/目录变化同样执行“检查影响→更新相关文档或说明不适用→审查→CI→合并”的流程。
+- **W0 通过时**，标明最短端到端技术链路实测范围和剩余风险，不写成 G、MVP 或生产已完成；**G 通过后**才可开始首个正式业务 M，按实际公共基座验收补证（含独立 AC-17）；**MVP 通过时**，单独补用户任务、业务权限、目标环境与业务验收。后续功能/架构/目录变化同样执行“检查影响→更新相关文档或说明不适用→审查→CI→合并”的流程。
 - 新的正式技术决定覆盖旧版时更新此入口；旧版方案保留版本和来源，但明确标注为历史。规范详情见[目录治理规则](repository-layout.md)，自动链接检查由 [make check](../Makefile) 执行，语义正确性由实施者和 Reviewer 核对。

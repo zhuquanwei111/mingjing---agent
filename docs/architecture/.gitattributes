@@ -1,2 +1,0 @@
-# The reviewed CSV contains UTF-8 with BOM and CRLF. Preserve its source digest.
-明镜公共组件选型_首期运行与证据.csv -text whitespace=trailing-space,space-before-tab,cr-at-eol
