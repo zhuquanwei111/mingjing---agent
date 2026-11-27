@@ -4,7 +4,7 @@
 
 ## 当前项目状态
 
-**项目方已采纳 R3 最终裁决，选定 DeerFlow 作为明镜智能体主体。** 原生宿主承担会话、运行、工具与扩展，普通业务程序可直接调用同一业务能力。架构、正式需求及实施边界见[现行架构](docs/designs/current-architecture-baseline.md)、[需求修订](docs/requirements/current-engineering-requirements.md)、[架构图与契约](docs/designs/architecture-final/contracts.md)及 [ADR 0003](docs/adr/0003-deerflow-architecture-transition.md)。v2.2.0 是研究参考版；实际制品在 H 确认。W0 另行批准。全部必要公共能力和独立 AC-17 在 G 签收后，才可另批首个正式业务 M。
+**项目方已采纳 R3 最终裁决，选定 DeerFlow 作为明镜智能体主体。** DeerFlow 是唯一主体应用工程底座，优先承载 Agent、工作流、异步任务与调度。普通程序可直接查询开播时间；直播表现分析由 Agent 处理。架构、正式需求及实施边界见[现行架构](docs/designs/current-architecture-baseline.md)、[需求修订](docs/requirements/current-engineering-requirements.md)、[架构图与契约](docs/designs/architecture-final/contracts.md)及 [ADR 0003](docs/adr/0003-deerflow-architecture-transition.md)。v2.2.0 是研究参考版；实际制品在 H 确认。W0 另行批准。全部必要公共能力和独立 AC-17 在 G 签收后，才可另批首个正式业务 M。
 
 早期 P1 隔离验证与 P2 公共层已归入[历史代码与证据](docs/archive/legacy-runtime/README.md)。两套实现仍供 CI 复跑；正式公共宿主的建设状态以[基线任务](docs/tasks/architecture-baseline-transition.md)为准。
 

@@ -2,9 +2,11 @@
 
 **设计基线，非已实施接口。** 固定参考源码 `58fc5bd5b8e6ea46538e9481ba06ca2a46e14e2a`；详细证据为R3 独立裁决《01-问题与依据》§3–6，见[原件定位](../../tasks/architecture-baseline-transition.md#决定与证据定位)。实际制品由 H 锁定。遵守[当前架构](../current-architecture-baseline.md)及[现行需求](../../requirements/current-engineering-requirements.md)。
 
-![App 的普通程序和 DeerFlow Agent 经真实资源授权复用业务与知识能力，宿主及资源方分别提供治理证据。](architecture.png)
+![明镜 App 查开播时间时可直接调用获准业务接口；分析直播表现进入 DeerFlow Agent。工作流、异步任务和调度归入唯一的 DeerFlow 主体底座。](architecture.png)
 
-[Mermaid 图源](architecture.mmd) · [矢量图](architecture.svg)。SVG 与本页 PNG 均由同一图源生成。框图为职责与调用关系，不是一框一服务或实际部署清单。
+[Mermaid 图源](architecture.mmd) · [矢量图](architecture.svg)。SVG 与本页 PNG 均由同一图源生成。实线表示调用，虚线表示证据来源。“实际资源端核权”指各资源服务的责任。
+
+查询主播开播时间，App 用员工身份直查排期接口，返回已登记的时间，模型调用为零。分析主播直播表现，App 调用 DeerFlow Agent，由它按权限取资料、用工具并形成分析。需要分步、等待或定时触发时优先复用 DeerFlow 的工作流、异步任务和调度。两条路径共用资源端权限和业务事实。
 
 ## 一、责任分离（避免重复建设）
 
@@ -12,7 +14,7 @@
 |---|---|---|
 | App 与身份入口 | DeerFlow Gateway、原生 session/OIDC、用户与 owner、线程/事件/API | 实际 App 接入和业务身份映射、用户体验；普通服务按授权直达业务 API；禁止客户端共享内部 token 或任意 owner。不要重做一个通用智能体聊天宿主。 |
 | Agent 执行 | 原生 Lead Agent、工具/子任务、扩展、检查点/运行状态、模型配置 | 真实业务工具/参数/权限及实际结果；原生适用机制合理使用，不重写 Loop、上下文或通用调度。 |
-| 普通/固定/异步 | 现有业务程序/合适普通代码、原生 scheduler/工作流/MCP Tasks | 同一业务模块/API 实现正式规则；必要无人值守若原生不能满足才补适用成熟任务机制，避免重复调度同一工作。 |
+| 确定性业务与任务编排 | 普通函数/API 直接处理一次业务操作；编排、异步任务和调度优先使用 DeerFlow 工作流、MCP Tasks、scheduler 等适用接口 | 明镜维护业务函数、资源权限和正式结果。必要无人值守路径若有已证实的原生缺口，按影响范围处理并验证，不另立并行公共执行底座。 |
 | 资源权限与正式结果 | 原生工具 Provider/Guardrail、真实资源方授权/事务/成熟接口 | 启用原生细粒度授权、最小默认角色，按实际用户和资源核权。业务资源定义批准的动作、正式效果与查证。记录实际事实，不以 Agent 自述/Trace 替代。 |
 | 数据/知识/原件 | 原生知识 Provider/范围/来源/管理扩展及成熟知识库/解析/存储 | 必要版本、有效性、实际知识 ACL、正式数据质量和媒体/复杂版面等真实需求；普通资料无需统一发布，原生更新或范围重建可接受。 |
 | 管理与质量/运维 | 原生界面/配置/运行证据、成熟测试评测/观测、原生部署/恢复 | 必要业务管理/交付、最小审计、实际费用、版本与回归、实际安全制品及恢复目标。无默认独立平台或金融级总账。 |
@@ -27,7 +29,7 @@
 
 [插件合同](https://github.com/bytedance/deer-flow/blob/58fc5bd5b8e6ea46538e9481ba06ca2a46e14e2a/backend/packages/extension-api/deerflow_extension_api/plugins.py) 提供 BackendAction/ModelTool 和 host principal；普通 API、固定代码、Agent 工具复用同一实际业务模块。共享业务规则、输入/输出和真实结果，而非强制共享运行引擎。版本、发布、授权通过原生登记/部署启用/资源核权实现；必要 ID 关联而非全局总账。
 
-[AgentRuns](https://github.com/bytedance/deer-flow/blob/58fc5bd5b8e6ea46538e9481ba06ca2a46e14e2a/backend/docs/extension-agent-runs.md) 的保留授权 handle 不跨重启；交互工作流不提供任意业务 I/O；上游双 Gateway 验证为局部而非明镜无人值守。原生 scheduler/MCP Tasks 处理适用后台场景；必要业务时效按实际合同用合适任务服务或恢复。远端提交在本地 handle 保存之前（[MCP service](https://github.com/bytedance/deer-flow/blob/58fc5bd5b8e6ea46538e9481ba06ca2a46e14e2a/backend/app/mcp_tasks/service.py)），普通低风险可重做、查或提醒；预约等正式效果按资源端幂等/查询、可靠同意图重试、等待或人工核实。取消后不推进已取消下游，已有效果真实记录。
+[AgentRuns](https://github.com/bytedance/deer-flow/blob/58fc5bd5b8e6ea46538e9481ba06ca2a46e14e2a/backend/docs/extension-agent-runs.md) 的保留授权 handle 不跨重启；交互工作流不提供任意业务 I/O；上游双 Gateway 验证为局部而非明镜无人值守。原生 scheduler/MCP Tasks 处理适用后台场景；先验证所选制品的适用范围和恢复时效；确实达不到业务合同要求时，只对该任务评估成熟接线或局部适配。远端提交在本地 handle 保存之前（[MCP service](https://github.com/bytedance/deer-flow/blob/58fc5bd5b8e6ea46538e9481ba06ca2a46e14e2a/backend/app/mcp_tasks/service.py)），普通低风险可重做、查或提醒；预约等正式效果按资源端幂等/查询、可靠同意图重试、等待或人工核实。取消后不推进已取消下游，已有效果真实记录。
 
 ## 四、C：知识、正式业务、费用与质量
 

@@ -7,7 +7,7 @@ H/W0a/W0b/G/M/T/P 按[新旧阶段衔接与门禁](docs/designs/current-architec
 ## 项目地图
 
 - [当前项目状态](README.md#当前项目状态)；[统一文档索引](docs/index.md)与[持续目录治理规范](docs/repository-layout.md)。
-- [当前架构与实施门禁](docs/designs/current-architecture-baseline.md)及 [ADR 0003](docs/adr/0003-deerflow-architecture-transition.md)确定 DeerFlow 主体。H 确认实际安全制品和接入条件，W0 另行批准。G 全部必要公共能力及独立 AC-17 签收后，另批首个正式业务 M。[Mastra](docs/archive/mastra-20261126/README.md)和[路线 B](docs/archive/route-b/designs/whole-product-decision.md)仅供追溯。
+- [当前架构与实施门禁](docs/designs/current-architecture-baseline.md)及 [ADR 0003](docs/adr/0003-deerflow-architecture-transition.md)确定 DeerFlow 为唯一主体应用工程底座。普通确定性业务可直调获准接口；工作流、异步任务和调度优先复用 DeerFlow。H 确认实际安全制品和接入条件，W0 另行批准。G 全部必要公共能力及独立 AC-17 签收后，另批首个正式业务 M。[Mastra](docs/archive/mastra-20261126/README.md)和[路线 B](docs/archive/route-b/designs/whole-product-decision.md)仅供追溯。
 - [现行阶段及接续记录](docs/tasks/architecture-baseline-transition.md)；[v1 历史方案与仍有效规则](docs/archive/engineering-v1/README.md)；[P2 历史接口与操作](docs/archive/legacy-runtime/core/README.md)。
 - 历史验收：[P1 报告](docs/archive/legacy-runtime/p1-walking-skeleton/P1_REPORT.md)、[P2 早期报告](docs/archive/legacy-runtime/core/P2_REPORT.md)；新提交以对应 CI 为准。
 - [开发流程](docs/development.md)、[长任务计划与接续](docs/PLANS.md)、[配置与环境边界](docs/configuration.md)。

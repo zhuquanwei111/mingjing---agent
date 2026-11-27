@@ -1,12 +1,12 @@
 历史技术ID,原职责,新处置,现行设计或候选,边界及未决,依据ID（R3/独立/M）,关口
 T01,App与业务权威,原生继承＋必要适配,DeerFlow Gateway/会话/运行入口；实际 App 与资源业务服务,不是已存在的明镜后端；确定真实 App 身份、用户体验与业务接口,Q03 Q10 M06,H/W0a/G
 T02,主运行框架及入口,替换主体,DeerFlow OSS Python/LangGraph 原生 Gateway/harness；正式制品待H,取消 Mastra Server/Node/TS 主体默认；不得二次造核心,Q01 Q02 Q24,H-V/W0
-T03,普通程序及Tool,原生继承＋业务接线,普通 API/函数、原生 Tool/Plugin/MCP,确定性不强制模型；资源核权及业务逻辑共用,Q10 D05,W0/G
-T04,普通Workflow/Agent Loop,原生优先,原生 Agent/工具；适用固定工作流或普通代码,QuickJS 不是任意业务 I/O；不强制统一工作流引擎,Q11 Q12 D05,W0/G
-T05,跨进程后台及Durable Agent,原生优先/风险分级,原生 Run/事件/调度，适用保存、补跑、重做,旧 Mastra durable 不继承；仅必要无人值守核恢复,Q11 Q12 D06,W0/G
+T03,普通程序及Tool,原生继承＋业务接线,普通业务函数/API 可直接调用，也可通过 DeerFlow 工具/插件复用,直接查询无需推理；实际资源端核权，查询同一业务事实,Q10 D05,W0/G
+T04,普通Workflow/Agent Loop,原生优先,DeerFlow 原生 Agent、工具及适用工作流；确定性步骤复用业务函数,不因固定流程另建执行体系；QuickJS 不提供任意业务 I/O,Q11 Q12 D05,W0/G
+T05,跨进程后台及Durable Agent,原生优先/风险分级,优先复用 DeerFlow 原生 Run、异步任务、调度及事件；按需恢复或补跑,旧 Mastra durable 不继承；仅必要无人值守核恢复,Q11 Q12 D06,W0/G
 T06,Mastra持久运行和Memory,替换旧实现,DeerFlow 原生线程/检查点/上下文；记忆按需,不选 @mastra/pg；实际持久存储及安全在 H/G,Q03 Q08 D13,H/G
 T07,事件传输与共享续流,原生配置待锁,原生事件与 Redis 支持路径,不预设 Mastra Valkey Streams/缓存；锁真实兼容依赖,Q12 Q01,H/G
-T08,严格固定流程恢复,条件候选,原生 scheduler、业务端任务；确需时再选成熟持久引擎（Temporal仅候选）,不默认部署 Temporal 或 Mastra adapter；重要时效/恢复按实际,Q11 Q12 Q16 D06,H/G/启用前
+T08,严格固定流程恢复,条件候选,先核 DeerFlow 原生工作流、调度与恢复。若确有必要时效缺口，再定向评估成熟组件,仅解决已证实的缺口；不建立平行的通用调度体系,Q11 Q12 Q16 D06,H/G/启用前
 T09,公共事务数据库,原生与业务共同依赖待锁,DeerFlow 支持的实际持久 SQL；必要业务事实事务,PostgreSQL 可用候选，具体版与客户端待核；不建统一运行总账,Q08 Q12 D05,H/G
 T10,身份认证,原生优先,DeerFlow session/OIDC；已有明镜身份源，Keycloak仅候选,真实用户、SSO、App桥接待核；internal token不暴露,Q03 Q04,H/W0
 T11,关系授权,原生＋实际资源权限,AuthorizationProvider/Guardrail＋业务资源核权；SpiceDB仅必要时,显式启用fail-closed；单机构，无默认多租户权限平台,Q05 Q06 Q07 D04,H/W0/G
