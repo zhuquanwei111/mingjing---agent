@@ -41,9 +41,13 @@ R3 的独立裁决在方案层确认 A（身份、资源权限与隔离）、B�
 
 独立迁移方案审查对应 `f7b8b2ff661f6f86127e1eece6d43c252e7d79c0`，结论通过。依据评审意见，历史 H1/H2 链接固定到原提交；两种展示图均从同一灰阶 Mermaid 源渲染，保留运行、业务与知识证据三条连线；跨期逐项分列隔离与真实业务证据。文件级清单 56 个非归档路径中，55 个 blob 与固定树逐字相符；通用评审配置路径 `engineering-standard/agents/solution-reviewer.toml` 的清单值漏写 `ace5`，现场 blob 为 `efc421a36fe043e33ba85b9a04e25895bace5fee`，两份评审配置内容相同且均保留原件。
 
-旧归档 16 件 v1 规则和方案、12 件路线 B 资料、9 件设计原件 ZIP 与旧运行回归保留。178 个历史运行路径中，两份仍被开发入口直接引用的 README 校正导航措辞，原版可在[固定归档树](https://github.com/zhuquanwei111/mingjing---agent/tree/114af05ea6a24cde7f36d3e3dce7225234aa279a/docs/archive/legacy-runtime)逐件核查。现有 CI、运行代码、锁文件和 Makefile 继续承担原回归职责。服务器实际必需检查为 ARM64 `P1 acceptance`，包括 P1 恢复与 P2 公共层，另有两项 amd64 辅助回归。实施复审、整改、最终提交和同版 CI 在本任务草稿 PR 中登记，供项目方决定是否合并。
+旧归档 16 件 v1 规则和方案、12 件路线 B 资料、9 件设计原件 ZIP 与旧运行回归保留。178 个历史运行路径中，两份仍被开发入口直接引用的 README 校正导航措辞，原版可在[固定归档树](https://github.com/zhuquanwei111/mingjing---agent/tree/114af05ea6a24cde7f36d3e3dce7225234aa279a/docs/archive/legacy-runtime)逐件核查。现有 CI、运行代码、锁文件和 Makefile 继续承担原回归职责。服务器实际必需检查为 ARM64 `P1 acceptance`，包括 P1 恢复与 P2 公共层，另有两项 amd64 辅助回归。实施复审、整改、最终提交和同版 CI 登记在[草稿 PR #29](https://github.com/zhuquanwei111/mingjing---agent/pull/29)，供项目方决定是否合并。
+
+独立实施审查比对 `3d2abedbe48bebc4d51cb8be2ea37f0d91e93703` 和基准，要求修正 H-A 的撤权措辞，以及 FR-15/21/26 的中立测试边界。现行门禁已限定按具体风险决定即时阻断；W0/G 用测试身份与可独立查证的中立资源，实际复盘、预约及岗位结果在另批 M 取证。另已澄清下文离线对账发生于 #27。
 
 ## 2026-11-26　Mastra 历史归档
+
+以下各节均记录 #27 及更早版本当时的工作、证据、权限与后续计划。DeerFlow 接续只使用本页上方的决定、未决清单及其现行入口。
 
 **当时任务状态**　总控已完成选型，架构基线经 [#27](https://github.com/zhuquanwei111/mingjing---agent/pull/27) 审核并合入主分支（提交 `3828592`）。改动限于架构及工程文档。进入公共基座正式建设仍需项目方批准。
 
@@ -136,4 +140,4 @@ B04：WeKnora v0.9.1 标准版、App/DocReader/PG/Redis、两测试租户、合�
 | P1 旧路线仍被活跃文档指引 | 修订[目录治理任务](directory-governance.md)当前状态、历史定位和可执行后续清单；[P2 手册](../archive/legacy-runtime/core/README.md)明确旧实现维护/历史复用范围并导向现行入口。保留原历史事实及已有运行命令。#22 后续同步事项已列明。 | 核对旧入口不再误指新建设、迁移责任与历史证据保留 |
 | P2 执行类型与开发阶段同名 | F03 原执行类型 P0–P3 一一改记 EXEC-0–EXEC-3（不用 #20 已有 E1 等阶段编号）；[根规则](../../AGENTS.md)链接[新旧开发阶段衔接](https://github.com/zhuquanwei111/mingjing---agent/blob/114af05ea6a24cde7f36d3e3dce7225234aa279a/docs/designs/current-architecture-baseline.md#stage-gate-crosswalk)，旧门禁与 H/W0/G/M/T/P 并用，P1 验收确认后 G，G 全部必要能力及 AC-17 通过且获准才 M；原规则文件与 CI 名称不改。 | 核对阶段语义无重叠、旧门禁未削弱，实施仍暂停 |
 
-过渡阶段两个 head 的回归与独立复审以各自固定提交为准。当时未取得完整材料的限制已由本次受控原包及逐项核验补齐，见本页开头。本次在临时副本分别执行 H1 的 verify-evidence.py 和 H2 的 check.py，只对已有记录离线对账，两份输出都与原 results JSON 逐字节一致。未重新运行原实验服务。
+过渡阶段两个 head 的回归与独立复审以各自固定提交为准。当时缺少的材料后来在 #27 交付时补齐，见[固定历史回执](https://github.com/zhuquanwei111/mingjing---agent/blob/114af05ea6a24cde7f36d3e3dce7225234aa279a/docs/tasks/architecture-baseline-transition.md)。#27 当时在临时副本分别执行 H1 的 verify-evidence.py 和 H2 的 check.py，只对已有记录离线对账，两份输出都与原 results JSON 逐字节一致。未重新运行原实验服务。
