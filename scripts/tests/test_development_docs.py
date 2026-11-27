@@ -22,6 +22,11 @@ class DevelopmentDocsTests(unittest.TestCase):
     def test_current_documentation_entrypoints_cannot_be_silently_dropped(self):
         required = {"README.md", "AGENTS.md", "docs/index.md", "docs/repository-layout.md",
                     "docs/designs/current-architecture-baseline.md",
+                    "docs/designs/architecture-final/contracts.md",
+                    "docs/designs/architecture-final/gates-and-risks.md",
+                    "docs/requirements/current-engineering-requirements.md",
+                    "docs/adr/0003-deerflow-architecture-transition.md",
+                    "docs/archive/mastra-20261126/README.md",
                     "docs/archive/route-b/designs/whole-product-decision.md"}
         self.assertTrue(required.issubset(set(ENTRY_POINTS)))
 
