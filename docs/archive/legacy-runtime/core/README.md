@@ -1,6 +1,6 @@
 # 明镜 P2 最小公共层
 
-**适用范围：历史 P2 隔离实现及其维护、复现和回归测试。** 下文不是新 Mastra 主线的宿主接入说明，不授予正式开发或部署权限。新能力与新阶段从[当前架构与实施门禁](../../../designs/current-architecture-baseline.md#capability-onboarding)进入；旧 P2 API、类型及运行命令不直接外推新宿主。
+**适用范围：历史 P2 隔离实现及其维护、复现和回归测试。** 下文不是现行宿主的接入说明，不授予正式开发或部署权限。新能力与新阶段从[当前架构与实施门禁](../../../designs/current-architecture-baseline.md#capability-onboarding)进入；旧 P2 API、类型及运行命令不直接外推新宿主。
 
 P2 提供能力目录、版本发布、资源授权、任务与 Run API、审批、收据、预算和产物读取。业务模板与统一执行路径见 [SDK 示例](src/mingjing/examples.py)。执行版本和迁移规则见 [VERSIONING.md](VERSIONING.md)。
 
@@ -68,7 +68,7 @@ GitHub 正式 ARM64 作业沿用 `P1 acceptance` 名称，同时运行 P1 与本
 
 ### 开发能力与扩展
 
-本节的类、URL 和测试只对应历史 P2 隔离实现；[原路线 B 接入指南](../../route-b/designs/whole-product-decision.md#capability-onboarding)仅作为当时的契约与验证资产，不能据此开始新路线开发。新 Mastra 主线采用[现行能力接入边界](../../../designs/current-architecture-baseline.md#capability-onboarding)，实际宿主建成并验收后才提供相应 API/SDK 和接入手册。
+本节的类、URL 和测试只对应历史 P2 隔离实现；[原路线 B 接入指南](../../route-b/designs/whole-product-decision.md#capability-onboarding)仅作为当时的契约与验证资产，不能据此开始新路线开发。现行架构采用[现行能力接入边界](../../../designs/current-architecture-baseline.md#capability-onboarding)，实际宿主建成并验收后才提供相应 API/SDK 和接入手册。
 
 定义 Model 的输入输出类型和 CapabilityContext 上下文，再在应用加载配置中注册 Capability。业务函数通过 NotesPort 使用同库事务。普通程序 normalize_text 返回产物，固定 Workflow 的 write_note 审批后记一条合成笔记，Agent 的 draft_note 使用固定决策和受控工具复用同一笔记实现。业务函数的签名与 Temporal 和 LangGraph 无关。应用根据可信契约决定执行入口。
 

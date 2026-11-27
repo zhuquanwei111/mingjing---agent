@@ -6,7 +6,7 @@
 
 | 查找内容 | 现有入口 |
 | --- | --- |
-| 当前阶段、公开入口及历史材料 | [根 README](../README.md)、[项目执行规则](archive/engineering-v1/AGENTS.md) |
+| 当前阶段、公开入口及历史材料 | [根 README](../README.md)、[根执行规则与 R3 覆盖关系](../AGENTS.md) |
 | 历史 P2 公共层与契约 | [接口和运行方式](archive/legacy-runtime/core/README.md)、[版本与迁移](archive/legacy-runtime/core/VERSIONING.md)、[业务验收](archive/legacy-runtime/core/tests/test_core.py) |
 | P1 验证与未放行项 | [隔离环境](archive/legacy-runtime/p1-walking-skeleton/README.md)、[P1 报告](archive/legacy-runtime/p1-walking-skeleton/P1_REPORT.md) |
 | 任务与执行证据 | [长任务约定](PLANS.md)、[开发流程](development.md)、[设置与环境](configuration.md)、PR 和 CI |

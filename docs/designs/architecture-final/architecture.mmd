@@ -1,0 +1,40 @@
+---
+config:
+  theme: base
+  markdownAutoWrap: false
+  themeVariables:
+    primaryColor: "#ffffff"
+    primaryBorderColor: "#777777"
+    primaryTextColor: "#222222"
+    lineColor: "#555555"
+    edgeLabelBackground: "#ffffff"
+  deterministicIds: true
+  deterministicIDSeed: mj-deerflow
+  htmlLabels: false
+  fontFamily: "PingFang SC, Noto Sans CJK SC, sans-serif"
+  flowchart:
+    htmlLabels: false
+    wrappingWidth: 340
+    curve: linear
+    nodeSpacing: 35
+    rankSpacing: 40
+---
+flowchart TB
+    accTitle: 明镜以 DeerFlow 为唯一主体应用工程底座
+    accDescr: 查主播开播时间时，明镜 App 通过普通业务接口直查，无需模型推理。分析直播表现时调用 DeerFlow Agent。DeerFlow 原生承载适用的工作流、异步任务和调度，两条调用路径都由真实资源端核权。
+    APP["明镜 App<br/>可信用户入口"]
+    DF["DeerFlow<br/>唯一主体应用工程底座<br/>Agent、会话与工具<br/>原生工作流、异步任务与调度"]
+    AUTH["实际资源端核权<br/>主体、读写、用途与外发"]
+    BUS["业务服务<br/>正式事实与操作结果"]
+    KNOW["知识、数据与文件<br/>访问权限、版本与来源"]
+    GOV["质量、费用与运行管理"]
+    APP -->|分析直播表现| DF
+    APP -->|查开播时间<br/>普通接口直查 · 无模型| AUTH
+    DF -->|携带员工身份调用能力| AUTH
+    AUTH --> BUS
+    AUTH --> KNOW
+    DF -.运行记录.-> GOV
+    BUS -.正式结果.-> GOV
+    KNOW -.来源证据.-> GOV
+    classDef host fill:#f2f2f2,stroke:#333333,stroke-width:2px,color:#151515
+    class DF host

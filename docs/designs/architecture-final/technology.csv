@@ -1,41 +1,41 @@
-技术ID,职责,采用或处置,部署依赖,工程边界与已知证据,相关评审项
-T01,App与业务权威,公共宿主新建受理、结果与业务接入；复用 Mastra Server,Keycloak、SpiceDB、PG、资源与收件权威,B02 纳入基座；W0a 建真实中立入口，G 扩展。,S01/B02
-T02,主运行框架及入口,Mastra OSS / Mastra Server / TypeScript / Node.js 24 LTS,@mastra/core、Server及Client实际版本、AI SDK、PG,H1 固定 @mastra/core 1.84.0、@mastra/pg 1.37.0；生产套件另锁。,B01/S01
-T03,普通程序及Tool,Mastra原生Tool、适用Schema及TS函数,T02、实际资源权威和受控调用边界,EXEC-0 直接普通 TS/Tool，正式效果走真实受端及同一操作合同。,S01/B03
-T04,普通Workflow/Agent Loop,Mastra Agent/Workflow 原生,"T02,T06",原生编排；生成与评审、并发和故障待 G。,B01/S01/S08
-T05,跨进程后台及Durable Agent,Mastra 原生 default Durable Agent / evented Agent（按Run选定适用原生方式）,"T02,T06；跨进程T07的Streams和共享Cache",H1 限定顶层恢复；嵌套、并发、旧代次及在途待 W0b/G。,B01/B02/S02
-T06,Mastra持久运行和Memory,@mastra/pg PostgresStore、原生Memory包及实际存储接口,T09 独立 runtime DB；实际包依赖按 lockfile,原生 Store、检查点和已存原响应；会话与产品事实分权。,B01/S08
-T07,事件传输与共享续流,Valkey Streams及Mastra受支持的PubSub/共享Cache适配,"T02,T06、Valkey独立持久域/ACL/保留策略",Valkey Streams 原生 ACK/reclaim；共享 Cache、知识队列独立域；AOF/noeviction 及安全裁剪待核。,S02
-T08,严格固定流程恢复,限定 Temporal OSS；@mastra/temporal 支持子集或原生 TypeScript SDK（H互斥选一）,官方支持版本/TS SDK/worker/PG history与visibility，必要时启用,EXEC-3 仅严格固定流程。官方 @mastra/temporal 静态支持子集；不适用时 Temporal 原生 TS SDK；H 互斥选一。原生完全合格可取消 EXEC-3。,S03
-T09,公共事务数据库,PostgreSQL 17 系列受支持修补版；pg TS client,独立product/runtime/authz/obs/identity/temporal库及角色，适用filer元数据,PG 本地事务及真实事实，栅栏非第二 ACL；原子预留、MAY_HAVE_SENT 和唯一核销；不保证跨网络原子。,B02/B03
-T10,身份认证,Keycloak OSS / OIDC；账号、组、会话与停用,OIDC issuer、受众、签名和服务身份；Keycloak 独立 PG,公共身份已选，尚未部署和验收。,S07/B02
-T11,关系授权,SpiceDB OSS CheckPermission/LookupResources/ZedToken,T09独立datastore；原生gRPC/API客户端,SpiceDB CheckPermission/LookupResources/关系 schema；fully_consistent 等不是实际 HTTP 原子授权，终核/物理栅栏。,B02/S07
-T12,能力发布与发现,Git/版本化原生Agent、Workflow、Tool注册；PG发布指针及受控筛选,"T02,T09,T11",原生定义、Git/Schema、PG 发布指针；先发布/权限/任务/I-O/版本过滤，再真实调用复核，不另造目录。,S01/S07
-T13,实际出站与操作预算,PG 本地原子操作、Attempt/Receipt/Settlement/共享预算 + 实际受信出站者/资源端,"T09,T10,T11、实际资源和供方合同",PG 只认领、预留和核销；真实接收方按号查终局。,B01/B02/B03/B04
-T14,数据规则设计和编辑,Apache Hop GUI 2.20.0参考,Java21、Git项目/规则文件、授权远程工程环境,Apache Hop OSS GUI/Run；真实规则编辑并输出固定工程，不将 Hop Web 或 Putki 算免费必要。,S04
-T15,数据转换与错误处理,Apache Hop Run/headless，内置转换和Pipeline Unit Test,Java21、来源连接器、隔离Worker、PG staging,Hop 原生 transform/Data Validator/错误流；源/连接器真实出站核权及计量，Hop 内部流程非第二任务调度。,S04/B02
-T16,数据质量及发布,Hop 原生校验+SQL约束+业务确定性验证，PG发布指针,"T15,T09,T11,T13",样本 Unit Testing 和实际行校验分开；处理/质量/正式发布/撤回四态，PG 指针与源权威。,S04/B04
-T17,对象存储,SeaweedFS OSS master/volume/filer/S3,真实filer元数据持久化（目标PG受支持backend）、私有卷及桶,SeaweedFS 私有桶；条件创建或实际版本+hash 隔离；不假定不可变键、ETag 非 SHA256。,S05
-T18,对象引用及受控交付,AWS SDK v3 S3Client等成熟接口+固定对象键/hash/version/发布元数据,"T17,T09,T11,T13、真实收件方",固定 Artifact 版本与独立收件；真实受控下载分段、撤回先禁读；S3 凭据不暴露业务用户。,B02/B04/S05
-T19,知识主体,WeKnora v0.9.1 原生 App / DocReader / Wiki,每个同权限域固定版本与独占批次；同一后台按版本签发凭据并在发送前验证,H2 限定采用；撤回先关旧版，按依赖从合法原件干净重建受影响域。,B04
-T20,知识数据库,WeKnora原生ParadeDB v0.25.11-pg17参考镜像及所需搜索扩展,独立知识数据库；核pg_search/pgvector与实际镜像,ParadeDB v0.25.11-pg17 发行参考独立库/实例；pg_search AGPL 实际义务核查。,S05/S10
-T21,知识缓存和队列,Redis兼容域：目标独立Valkey实例；不兼容则知识域受支持免费Redis修补版,T19；v0.9.1原compose redis:7.0-alpine 只作证据,与主体执行事件、续流隔离。H2 只测同一原生 Redis 队列；Valkey 兼容及多活动批次待验，不默认旧镜像。,S02/S05
-T22,复杂文档解析,WeKnora原生MinerU接线；4.2.3参考,DocReader、实际MinerU API/推理依赖、数据/许可,H2 合成 PDF 只用于归账；MinerU V1 原生接线需验定位、处理超时与查证，核实际版本、权重和商用许可。,B04/S06/S10
-T23,知识文本模型,text-embedding-v4 1024维初始配置 + qwen3-rerank,Model Studio获准端点、原生支持协议、固定索引版本,v4 固定维度与索引版本；qwen3-rerank 不兼容时只限获准的 gte-rerank-v2。真实中文质量与收费待 G。,B04/S08
-T24,音频与图片,WeKnora原生；Qwen3-ASR-1.7B/WeMM-Embedding-4B为参考,实际模型服务、模型权重许可、受控外发,音频/图片原生；ASR/WeMM 权重、真实端点与定位、授权及计量均待核。,B04/S06
-T25,视频,TwelveLabs 条件主选,实际获准API、采购/用途/地区、原件时间定位,TwelveLabs 仅条件启用，实际外服费用另批，默认无外发。,S06/S10
-T26,通用文本模型,Mastra原生AI SDK；qwen3.7-plus固定快照第一G配置,实际region/workspace、模型/协议/费用，@ai-sdk/openai-compatible兼容包,qwen3.7-plus 固定快照为待授权参考，实际模型/价格/region/上界 H；不兼容 fallback 拒绝。,B01/B03/S08
-T27,模型与工具真实派发,原生公开扩展点/AI SDK custom fetch；隔离出站,"T13,T26,T11；实际WeKnora/外服受支持接线",每次物理模型、工具、解析及重试发送前重新准入；未知保留预算。,B01/B02/B03/B04
-T28,免费工程调试管理,Mastra Studio OSS,"T02,T29，受信工程域/真实认证",免费 Studio production-mode 核实际 auth，独立非生产凭据；RBAC/SSO/Builder 付费不计。,S07/S10
-T29,持久AI观测,Mastra Observability/MastraStorageExporter + @mastra/pg受支持观测Store,PG独立obs DB；PostgresStoreVNext参考接口待锁,原生 PG 持久 observability/query 先锁，VNext 非承诺；仅失败时局部 ClickHouse，业务审计独立。,S08
-T30,公共评测与确定性测试,Mastra Scorers/Evals/Studio + Vitest、Git版本化金样,"T02,T29、实际真实参考与业务规则",原生 Scorers/Evals+Vitest+Git fixture；交付前确定性质量门与生成评审分离；不重造评测平台。,S08
-T31,业务操作管理页,Keycloak、Studio、Hop、WeKnora 原生界面；业务管理缺页用 React-admin OSS,受控 API 与 dataProvider/authProvider；应用后端纳入基座建设,缺页属公共宿主；业务岗位与管理职责分离。,S07/S10
-T32,审计和资源计量,PG最少必要审计/用量/核销记录+资源方真实回执/账单,"T09,T13；原生指标和实际计量来源",真实收据/独立最小审计；实际/估算/分摊分别，硬上界及未知保留；trace 不作费用权威。,B03/S08
-T33,基础运行监控,Prometheus / Alertmanager + 原生/exporter指标和结构化日志,实际各服务采集接口；私网,Prometheus/Alertmanager 实际指标、混合负载与等待释放；H 定 G 基线，T/P 目标。,S09
-T34,宿主与入口,Linux OCI / Docker Engine + Compose / Caddy TLS,持久卷、分区网络、密钥/认证,Linux OCI/Engine/Compose/Caddy + 实际受控出口与私网凭据隔离，不以入口代理替代授权。,B02/S09
-T35,发布与回退,Git/实际既有CI，制品lock/digest及迁移,T02-T34实际依赖、版本/许可/SBOM,实际制品 SHA/digest/SBOM/lock、两真实构建、停接排空或在途隔离；回退不复活授权。,S09/S10
-T36,备份恢复,pgBackRest + restic；对象/filer一致代次、原生支持的DB备份,"T09,T17,T20及实际持久域/密钥",pgBackRest/restic；PG/对象/filer/索引/权限/身份/配置/密钥及外部事实跨权威恢复，先冻结再对账。,S09
-T37,不可信执行器与高级协议,不预装；实际获准能力触发成熟隔离及协议接入审查,真实隔离边界、最小凭据、网络/额度,MCP/A2A/不可信执行按需要；默认禁止裸 HTTP/未验证执行器，现成隔离启用前验收。,B02/S07/S09
-T38,产品行为埋点,保留此前PostHog Cloud方向与受控事件合同,实际数据外发和账号许可,PostHog Cloud 仅历史条件方向，数据/套餐未核；不计必要付费平台。,S08/S10
-T39,取消旧主体和重复模块,Pydantic AI、Agno并行运行、LangSmith付费、重复队列/工具平台,不部署,取消第二 Agent 核及重复执行；EXEC-3 仅单一固定后端，备选不并装。,S01/S03
-T40,取消重复数据/知识/观测平台,dlt/NiFi/Airbyte、GX/Pandera、第二RAG、Langfuse/Phoenix、独立LiteLLM、OpenMeter默认硬预算、默认K8s,不部署,不重复造 ETL/知识/文件/评测/记忆/控制面；成熟原生不能覆盖的实际公共缺口保留。,S04/S07/S08
+历史技术ID,原职责,新处置,现行设计或候选,边界及未决,依据ID（R3/独立/M）,关口
+T01,App与业务权威,原生继承＋必要适配,DeerFlow Gateway/会话/运行入口；实际 App 与资源业务服务,不是已存在的明镜后端；确定真实 App 身份、用户体验与业务接口,Q03 Q10 M06,H/W0a/G
+T02,主运行框架及入口,替换主体,DeerFlow OSS Python/LangGraph 原生 Gateway/harness；正式制品待H,取消 Mastra Server/Node/TS 主体默认；不得二次造核心,Q01 Q02 Q24,H-V/W0
+T03,普通程序及Tool,原生继承＋业务接线,普通业务函数/API 可直接调用，也可通过 DeerFlow 工具/插件复用,直接查询无需推理；实际资源端核权，查询同一业务事实,Q10 D05,W0/G
+T04,普通Workflow/Agent Loop,原生优先,DeerFlow 原生 Agent、工具及适用工作流；确定性步骤复用业务函数,不因固定流程另建执行体系；QuickJS 不提供任意业务 I/O,Q11 Q12 D05,W0/G
+T05,跨进程后台及Durable Agent,原生优先/风险分级,优先复用 DeerFlow 原生 Run、异步任务、调度及事件；按需恢复或补跑,旧 Mastra durable 不继承；仅必要无人值守核恢复,Q11 Q12 D06,W0/G
+T06,Mastra持久运行和Memory,替换旧实现,DeerFlow 原生线程/检查点/上下文；记忆按需,不选 @mastra/pg；实际持久存储及安全在 H/G,Q03 Q08 D13,H/G
+T07,事件传输与共享续流,原生配置待锁,原生事件与 Redis 支持路径,不预设 Mastra Valkey Streams/缓存；锁真实兼容依赖,Q12 Q01,H/G
+T08,严格固定流程恢复,条件候选,先核 DeerFlow 原生工作流、调度与恢复。若确有必要时效缺口，再定向评估成熟组件,仅解决已证实的缺口；不建立平行的通用调度体系,Q11 Q12 Q16 D06,H/G/启用前
+T09,公共事务数据库,原生与业务共同依赖待锁,DeerFlow 支持的实际持久 SQL；必要业务事实事务,PostgreSQL 可用候选，具体版与客户端待核；不建统一运行总账,Q08 Q12 D05,H/G
+T10,身份认证,原生优先,DeerFlow session/OIDC；已有明镜身份源，Keycloak仅候选,真实用户、SSO、App桥接待核；internal token不暴露,Q03 Q04,H/W0
+T11,关系授权,原生＋实际资源权限,AuthorizationProvider/Guardrail＋业务资源核权；SpiceDB仅必要时,显式启用fail-closed；单机构，无默认多租户权限平台,Q05 Q06 Q07 D04,H/W0/G
+T12,能力发布与发现,原生优先,原生工具/插件登记、配置部署、适用授权筛选及普通API,可用不等于获权；不建独立注册/发布中心,Q06 Q10 D05,G
+T13,实际出站与操作预算,实质简化,真实资源端权限/正式效果；原生限额、必要硬限与批准目的地,不默认五出口原子屏障、统一物理Attempt/Settlement/父预算,D02 D09 D12 Q16,W0/G
+T14,数据规则设计和编辑,成熟候选按需,原有/原生处理及 Apache Hop 等成熟可视化工具候选,不自动选Hop 2.20.0；确认真实数据需求和可编辑体验,D01 D08 Q24,G
+T15,数据转换与错误处理,成熟候选按需,原生知识摄取/业务处理、成熟 ETL 或适用普通程序,不重复建设第二数据平台；实际错误及质量,D01 D08 Q15,G
+T16,数据质量及发布,分级治理,普通资料处理后可查，正式资料/事实按需质量与发布,不一律独立多级审核；权威版本不混淆,D07 D08 Q13 Q15,G
+T17,对象存储,原生/成熟候选,原生文件和适用成熟对象存储；SeaweedFS仅候选,实际字节/受控访问、容量与兼容；不预设所有旧存储,Q03 Q08 D01,H/G
+T18,对象引用及受控交付,原生＋必要适配,原生受控文件/产物、资源权威的原件与交付,新访问按许可；不强制所有历史派生产物追溯,D03 Q08,W0/G
+T19,知识主体,优先考察原生集成,DeerFlow WeKnora provider 有v0.8.3证据；目标知识供方/版待定,v0.9.1旧裁决不自动适用；空间管理不等于chat ACL,Q13 Q14 Q15,H/G
+T20,知识数据库,随知识实际制品选择,知识服务官方支持数据库/搜索扩展,不预锁ParadeDB v0.25.11-pg17；核实际许可证与兼容,Q14 D01,H/G
+T21,知识缓存和队列,随实际依赖选择,知识服务原生队列/缓存,不预设Valkey替换，Redis协议兼容实际核查,Q14 D01,H/G
+T22,复杂文档解析,成熟候选,成熟解析/DocReader/Docling/MinerU按实际效果选择,MinerU4.2.3旧参考不等于批准；复杂版面/来源/许可须验,Q14 D07,G
+T23,知识文本模型,实际效果及授权待选,成熟中文embedding/rerank/回答模型,历史text-embedding-v4/qwen3-rerank仅参考；实测实际中文,Q14 D01,G
+T24,音频与图片,实际需要待选,成熟ASR/图像处理/多模态原生接线,旧Qwen3-ASR/WeMM仅参考；实际质量与合法处理,D01 D11,G
+T25,视频,实际需要待选,成熟视觉/视频时间定位服务；TwelveLabs仅候选,真实模态不能用ASR冒充；许可/费用/保留待核,D09 D11,G/启用前
+T26,通用文本模型,替换旧接线/模型待定,DeerFlow原生模型配置/支持的provider,不选Mastra AI SDK或固定旧qwen快照；真实工具兼容及价格/许可待核,Q10 D12,H/G
+T27,模型与工具真实派发,原生＋安全接线,原生模型工厂、适用middleware、工具与实际批准目的地,observer不是强制授权入口；SDK重试不普适物理拦截；必要路径验证,Q05 Q09 D02 D12,W0/G
+T28,免费工程调试管理,替换旧主体管理,DeerFlow原生管理及开发接口,取消Mastra Studio默认；实际可用权限/免费制品确认,Q10 Q24,G
+T29,持久AI观测,原生/成熟按需,原生运行事件/日志、适用现成观测,不默认MastraStorageExporter/第二Trace平台，敏感日志最小化,D13 Q24,G
+T30,公共评测与确定性测试,原生/成熟按需,实际质量门、现成回归评测与测试工具,不默认Mastra Scorers/Vitest为新运行栈；保留可复用测试数据,D13 Q24,W0/G
+T31,业务操作管理页,原生优先/按需补,原生可用管理页、App业务界面，React-admin仅候选,真正缺页才补，不自研整套平台,Q10 Q24,G/M
+T32,审计和资源计量,分层治理,必要真实资源回执、原生日志、供应商账单及实际硬限,不统一全局账本；真实重要事实与费用不假归零,D09 D12 Q16,G
+T33,基础运行监控,原生/成熟候选,原生健康/日志、Prometheus/Alertmanager等按实际,不预设监控栈；实际告警和故障可查,D13 Q24,H/G/T
+T34,宿主与入口,上游支持部署待锁,DeerFlow实际支持部署/OCI/Compose等及安全入口,Linux架构、TLS、镜像digest、实际资源和回退H核；不预设Caddy必选,Q01 Q02 Q21,H
+T35,发布与回退,保留工程规范,现有 Git/CI，锁定实际制品、版本及适用升级回退,保持原PR和CI门禁；不得旧回归替代新验收,M17 M18 D13,BASELINE/H/G/T
+T36,备份恢复,风险匹配候选,实际存储原生备份及成熟工具，pgBackRest/restic仅候选,按实际RPO/RTO、关键事实与成本，不默认双域,D12 Q24,G/T
+T37,不可信执行器与高级协议,原生隔离/条件启用,AIO等实际provider、原生网络限制、可信MCP/插件,实际provider边界不同；默认open不可直接用于敏感业务；必要路径验收,Q09 Q10,H/W0/G/启用前
+T38,产品行为埋点,保留历史候选,PostHog Cloud此前方向，实际授权/接通未核；原生事件按需,不因主体切换宣布已接通或自动增加付费服务,M06 D13,G/启用前
+T39,取消旧主体和重复模块,取消默认并行,Mastra与路线B等历史证据、局部复用；不并行建主体,复用真实资产不等于旧主线继续；不自动删旧回归,M02 M06 M17,BASELINE/G
+T40,取消重复数据/知识/观测平台,保留去重原则,现成应用优先；其它技术只有真实必要缺口才局部选择,不固定一长串排除/选中清单，按实际维护效果,D01 D11 Q24,G

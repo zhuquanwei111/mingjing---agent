@@ -1,15 +1,13 @@
 # 明镜：Codex 开发入口
 
-本文件是整个 Git 仓库的开发入口。先读取
-[原工程规则](docs/archive/engineering-v1/AGENTS.md)；其中的业务、安全、编码、停止条件和 P0–P3 **旧开发阶段门禁**继续适用。
-新路线的实际实施阶段为 H/W0a/W0b/G/M/T/P，按[新旧阶段衔接与门禁](docs/designs/current-architecture-baseline.md#stage-gate-crosswalk)执行；
-旧阶段门禁与新关口的适用要求同时满足，不因编号或技术路线变化豁免。EXEC-0 至 EXEC-3 仅为执行类型，不是阶段或实施授权。
-更具体的目录规则与用户当前授权继续适用。
+先读[原工程规则](docs/archive/engineering-v1/AGENTS.md)。其中的安全、业务、编码、停止条件和 P0–P3 开发门禁继续适用。与项目方采纳的 D01–D13 明确冲突处，按[现行需求修订](docs/requirements/current-engineering-requirements.md)执行。普通任务按风险恢复和限费，按需关联标识；普通资料撤回停止新访问，合法历史原则保留。敏感正式写入在实际 I/O 前核权，模型不能授权，未经允许的资源访问、用途及外发须拒绝，明确资金硬限须可靠控制。
+
+H/W0a/W0b/G/M/T/P 按[新旧阶段衔接与门禁](docs/designs/current-architecture-baseline.md#stage-gate-crosswalk)执行。P0–P3 对应工程阶段；历史 EXEC 记号仅供追溯。具体目录规则与项目方本次授权继续适用。
 
 ## 项目地图
 
 - [当前项目状态](README.md#当前项目状态)；[统一文档索引](docs/index.md)与[持续目录治理规范](docs/repository-layout.md)。
-- [当前架构与实施门禁](docs/designs/current-architecture-baseline.md)：Mastra OSS 主线；[历史 PR #14 终裁](docs/archive/route-b/designs/whole-product-decision.md)只作历史证据。知识库已按 H2 裁决限定采用 WeKnora v0.9.1；正式实施仍暂停，必要公共基座通过 G 后才进入首个正式业务 M。
+- [当前架构与实施门禁](docs/designs/current-architecture-baseline.md)及 [ADR 0003](docs/adr/0003-deerflow-architecture-transition.md)确定 DeerFlow 为唯一主体应用工程底座。普通确定性业务可直调获准接口；工作流、异步任务和调度优先复用 DeerFlow。H 确认实际安全制品和接入条件，W0 另行批准。G 全部必要公共能力及独立 AC-17 签收后，另批首个正式业务 M。[Mastra](docs/archive/mastra-20261126/README.md)和[路线 B](docs/archive/route-b/designs/whole-product-decision.md)仅供追溯。
 - [现行阶段及接续记录](docs/tasks/architecture-baseline-transition.md)；[v1 历史方案与仍有效规则](docs/archive/engineering-v1/README.md)；[P2 历史接口与操作](docs/archive/legacy-runtime/core/README.md)。
 - 历史验收：[P1 报告](docs/archive/legacy-runtime/p1-walking-skeleton/P1_REPORT.md)、[P2 早期报告](docs/archive/legacy-runtime/core/P2_REPORT.md)；新提交以对应 CI 为准。
 - [开发流程](docs/development.md)、[长任务计划与接续](docs/PLANS.md)、[配置与环境边界](docs/configuration.md)。

@@ -1,6 +1,6 @@
 # 历史 P1/P2 运行与取证
 
-明镜现行架构采用 Mastra OSS。此处保留早期 Temporal/LangGraph 隔离实现，用于复现已交付行为、故障和回归结果。正式公共宿主的职责与验收见[现行架构](../../designs/current-architecture-baseline.md)。
+此目录在 PR #28 归档时，明镜采用 Mastra OSS。此处保留早期 Temporal/LangGraph 隔离实现，用于复现已交付行为、故障和回归结果。正式公共宿主的职责与验收见[现行架构](../../designs/current-architecture-baseline.md)。
 
 | 归档内容 | 复现入口 | 原始出处 |
 | --- | --- | --- |

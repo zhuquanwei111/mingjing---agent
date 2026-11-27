@@ -1,25 +1,29 @@
-许可项（与验收组分表）,技术ID,组件,许可依据（设计时）,研究锚点 / 待锁范围,免费与收费边界,制品及授权核查,F04 专项要求
-V01,"T02–T06,T28–T30",Mastra core/server/studio/memory/client/pg/observability,Apache-2.0 OSS 部分；ee/商业权益排除,实际公开锚点core 1.84.0 (10484e3)、pg 1.37.0；其余按同一实际发行peer锁,免费OSS原生运行及工程调试；不计企业RBAC/SSO/Agent Builder；免费Studio基础认证非生产付费RBAC/SSO/Builder；dev/test不算生产免费,逐包许可证、Studio功能、server auth、持久Beta/SDK兼容及SBOM,保留 OSS；[E20] 核实际生产模式、ee/、Studio 自托管 auth、付费 SSO/RBAC/Builder 及各 npm 包许可；不把可在 dev/test 使用算免费生产。
-V02,T02,Node.js / TypeScript,Node核心MIT等许可集合；TypeScript Apache-2.0,Node 24 LTS实施目标，TS具体版本待锁,不依赖商业IDE；npm工具及传递包各自许可,验证Mastra/SDK支持，锁Node补丁/TS与lockfile,保留；锁 Node 24 LTS 适用版/TS、传递许可证。
-V03,"T07,T21",Valkey / Mastra实际Streams及Cache适配,Valkey BSD-3-Clause；适配包按锁定OSS路径核,Valkey受支持稳定版，精确版本及适配器待锁,开源自托管；跨进程共享Cache不假定任意Redis客户端兼容,锁Streams、重投/裁剪/ACL/持久化和真实跨进程续接，知识缓存兼容另验,保留 OSS；核实际 `@mastra/valkey-streams`、GLIDE/native、共享 Cache 包与 peers/许可证。
-V04,T08,Temporal OSS / @mastra/temporal 固定子集 或限定 Temporal TS SDK,Temporal Server及TS SDK MIT；Mastra适配包实际OSS许可证需核,适配包0.5.0发行参考；core>=1.32.0是集成公告最低；SDK/Server待锁；原生SDK实际版本及peer待锁,自托管OSS，不用Temporal Cloud；不计商业管理服务；互斥P3，Temporal Cloud不计入,核适配器开源路径、官方API、peer、Worker/DB迁移与真实P3,保留限定；核 Server/TS SDK/官方 Mastra adapter 具体 tag/包 LICENSE 与 peer，未最终核制品免费性；不用 Temporal Cloud 收费权益。
-V05,T09,PostgreSQL / pg,PostgreSQL License；node-postgres MIT,PG17受支持修补版为实施目标，pg具体版本待锁,自托管事务，不使用商用数据库插件作预算前提,真实数据库角色、兼容、HA/备份和事务测试,保留；PG17 补丁/客户端、实际托管费用另计。
-V06,T10,Keycloak OSS / OIDC,Keycloak OSS Apache-2.0；实际镜像及依赖另核,最终选用 Keycloak；实际发行、镜像与兼容性待锁,复用 OSS 身份和管理；商用扩展不计入基座,实际issuer、认证配置、管理与服务身份、合规边界,Keycloak 与独立 PG；核生产制品和 OIDC 接入，不启用未批准商业 IdP
-V07,T11,SpiceDB / Postgres datastore / 官方客户端,Apache-2.0 OSS,实际受维护正式版本及客户端待锁,不使用Authzed Cloud/付费能力；PDP不代替实际外发排序,锁schema/一致性/PG支持，版本、撤权和五出口复验,OSS schema/API + PG；不把 AuthZed 托管/商业功能当免费必要依赖。
-V08,"T14,T15",Apache Hop GUI / Hop Run / Java,Apache-2.0；JDK及镜像各自许可证（选择合格OpenJDK发行）,Hop 2.20.0发行参考，Java21；JDK补丁和制品锁待H,无需付费ETL编辑器；不依赖尚待核Hop Web多租户,连接器/驱动许可证、Java兼容、headless和测试,Apache Hop OSS 与合格 JDK 发行；商业 Putki、云托管/付费插件不算原生免费。
-V09,"T17,T18",SeaweedFS OSS / AWS SDK JS v3,Apache-2.0 两者；实际镜像和SDK包核,SeaweedFS 4.55 (a98c9e2)发行参考；AWS SDK版本待锁,自托管S3，无需MinIO企业版；服务器和存储不是零成本,版本/对象策略/实际S3协议、filer backend、原生WeKnora接线,OSS S3；核实际镜像/SDK、存储策略、外部托管成本；不自动计入云 S3 服务。
-V10,T19,WeKnora UI/App/DocReader,项目原生许可参考MIT；实际制品、依赖及模型另核,v0.9.1 (71c32af) A07及实际tag；UI/App/DocReader镜像digest待锁,复用免费原生知识工作台；禁止默认云DocReader/商业服务,依赖扫描、授权/撤回及实际native API；不宣称所有镜像无附加条件,主项目许可与固定版本实际 App/UI/DocReader、原生 provider/依赖各自核查，不能把总项目 MIT 外推全部制品。
-V11,T20,ParadeDB Community / pg_search / pgvector,pg_search AGPL-3.0；PG及pgvector PostgreSQL License；实际镜像/扩展逐一核,v0.25.11-pg17为WeKnora v0.9.1 compose镜像锚点,AGPL不等于付费；须落实使用/修改/网络交互相关义务，不引入商业扩展,隔离知识DB、实际许可证/SBOM、混合检索、备份；未获许可确认不放行,AGPL 社区扩展许可及对应源码/通知义务需按实际部署、修改、分发/网络交互审查；不简单认定全部明镜应用被 AGPL，亦不以普通 PG 许可证覆盖扩展；禁必要企业功能。
-V12,T21,知识域Redis协议,目标Valkey BSD-3-Clause；若Redis则按实际发布许可判断，旧7.0原版为BSD-3-Clause参考,原compose redis:7.0-alpine仅证据，不为生产锁；Valkey/安全Redis实际版本未锁,不把旧版本当安全，也不自动把现代Redis全部许可视为BSD,实际命令/脚本/队列兼容与维护状态；如需独立Redis须说明必要性,首选合格 Valkey 实测；若 Redis 备选，逐具体发行与 license 核维护和可接受义务，旧 tag 非生产锁。
-V13,T22,MinerU 软件/模型/推理,4.2.3固定tag LICENSE：Apache-2.0基础及附加条款；主体及关联方合计MAU超1亿或月总收入超2000万美元需商业许可；向第三方提供在线服务须显著标注使用MinerU。权重/推理依赖另核。,4.2.3 A07研究参考；实际接线4.0.7 Flash，非同一版本全能力,实际免费资格未确认；须核主体及关联方、服务形态、标识、软件/权重、推理和实际费用。不合格按A07限定备用，不偷偷采购。,H核实际主体免费资格、许可及锁定权重/推理；不合格用合规内置路径，必要复杂解析定向复审,固定 4.2.3 附加门槛/标识如 S06，权重、推理服务/依赖分开。
-V14,"T23,T26",Model Studio 文本/embedding/rerank,商用API服务条款/数据地区/计价，不是开源软件许可,qwen3.7-plus-2026-05-26快照参考；text-embedding-v4 1024维、qwen3-rerank配置，具体服务可用性待核,实际按量费用另计，无平台订阅承诺；未采购不调用,H核账户、region、模型能力、费率、授权及实际版本；禁止静默替换,外部模型费与产品许可不同，核地域、价格、许可与数据外发；非免费平台承诺。
-V15,T24,Qwen3-ASR-1.7B、WeMM-Embedding-4B及实际推理,实际仓库/权重/推理制品许可尚未核锁；不由名称推出免费,A07模型参考；实际镜像/版本/端点未锁,按模态启用时单独确认，不能计已部署免费,许可、接口、数据外发、真实模态质量,软件与实际模型权重、推理服务、硬件、数据范围核查；仅适用功能启用。
-V16,T25,TwelveLabs,商业API及数据条款，付费/外发需审批,A07参考 Jockey/Agents API v1.3；实际合同/版本待定,条件外部能力；不计免费平台；未采购,实际用户审批/数据用途/计量；未批准则不调用,条件外服，必须单独审批预算、数据与合规；不计必要免费平台。
-V17,"T26,T27",Mastra原生AI SDK/provider及 @ai-sdk/openai-compatible,AI SDK及适配包按实际MIT/Apache等锁定许可核,依所选Mastra peer与AI SDK实际接口锁,软件可免费接入，真实模型调用收费另计,实际custom fetch/usage/重试控制，所有外发路径核,公开 OSS 扩展可用性不保证全部实际 provider；核 peers、许可、重试及物理传输。
-V18,T31,React-admin OSS + React及基础UI组件,React-admin MIT；React MIT；实际开源UI/peer分别核,OSS稳定版及兼容React、Material UI核心待锁,不计ra-enterprise或付费RBAC/SSO；不需要独立低代码控制面；ra-rbac EE订阅不计，OSS canAccess非服务端授权,仅配置实际管理页面，服务端授权/验收；真实工时未知,MIT 核心 CRUD 保留；EE `ra-rbac` 等需订阅，不将其算免费复用；服务端权限必须有。
-V19,T29,PG观测store（条件后备ClickHouse OSS）,同PG/Mastra OSS；若用ClickHouse开源服务器Apache-2.0，插件实际核,PostgresStoreVNext参考接口非稳定锁；ClickHouse不部署，触发才锁,不依赖商业Trace SaaS或两个AI后端,实际持久查询与免费Studio，失败只换必要后端,原生 PG 优先，缺口仅替换为合格 OSS；核实际存储包及 UI 免费查询和迁移。
-V20,T30,Vitest及现有CI,Vitest MIT；CI实际环境费用另计,按Node/TS与依赖锁兼容版,不额外购买评测平台；原生评测实际模型成本另计,合同/真值/失败回归、隔离环境,OSS 测试工具，既有 CI 账户额度/制品保留与执行费用分别核实。
-V21,T33,Prometheus/Alertmanager/exporter,核心 Apache-2.0；各实际exporter许可另核,受支持稳定发行物待锁,自托管监控，不额外购AI观测平台,真实指标接线/隔离/告警/保留,OSS，原生/exporter 实际许可与隔离，非托管商业观测。
-V22,T34,Linux OCI / Docker Engine / Compose / Caddy,实际Linux/镜像许可证；Moby及Compose Apache-2.0；Caddy Apache-2.0,H按目标平台锁OCI/组件digest,不要求Docker Desktop付费/商业TLS代理或K8s服务,反代证书、私网、持久卷及制品扫描,保留 Linux OSS 路径；核 JDK/基础镜像/代理插件及 Docker Desktop/托管额外权益。
-V23,T36,pgBackRest / restic,pgBackRest MIT；restic BSD-2-Clause,按PG及存储实际兼容版本锁,自托管备份工具；备份容量/人工/远端仓库另计,验证WAL/PITR、对象/filer一致代次、跨权威恢复,OSS 备份工具，实际对象后端、存储及灾备成本另计；恢复能力需验证。
-V24,T38,PostHog Cloud（条件）,外部SaaS实际服务条款,此前已选方向；本轮未接通,不计入必要免费平台；费用与数据外发另批,仅在批准后接入产品行为事件，不作预算/审计,保留历史方向，接通/套餐/数据许可未核；非必要 G 付费平台，批准后才真实外发。
+历史许可ID或新增核查ID,旧组件/新职责,新处置,实际制品及许可门禁（均未宣告通过）,依据ID
+V01,Mastra core/server/studio/memory/client/pg/observability,退出主体默认,保留旧许可与源码历史；若确实局部复用实际包再核,M10 M12 M02
+V02,Node.js / TypeScript,退出运行主体强制,App或独立程序实际用时核其版本/传递许可，不假设新Python宿主需Node主运行,M12 Q01
+V03,Valkey / Mastra Streams及Cache,旧Mastra适配退出；队列按需,核DeerFlow及实际知识服务支持的Redis/Valkey兼容、许可证、实际版本,M12 Q12
+V04,Temporal OSS / Mastra adapter / TS SDK,条件候选,去掉Mastra adapter默认；仅必要持久流程选择实际成熟引擎并核许可,M12 D06
+V05,PostgreSQL / pg,实际持久化候选,核上游支持版、实际SQL客户端、镜像及扩展许可,Q12 M12
+V06,Keycloak OSS / OIDC,实际身份源候选,优先原生session/OIDC；如确需Keycloak核实际制品,Q03 M12
+V07,SpiceDB / datastore / 客户端,条件候选,原生/资源授权优先，必要关系权限才选；核实际免费功能及依赖,Q05 Q06 M12
+V08,Apache Hop GUI / Hop Run / Java,按需数据候选,实际可编辑ETL需要、连接器、Java及组件许可核查,M12 D01
+V09,SeaweedFS OSS / AWS SDK JS v3,按需存储候选,实际存储/对象API及版本、SDK许可按最终接线,M12 D01
+V10,WeKnora UI/App/DocReader,优先考察原生集成,v0.8.3局部证据，实际目标制品、解析/模型及许可待锁,Q13 Q14 M12
+V11,ParadeDB Community / pg_search / pgvector,随实际知识供方,核实际搜索扩展及镜像许可，旧参考非批准,M12 Q14
+V12,知识域Redis协议,随实际供方,实际版本、授权、兼容和隔离；不假设无商业限制,M12 Q14
+V13,MinerU 软件/模型/推理,解析候选,实际代码、权重、商用/托管及推理成本分别核，不沿用旧参考版本结论,M12 D11
+V14,Model Studio 文本/embedding/rerank,模型候选,实际模型快照、费用、地区、数据/训练/保留条款及真实质量,M12 D11 D12
+V15,Qwen3-ASR、WeMM及实际推理,音图候选,模型权重、商用、推理/数据费用及必要实际效果,M12 D11
+V16,TwelveLabs,媒体候选,实际视觉/时码、数据用途/保留/训练、报价/许可与访问，未授权不上传,M12 D09 D11
+V17,Mastra AI SDK/provider,退出主体默认,改原生DeerFlow配置/实际provider，核真实SDK与供方合同,M12 Q01
+V18,React-admin OSS + React/UI,条件候选,原生管理优先，缺页才补，核实际免费版本与依赖,M12 Q10
+V19,PG观测store/ClickHouse,按需观测候选,原生观测/实际存储优先；不默认独立观测数据库,M12 D13
+V20,Vitest及现有CI,现有回归保留；新工具按需,不将历史工具强加新Python层；现行CI保留，实际新测试依赖另核,M17 M12
+V21,Prometheus/Alertmanager/exporter,监控候选,核真实部署需求、实际许可证与资源,M12 D13
+V22,Linux OCI / Docker Engine / Compose / Caddy,实际制品待H,上游支持部署、镜像digest、安全、主机及实际入口组件许可；不预设Caddy,Q01 Q02 M12
+V23,pgBackRest / restic,风险匹配候选,按实际数据库/存储与恢复需求，核版本/许可及演练,M12 D12
+V24,PostHog Cloud,历史条件方向,接通/授权未核；真实免费额度/费用/数据隐私及事件合同再验,M06 M12
+DF-L01,DeerFlow OSS 主体,用户选型已确认；制品许可待H,独立裁决记录根项目MIT；实际tag、源码、镜像、传递依赖、扩展、品牌/通知义务逐项核,Q01 Q21 R51
+DF-L02,DeerFlow Gateway/harness 与Python/LangGraph相关依赖,原生主体依赖待锁,以最终发行的lock/镜像/SBOM与LICENSE核实际版本及可分发/商业条件，不套旧Mastra许可证表,Q01 Q02 Q12
+DF-L03,DeerFlow sandbox/网络代理及插件,实际启用时核,实际 provider、镜像digest、可信插件代码/依赖与外部服务条款；避免生产latest，非必要不启用,Q09 Q10
+DF-L04,DeerFlow知识管理/检索/工作流等可选扩展,实际启用时核,原生扩展兼容的extension API/依赖、供方版本及数据授权；示例包不等于所有能力已批准,Q11 Q12 Q13 Q14 Q15
