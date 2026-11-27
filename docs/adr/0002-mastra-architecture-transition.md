@@ -1,9 +1,9 @@
 # ADR 0002：由历史路线 B 转入 Mastra OSS 主线
 
 - 日期：2026-11-26。
-- 状态：总控已完成架构和技术选型裁决；[PR #27](https://github.com/zhuquanwei111/mingjing---agent/pull/27) 已通过审核并合入主分支。正式公共宿主和业务均未获施工批准。
+- 状态：历史决定，已由 [ADR 0003](0003-deerflow-architecture-transition.md)取代。下文记录 [PR #27](https://github.com/zhuquanwei111/mingjing---agent/pull/27) 当时的选择。
 - 生效范围：已替代 [PR #14 的旧主体选型](../archive/route-b/designs/whole-product-decision.md)作为后续设计/准备依据；不追溯否定历史裁决，不授权开发、部署、采购或流量。
-- 唯一现行设计入口：[当前架构与实施门禁](../designs/current-architecture-baseline.md)；[施工记录、H1/H2 证据与校验入口](../tasks/architecture-baseline-transition.md)。
+- 当时的设计和证据：[Mastra 架构](https://github.com/zhuquanwei111/mingjing---agent/blob/114af05ea6a24cde7f36d3e3dce7225234aa279a/docs/designs/current-architecture-baseline.md)、[H1/H2 历史回执](https://github.com/zhuquanwei111/mingjing---agent/blob/114af05ea6a24cde7f36d3e3dce7225234aa279a/docs/tasks/architecture-baseline-transition.md)。
 
 ## 情境与决定
 
@@ -15,6 +15,6 @@
 
 需求 v0.4.1 原件及 FR01–41、NFR01–11、TS01–07、AC01–17 不改写；原 23 组/76 个编号、冻结判据及历史证据保留。可靠外部工程证据、已有试件、固定版本源码可支持合理选型；不强制重测全部候选，但不能降低安全、质量、可靠性、可维护性及正式验收。对实际采用的组合完成 H/W0a/W0b/G，G 全部必要公共能力实际通过后才开始 M。T/P 另行放行。H1 合成收端验证不等于生产或模型质量通过。
 
-知识域按授权范围分区；每个版本固定来源、编译批次及父预算，所有物理出站先准入再发送，撤回关闭旧版并仅重建受影响域。多活动批次、实际费用和知识质量按 G 验收。若真实质量或重建开销超过批准边界，或必须重写知识核心，只提 A07 局部反转。详见[完整实施契约](../designs/architecture-final/contracts.md)。
+知识域按授权范围分区；每个版本固定来源、编译批次及父预算，所有物理出站先准入再发送，撤回关闭旧版并仅重建受影响域。多活动批次、实际费用和知识质量按 G 验收。若真实质量或重建开销超过批准边界，或必须重写知识核心，只提 A07 局部反转。详见[完整实施契约](https://github.com/zhuquanwei111/mingjing---agent/blob/114af05ea6a24cde7f36d3e3dce7225234aa279a/docs/designs/architecture-final/contracts.md)。
 
 #27 归档文档、图、映射及工程证据，保留原件和旧实现。回退 #27 只回退仓库文档，不能自动恢复旧路线开发权。公共宿主建设由项目方另行批准。

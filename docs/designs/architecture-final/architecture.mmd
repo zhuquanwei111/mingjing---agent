@@ -1,0 +1,40 @@
+---
+config:
+  theme: base
+  markdownAutoWrap: false
+  themeVariables:
+    primaryColor: "#ffffff"
+    primaryBorderColor: "#777777"
+    primaryTextColor: "#222222"
+    lineColor: "#555555"
+    edgeLabelBackground: "#ffffff"
+  deterministicIds: true
+  deterministicIDSeed: mj-deerflow
+  htmlLabels: false
+  fontFamily: "PingFang SC, Noto Sans CJK SC, sans-serif"
+  flowchart:
+    htmlLabels: false
+    wrappingWidth: 340
+    curve: linear
+    nodeSpacing: 35
+    rankSpacing: 40
+---
+flowchart TB
+    accTitle: 明镜的业务调用与证据归属
+    accDescr: App 通过 DeerFlow 或普通程序调用业务与知识服务。可信身份用于资源端核权。宿主记录运行过程，业务方记录正式效果，知识服务提供来源证据。
+    APP["明镜 App<br/>可信用户入口"]
+    DF["DeerFlow 宿主<br/>会话、运行与工具"]
+    DIRECT["普通程序与固定流程<br/>按需异步执行"]
+    AUTH["可信身份与资源授权<br/>读写、用途与外发"]
+    BUS["业务服务<br/>规则与正式结果"]
+    KNOW["知识、数据与文件<br/>权限、版本及来源"]
+    GOV["质量与费用<br/>运行管理与恢复"]
+    APP --> DF
+    APP --> DIRECT
+    DF --> AUTH
+    DIRECT --> AUTH
+    AUTH --> BUS
+    AUTH --> KNOW
+    DF -.运行记录.-> GOV
+    BUS -.正式结果.-> GOV
+    KNOW -.来源证据.-> GOV
