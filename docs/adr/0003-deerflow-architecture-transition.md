@@ -1,6 +1,6 @@
 # ADR 0003：由 Mastra OSS 主体转入 DeerFlow 应用工程底座
 
-- 状态：用户已确认主体选择；本 ADR 随基线迁移候选审查、人工合并后作为仓库正式决定。尚未批准实际制品部署或 W0 开工。
+- 状态：已生效。[PR #29](https://github.com/zhuquanwei111/mingjing---agent/pull/29) 经项目方批准合并至 main。实际制品部署、W0 及正式业务开发须按各自关口另获批准。
 - 日期：2026-11-27（北京时间）。
 - 替代：[ADR 0002](0002-mastra-architecture-transition.md) 的当前主体与冲突机制；保留其历史事实与证据。原旧主线 PR #27/#28 固定提交 `114af05ea6a24cde7f36d3e3dce7225234aa279a`。
 - 依据：R3 独立最终裁决《00-最终独立裁决.md》推荐采用；《01-问题与依据.md》及《02-证据.csv》；R3 D01–D13 用户决定。原始交付包指纹见[基线施工记录](../tasks/architecture-baseline-transition.md)。

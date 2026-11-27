@@ -30,6 +30,7 @@ ENTRY_POINTS = (
     "docs/designs/architecture-final/gates-and-risks.md",
     "docs/requirements/current-engineering-requirements.md",
     "docs/adr/0003-deerflow-architecture-transition.md",
+    "docs/archive/README.md",
     "docs/archive/mastra-20261126/README.md",
     "docs/archive/route-b/designs/whole-product-decision.md",
     "docs/development.md",

@@ -1,6 +1,6 @@
 # 明镜智能体 · 当前架构与实施门禁（DeerFlow）
 
-**主体选型决定：2026-11-27，R3 独立最终裁决推荐采用 DeerFlow，用户确认以其替换旧 Mastra 主体。** 仓库基线随本次 PR 人工合并生效。正式制品、施工批准、真实功能和流量均未由选型直接通过。
+**主体选型决定：2026-11-27，R3 独立最终裁决推荐采用 DeerFlow，用户确认以其替换旧 Mastra 主体。** 仓库基线已随 [PR #29](https://github.com/zhuquanwei111/mingjing---agent/pull/29) 合并生效。正式制品、施工批准、真实功能和流量均未由选型直接通过。
 
 [现行需求修订](../requirements/current-engineering-requirements.md) · [76 项现行映射](../requirements/final-architecture-mapping.csv) · [详细契约及架构图](architecture-final/contracts.md) · [技术清单](architecture-final/technology.csv) · [公共机制去留](architecture-final/reuse.csv) · [许可清单](architecture-final/licenses.csv) · [门禁与风险](architecture-final/gates-and-risks.md) · [新 ADR](../adr/0003-deerflow-architecture-transition.md) · [施工及证据记录](../tasks/architecture-baseline-transition.md) · [旧 Mastra 固定历史](../archive/mastra-20261126/README.md)。
 
@@ -36,7 +36,7 @@ R3 原始送审、独立最终裁决与用户决定提供主体选型和现行�
 
 ## 6. 阶段及硬门槛
 
-- 本次基线迁移：一致更新设计与规则，独立审查及适用 CI，用户人工合并；不自动开工。
+- 基线迁移已完成，合并提交为 `c56b1e7`。适用范围为架构、需求、工程入口与对应检查。
 - H：实际安全制品、许可、部署、App/权限接线、必要适配与成本风险、测试环境和 W0 批准。只核决定实际投入/制品的必要事项，不重开全行业选型。
 - W0a/W0b：另获准的真实最短受控链路，普通/动态/适用异步共享业务，真实资源/身份/权限、质量、效果、合理异常；通过并另获项目方批准后进入 G。
 - G：完整产品必要公共工程、实际可用用户/管理接口、适用 76 项及 AC17，按需启用条件能力，不能延迟必要机制到 M。

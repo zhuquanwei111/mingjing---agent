@@ -2,11 +2,13 @@
 
 ## 2026-11-27　DeerFlow 基线迁移
 
-项目方已采纳 R3 最终独立裁决及 D01–D13。此次交付为待人工合并的文档与工程入口候选。起点为 PR #28 合并后的 `114af05ea6a24cde7f36d3e3dce7225234aa279a`，与现场干净的主工作区、远端 main 和交接包一致。施工使用独立分支 `codex/deerflow-architecture-baseline`。
+项目方已采纳 R3 最终独立裁决及 D01–D13。[PR #29](https://github.com/zhuquanwei111/mingjing---agent/pull/29) 已合并至 main，合并提交为 `c56b1e7cc82321a41a1495a036d41e7d72b6b925`。受审提交 `3e1e8b3a27aa24b6f50d5f8fa0ee2cd012d0c512` 通过[独立复审](https://github.com/zhuquanwei111/mingjing---agent/pull/29#issuecomment-7210702553)和[三项 CI](https://github.com/zhuquanwei111/mingjing---agent/actions/runs/45946186146)。正式开发按[现行需求](../requirements/current-engineering-requirements.md)接续，W0 和业务开发仍待另批。
+
+以下保留 #29 从基准 `114af05ea6a24cde7f36d3e3dce7225234aa279a` 起步的施工方案及当时记录。
 
 1. 稳定现行架构、76 项映射及三张矩阵的入口，新增 ADR、现行需求与旧 Mastra 固定导航。逐项对照原 ID、R3 取舍、W0 A/B 场景和 G 十组实际效果。
 2. 同步根规则、README、索引、开发流程和任务。仅覆盖旧规则与 R3 的明确冲突，保留原件、独立审查、真实敏感写入终核、旧运行回归及授权边界。
-3. 核查文件清单、图源与派生图、链接与锚点、历史指纹，运行 `make check`，独立审查实际差异，按最终提交记录 ARM64 必需回归及两项 amd64 辅助结果。施工现场与最终证据可从本任务的草稿 PR 接续。
+3. 核查文件清单、图源与派生图、链接与锚点、历史指纹，运行 `make check`，独立审查实际差异，按最终提交记录 ARM64 必需回归及两项 amd64 辅助结果。施工现场与最终证据可从已合并的 PR #29 追溯。
 4. 人工合并前可关闭候选。合并后按批准回退此 PR 的文档变更，回退不授予旧路线开工权。本轮不部署制品或运行 W0。下一项是另行批准 H 制品及实施准备。
 
 ### 决定与证据定位
@@ -41,7 +43,7 @@ R3 的独立裁决在方案层确认 A（身份、资源权限与隔离）、B�
 
 独立迁移方案审查对应 `f7b8b2ff661f6f86127e1eece6d43c252e7d79c0`，结论通过。依据评审意见，历史 H1/H2 链接固定到原提交；两种展示图均从同一灰阶 Mermaid 源渲染，保留运行、业务与知识证据三条连线；跨期逐项分列隔离与真实业务证据。文件级清单 56 个非归档路径中，55 个 blob 与固定树逐字相符；通用评审配置路径 `engineering-standard/agents/solution-reviewer.toml` 的清单值漏写 `ace5`，现场 blob 为 `efc421a36fe043e33ba85b9a04e25895bace5fee`，两份评审配置内容相同且均保留原件。
 
-旧归档 16 件 v1 规则和方案、12 件路线 B 资料、9 件设计原件 ZIP 与旧运行回归保留。178 个历史运行路径中，两份仍被开发入口直接引用的 README 校正导航措辞，原版可在[固定归档树](https://github.com/zhuquanwei111/mingjing---agent/tree/114af05ea6a24cde7f36d3e3dce7225234aa279a/docs/archive/legacy-runtime)逐件核查。现有 CI、运行代码、锁文件和 Makefile 继续承担原回归职责。服务器实际必需检查为 ARM64 `P1 acceptance`，包括 P1 恢复与 P2 公共层，另有两项 amd64 辅助回归。实施复审、整改、最终提交和同版 CI 登记在[草稿 PR #29](https://github.com/zhuquanwei111/mingjing---agent/pull/29)，供项目方决定是否合并。
+旧归档 16 件 v1 规则和方案、12 件路线 B 资料、9 件设计原件 ZIP 与旧运行回归保留。178 个历史运行路径中，两份仍被开发入口直接引用的 README 校正导航措辞，原版可在[固定归档树](https://github.com/zhuquanwei111/mingjing---agent/tree/114af05ea6a24cde7f36d3e3dce7225234aa279a/docs/archive/legacy-runtime)逐件核查。现有 CI、运行代码、锁文件和 Makefile 继续承担原回归职责。服务器实际必需检查为 ARM64 `P1 acceptance`，包括 P1 恢复与 P2 公共层，另有两项 amd64 辅助回归。实施复审、整改、最终提交和同版 CI 登记在[PR #29](https://github.com/zhuquanwei111/mingjing---agent/pull/29)，合并结果见本节开头。
 
 独立实施审查比对 `3d2abedbe48bebc4d51cb8be2ea37f0d91e93703` 和基准，要求修正 H-A 的撤权措辞，以及 FR-15/21/26 的中立测试边界。现行门禁已限定按具体风险决定即时阻断；W0/G 用测试身份与可独立查证的中立资源，实际复盘、预约及岗位结果在另批 M 取证。另已澄清下文离线对账发生于 #27。
 

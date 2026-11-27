@@ -13,13 +13,13 @@
 | 通用 Codex 工程规范 | [通用规范包](../engineering-standard/README.md) | 含执行脚本、Skills、模板，不是明镜业务交付包 |
 | 明镜如何采用工程规范 | [项目接入说明](engineering-standard.md)、[执行性审查](engineering-standard-execution.md) | 通用层与项目例外分开 |
 | 开发与任务接续 | [开发流程](development.md)、[长任务计划](PLANS.md)、[设置及环境边界](configuration.md) | 任务具体状态以所属任务记录和实际 Git 状态核对 |
-| 需求与验收 | [D01–D13 生效修订](requirements/current-engineering-requirements.md)、[76 项映射](requirements/final-architecture-mapping.csv)、[工程流程需求](requirements/engineering-standard.md) | 原始编号保留，按现行判据逐阶段签收 |
+| 需求与验收 | [现行工程需求与 D01–D13](requirements/current-engineering-requirements.md)、[76 项映射](requirements/final-architecture-mapping.csv)、[工程流程需求](requirements/engineering-standard.md) | 原始编号保留，按现行判据逐阶段签收 |
 | 当前产品架构与选型 | [DeerFlow 架构](designs/current-architecture-baseline.md)、[架构图与契约](designs/architecture-final/contracts.md)、[技术清单](designs/architecture-final/technology.csv)、[实施门禁](designs/architecture-final/gates-and-risks.md) | 主体已定，H 核实际制品，W0/G 及业务待验 |
 | 历史架构与原需求证据 | [PR #14 独立终裁](archive/route-b/designs/whole-product-decision.md)、[原 76 项历史填证](archive/route-b/requirements/whole-product-acceptance-results.md) | 保留原需求、证据范围和失败；不作为新组合的通过证明 |
 | 首期设计历史原件 | [九份原件、文件指纹与 W0 设计回执](tasks/reviewed-deliverables.md) | 用于追溯早期业务范围、组件计划和验收设计；现行建设按上列最终架构执行 |
 | 技术决定 | [ADR 目录](adr/) | 记录拟议、接受、替代与撤回，状态必须与当前事实一致 |
 
-历史工程材料可从[P1/P2 回归与原始证据](archive/legacy-runtime/README.md)和[历史路线 B 裁决](archive/route-b/designs/whole-product-decision.md)进入。
+[历史方案与证据导航](archive/README.md)列出旧技术方案、仍被加载的工程规则、仍运行的回归，以及固定原件的用途。
 
 ## 当前架构与历史的区别
 
@@ -38,5 +38,5 @@
 
 - **已有开发分支**不能假定自动继承本规范；启动 W0/MVP 或接续旧 PR 时要与最新 `main` 比较，安全同步适用规则及文档入口，再以该候选复验。不得为同步而覆盖未提交的他人改动。
 - **每次阶段交付之前**，实施者根据实际代码、受控需求与验收结果核对本索引、根 README、受影响的架构设计/ADR、任务记录、运行说明和相关引用；完成状态必须给出具体 PR、提交及运行证据，不能只凭 CI 绿灯宣布用户目标完成。
-- **W0 通过时**，标明最短端到端技术链路实测范围和剩余风险，不写成 G、MVP 或生产已完成；**G 通过后**才可开始首个正式业务 M，按实际公共基座验收补证（含独立 AC-17）；**MVP 通过时**，单独补用户任务、业务权限、目标环境与业务验收。后续功能/架构/目录变化同样执行“检查影响→更新相关文档或说明不适用→审查→CI→合并”的流程。
+- **W0 通过时**，标明最短端到端技术链路实测范围和剩余风险，不写成 G、MVP 或生产已完成；**G 通过、首个业务方案独立评审并获另批后**才可开始 M，按实际公共基座验收补证（含独立 AC-17）；**MVP 通过时**，单独补用户任务、业务权限、目标环境与业务验收。后续功能/架构/目录变化同样执行“检查影响→更新相关文档或说明不适用→审查→CI→合并”的流程。
 - 新的正式技术决定覆盖旧版时更新此入口；旧版方案保留版本和来源，但明确标注为历史。规范详情见[目录治理规则](repository-layout.md)，自动链接检查由 [make check](../Makefile) 执行，语义正确性由实施者和 Reviewer 核对。
