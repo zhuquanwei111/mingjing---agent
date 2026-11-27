@@ -8,9 +8,9 @@
 
 ## 知识库岗位需求如何沿用
 
-项目方已在 #23 确认七个范围的岗位任务：机构制度与岗位协作、主播经纪与人才培养、内容创作与素材、直播与制作运营、商务与项目交付、经营财务与合规、行业研究与组织经验。该 PR 后来关闭，已确认的岗位需求仍从固定原件追溯。[确认记录](https://github.com/zhuquanwei111/mingjing---agent/blob/7575c06a0431c1289cfddb702eef3ae5e839a9fd/docs/requirements/knowledge-base-requirements.md) · [已确认原件及四家同行出处](https://github.com/zhuquanwei111/mingjing---agent/blob/43b6f2384bd8d9afc54ec0f0bda26fb9117a1d25/docs/requirements/knowledge-base-requirements.md)
+项目方已在 #23 确认七个范围的岗位任务：机构制度与岗位协作、主播经纪与人才培养、内容创作与素材、直播与制作运营、商务、客户与项目交付，经营、财务与合规、行业研究与组织经验。该 PR 后来关闭，已确认的岗位需求仍从固定原件追溯。[确认记录](https://github.com/zhuquanwei111/mingjing---agent/blob/7575c06a0431c1289cfddb702eef3ae5e839a9fd/docs/requirements/knowledge-base-requirements.md) · [已确认原件及四家同行出处](https://github.com/zhuquanwei111/mingjing---agent/blob/43b6f2384bd8d9afc54ec0f0bda26fb9117a1d25/docs/requirements/knowledge-base-requirements.md)
 
-例如，编导交素材给商务，商务按客户交付许可使用，带教按教学许可使用。原件修订时由教案负责人核对引用并更新课件。教学许可撤回后，学员重开旧链接不能再取到受限片段；商务按独立的客户许可判断是否需要通知收件人。普通撤回按 D03、D07 停止新的检索与使用，已合法产生的历史原则上保留。具体素材许可另有要求时，核对其适用版本、用途和交付范围。正式检索、发布和撤回分别按 FR-22、FR-23、AC-09 的现行判据验收。
+例如，编导交素材给商务，商务按客户许可向客户交付，并按独立的教学许可把教学版入口交给带教。带教从本人收件处核对版本与用途，确认查收后才用于课程。原件修订时由教案负责人核对引用并更新课件。教学许可撤回后，学员重开旧链接不能再取到受限片段；商务按独立的客户许可判断是否需要通知收件人。普通撤回按 D03、D07 停止新的检索与使用，已合法产生的历史原则上保留。具体素材许可另有要求时，核对其适用版本、用途和交付范围。正式检索、发布和撤回分别按 FR-22、FR-23、AC-09 的现行判据验收。
 
 ## 已采纳的决定（全部纳入）
 
